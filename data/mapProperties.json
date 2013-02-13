@@ -1,0 +1,57 @@
+{
+    "success": true,
+    "data": [{
+        "center": [-68, -29],
+        "zoom": 4,
+        "layers": [{
+            "type": "WMS",
+            "name": "MapBaseLayer",
+            //"url": "http://maps.opengeo.org/geowebcache/service/wms",
+            "url": "http://maps.opengeo.org/geowebcache/service/wms",
+            "params": {
+                //"layers": "bluemarble",
+                "layers": "graphite",
+                "format": "image/png"
+            },
+            "options": {
+                "projection": 'EPSG:4326',
+                "maxExtent": [-180.0, -90.0, 180.0, 90.0],
+                "units": "degrees",
+                "resolutions": [
+                    0.703125, 0.3515625, 0.17578125, 0.087890625, 0.0439453125,
+                    0.02197265625, 0.010986328125, 0.0054931640625, 0.00274658203125, 0.001373291015625,
+                    6.866455078125E-4, 3.4332275390625E-4, 1.71661376953125E-4, 8.58306884765625E-5,
+                    4.291534423828125E-5, 2.1457672119140625E-5, 1.0728836059570312E-5, 5.364418029785156E-6,
+                    2.682209014892578E-6, 1.341104507446289E-6, 6.705522537231445E-7, 3.3527612686157227E-7
+                ]
+            }
+        }, {
+            "type": "Vector",
+            "name": "_Remove_Me_01_",
+            "options": {
+                "metadata": {
+                    "geometries": [ "POINT", "LINE" ],
+                    "editable": true
+                }
+            }
+        }, {
+            "type": "Vector",
+            "name": "_Remove_Me_02_",
+            "options": {
+                "metadata": {
+                    "geometries": [ "LINE", "POLYGON" ],
+                    "editable": false
+                }
+            }
+        }, {
+            "type": "Vector",
+            "name": "_Remove_Me_03_",
+            "options": {
+                "metadata": {
+                    "geometries": [ "POINT", "LINE", "POLYGON" ],
+                    "editable": true
+                }
+            }
+        }]
+    }]
+}

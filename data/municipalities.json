@@ -1,0 +1,23 @@
+{
+    "success": true,
+    "data": [
+        { "id": 1, "province_id": 1, "municipality": "Codegua",
+            "center": { "lon": -68, "lat": -29 }, "zoom": 4,
+            "geometry": [{ "lon": -68, "lat": -29 }, { "lon": -58, "lat": -19 }, { "lon": -58, "lat": -29 }]
+        },
+        { "id": 2, "province_id": 1, "municipality": "Coínco",
+            "center": { "lon": -88, "lat": -8 }, "zoom": 2,
+            "geometry": [{ "lon": -98, "lat": -15 }, { "lon": -65, "lat": -2 }, { "lon": -60, "lat": -29 }]
+        },
+        { "id": 3, "province_id": 1, "municipality": "Coltauco",
+            "center": { "lon": -60, "lat": 0 }, "zoom": 4,
+            "geometry": [{ "lon": -68, "lat": 4 }, { "lon": -58, "lat": -10 }, { "lon": -60, "lat": -5 }]
+        },
+        { "id": 4, "province_id": 2, "municipality": "Chépica" },
+        { "id": 5, "province_id": 2, "municipality": "Chimbarongo" },
+        { "id": 6, "province_id": 2, "municipality": "Lolol" },
+        { "id": 7, "province_id": 3, "municipality": "La Estrella" },
+        { "id": 8, "province_id": 3, "municipality": "Litueche" },
+        { "id": 9, "province_id": 3, "municipality": "Marchigüe" }
+    ]
+}

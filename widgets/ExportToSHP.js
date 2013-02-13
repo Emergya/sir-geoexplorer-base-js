@@ -1,0 +1,161 @@
+/**
+ * Copyright (C) 2012
+ *
+ * This file is part of the project ohiggins
+ *
+ * This software is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option) any
+ * later version.
+ *
+ * This software is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ * FOR A PARTICULAR PURPOSE. See the GNU General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this library; if not, write to the Free Software Foundation, Inc., 51
+ * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
+ *
+ * As a special exception, if you link this library with other files to produce
+ * an executable, this library does not by itself cause the resulting executable
+ * to be covered by the GNU General Public License. This exception does not
+ * however invalidate any other reasons why the executable file might be covered
+ * by the GNU General Public License.
+ *
+ * Author: Moisés Arcos Santiago <marcos@emergya.com>
+ */
+
+/**
+ * @requires plugins/Tool.js
+ */
+
+/** api: (define)
+ *  module = gxp.plugins
+ *  class = ExportToSHP
+ */
+
+/** api: (extends)
+ *  plugins/Tool.js
+ */
+Ext.namespace("Viewer.plugins");
+
+/** api: constructor
+ *  .. class:: ExportToSHP(config)
+ *
+ *    Plugin for exporting a selected layer to shape file.
+ *    TODO Make this plural - selected layers
+ */
+Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
+    
+    /** api: ptype = vw_exporttoshp */
+    ptype: "vw_exporttoshp",
+
+    exportToSHPText: "Export to SHP",
+    exportToSHPTooltipText: "Export a layer to shape file",
+    exportToSHPMsg: "Generating ZIP File ...",
+    exportToSHPErrorTitle: "Error",
+    exportToSHPErrorContent: "Error to export the layer",
+
+    /** private: method[init]
+     * :arg target: ``Object`` The object initializing this plugin.
+     */
+    init: function(target) {
+        Viewer.plugins.ExportToSHP.superclass.init.apply(this, arguments);
+        this.target.on('beforerender', this.addActions, this);
+    },
+    
+    /** api: method[addActions] */
+    addActions: function() {
+        var selectedLayer = null;
+        var actions = PersistenceGeo.tree.MakeLayerPersistent.superclass.addActions.apply(this, [{
+            menuText: this.exportToSHPText,
+            iconCls: "gxp-icon-export-shp",
+            disabled: true,
+            tooltip: this.exportToSHPTooltipText,
+            handler: function() {
+                var urlToExport = null;
+                var paramsToExport = null;
+                var urlLocalGeoServer = this.target.sources.local.url.replace("/ows", "");
+                if(selectedLayer.url){
+                    if(selectedLayer.url.indexOf(urlLocalGeoServer) != -1){
+                        urlToExport = urlLocalGeoServer;
+                    }
+                }
+                var contextLayer = null;
+                if(selectedLayer.params && selectedLayer.params.LAYERS){
+                    if(selectedLayer.params.LAYERS.indexOf(":") != -1){
+                        contextLayer = selectedLayer.params.LAYERS.split(":")[0];
+                    }
+                }
+                if(contextLayer != null){
+                    urlToExport += "/" + contextLayer + "/wfs"
+                }
+
+                paramsToExport = {
+                    'SERVICE': 'WFS',
+                    'VERSION': selectedLayer.params.VERSION,
+                    'REQUEST': 'GetFeature',
+                    'TYPENAME': selectedLayer.params.LAYERS,
+                    'SRS': selectedLayer.params.SRS,
+                    'OUTPUTFORMAT': 'shape-zip'
+                };
+
+                Ext.MessageBox.wait(this.exportToSHPMsg);
+                
+                Ext.Ajax.request({
+                    url: urlToExport,
+                    params: paramsToExport,
+                    method: 'GET',
+                    disableCaching: false,
+                    success: function(o, r, n){
+                        var elemIF = document.createElement("iframe");
+                        elemIF.src = this.target.proxy + encodeURIComponent(this.prepareUrlToDownload(r));
+                        elemIF.style.display = "none"; 
+                        document.body.appendChild(elemIF);
+                        Ext.MessageBox.updateProgress(1);
+                        Ext.MessageBox.hide();
+                    },
+                    failure: function(o, r, n){
+                        Ext.MessageBox.updateProgress(1);
+                        Ext.MessageBox.hide();
+                        Ext.Msg.show({
+                            title: this.exportToSHPErrorTitle,
+                            msg: this.exportToSHPErrorContent,
+                            buttons: Ext.Msg.OK
+                        });
+                    },
+                    scope: this
+                });
+            },
+            scope: this
+        }]);
+
+        this.target.on("layerselectionchange", function(record) {
+            if(record && record.data){
+                selectedLayer = record.data.layer;
+            }
+        }, this);
+    },
+
+    prepareUrlToDownload: function(data){
+        //"http://gofre.emergya.es:8080/geoserver/gore/wfs?SERVICE=WFS&VERSION=1.1.1&REQUEST=GetFeature&TYPENAME=gore%3Aagroclima&SRS=EPSG%3A900913&OUTPUTFORMAT=shape-zip"; 
+        if(data != null){
+            var urlToReturn = data.url;
+            var cont = 0;
+            if(data.params!=null){
+                for(p in data.params){
+                    if(cont == 0){
+                        urlToReturn += "?" + p + "=" + data.params[p];
+                        cont ++;
+                    }else{
+                        urlToReturn += "&" + p + "=" + data.params[p];
+                    }
+                }
+            }
+        }
+        return urlToReturn;
+    }
+});
+
+Ext.preg(Viewer.plugins.ExportToSHP.prototype.ptype, Viewer.plugins.ExportToSHP);

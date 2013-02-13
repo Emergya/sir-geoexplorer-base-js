@@ -1,0 +1,8 @@
+{
+    "success": true,
+    "data": [
+        { "id": 1, "province": "Cachapoal" },
+        { "id": 2, "province": "Cardenal Caro" },
+        { "id": 3, "province": "Colchagua" }
+    ]
+}
