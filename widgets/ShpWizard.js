@@ -247,7 +247,7 @@ Viewer.plugins.ShpWizard = Ext.extend(Ext.Window, {
 	                            Viewer.getMapPanel().map.addLayer(layer);
 	                            this.close();
 	                            Ext.Msg.alert('Capa creada', "La capa se ha creado de forma temporal");
-	                        } else if(resp && resp.success && resp.data && resp.status === "error") {
+	                        } else if(resp && resp.success && resp.data && resp.data.status === "error") {
 	                        	Ext.Msg.alert('Error', resp.data.message);
 	                        } else {
 	                        	Ext.Msg.alert('Error', "Se ha producido un error creando la capa.");

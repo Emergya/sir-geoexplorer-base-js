@@ -128,14 +128,22 @@ GeoExt.Lang.add("es",{
     },
 
     "Viewer.plugins.RasterUploadPanel.prototype":{
+        windowTitleText: "Crear una nueva capa a partir de un fichero raster",
+        buttonText: "Subir",
+        layerNameLabelText: "Nombre",
+        layerNameEmptyText: "Nombre de la capa",
+        fileLabel: "Archivo raster",
+        fileLabelText: "Archivo con los datos de la capa raster",
+        fileEmptyText: "Buscador para el archivo raster...",
+        chooseFileText: "Buscar",
         titleLabel: "Nombre",
         titleEmptyText: "Nombre de la capa",
         abstractLabel: "Descripción",
         abstractEmptyText: "Descripción de la capa",
-        fileLabel: "Raster",
-        fieldEmptyText: "Buscador para el archivo raster...",
-        uploadText: "Subir",
-        waitMsgText: "Subiendo la capa...",
+        createLayerWaitMsgText: "Enviando archivo. Por favor espere.",
+        createLayerWaitMsgTitleText: "Subida de archivo",
+        errorMsgTitle: "Error",
+        errorMsg: "Ha habido un error al enviar los datos al servidor",
         invalidFileExtensionText: "La extensión del archivo debe ser una de: ",
         crsEmptyText: "ID del Sistema de Referencia de Coordenadas",
         invalidCrsText: "El identificador CRS debe ser un código EPSG (ej. EPSG:4326)"
@@ -248,6 +256,33 @@ GeoExt.Lang.add("es",{
         xAxisTitle: "Monto (M$)",
         porcionOtrosText: "Otros",
         geoButtonText: "Buscar Iniciativas Georreferenciadas"
+    },
+
+    "gxp.plugins.PDFPrintAction.prototype" : {
+        buttonText:"Imprimir",
+        menuText:"Imprimir",
+        tooltip : "Imprimir",
+        errorText:"Ocurrió un error, vuelva a intentarlo en unos instantes."
+    },
+
+    "Viewer.dialog.PDFPrintWindow.prototype" : {
+        printText : 'Imprimir',   
+        downloadImageText: "Descargar imagen",
+        sizeText:"Tamaño",
+        resolutionText:"Resolución",
+        gridText:"Grilla",
+        legendText: "Leyenda",
+        logoText: "Logotipo",
+        browseText: "Examinar",
+        textText : "Texto",
+        titleText: "Título",
+        fontText: "Fuente",
+        descriptionText: "Descripción",
+        northArrowText: "Flecha de norte",
+        waitText: "Por favor espere...",
+        closeText: "Cerrar",
+        logoFileTypeUnsupportedText: "Los tipos de imagen soportados son PNG y JPEG",
+        errorText:"Ocurrió un error, vuelva a intentarlo en unos instantes."
     },
 
     "gxp.plugins.LocalCertificatesAction.prototype" : {

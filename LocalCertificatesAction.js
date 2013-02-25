@@ -43,7 +43,7 @@ Ext.namespace("gxp.plugins");
 /** api: constructor
  *  .. class:: pointInformationAction(config)
  *
- *    Provides an action for showing channel selector dialog.
+ *    Provides actions for generating certificates for properties in a given localty.
  */
 gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
     
@@ -144,7 +144,6 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
             ds.hide();
         } else {
             ds.show();
-            Viewer.trackUrl('modules/CertificadosMunicipales');
         }
 
     },
@@ -212,8 +211,8 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                     try {
                         output = Ext.decode(response.responseText);
                     } catch(e) {
-                        // Si la respuesta no es json válido hubo un fallo
-                        console.debug(response.responseText);
+                        // If we can't decode the response's json then the server outputted
+                        // the error in xml.      
                         Ext.MessageBox.updateProgress(1);
                         Ext.MessageBox.hide();
                         Ext.MessageBox.alert("",this.errorText);                            
@@ -388,68 +387,63 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
             this.createPDFDocument(pdfDoc, this.pdfData);
             var fileName = "certificado_municipal_"+this.pdfData.resultLabel+".pdf";
             
-            
-            var uristring = pdfDoc.output("datauristring");
-            this.downloadDataURI({
-                filename : fileName,
-                data: uristring,
-                contentType:"application/pdf"
-            });     
+            jsPDFUtils.downloadPDF(fileName, pdfDoc)  ;
+          
             Ext.MessageBox.hide();
         },
-
-        
-        downloadDataURI : function(options){
-            // Localhost will work because the request is done actually by the proxy.
-            var form = $('<form method="POST" action="'+app.proxy+'http://localhost/downloadURI/downloadURI.php">'
-                    +'<input type="text" name="filename" value="'+options.filename
-                    +'"/><input type="text" name="data" value="'+options.data
-                    +'"/><input type="text" name="contentType" value="'+options.contentType
-                    +'"/><button type="submit"/>')[0];
-            var body = $("body")[0];
-            body.appendChild(form);
-            form.submit();                              
-        },
-        
         
         
         retrievePDFImage : function(objectid, geometry) {
             var bounds = geometry.getBounds();
             // We add a bit of padding to the bounds so we show a bit of 
             // context in the map.
-            var padding = 25;
+            var padding = 200;
             bounds.top +=padding;
             bounds.left-=padding;
             bounds.bottom-=padding;
             bounds.right+=padding;
+
+			// The format of the base layer must be jpeg or pdf creation might fail
+			// for unknown reasons.....
+            var baseLayerUrl = this._createURL(
+                "http://localhost/osmWMS/osmWMS.php",{
+                REQUEST:"GetMap",
+                WIDTH:800,
+                HEIGHT:600,
+                BBOX: bounds,                
+                FORMAT:"image/jpeg"
+            });
+
             var mapUrl = this._createURL(
-                    app.sources.local.url.replace("ows","wms"), {
-                    service:"WMS",
-                    version: "1.1.0",
-                    request:"GetMap",
-                    layers:"gore:"+this.getLayerName(),
-                    width:400,
-                    height:300,
-                    bbox: bounds,
-                    srs : Viewer.getMapPanel().map.projection,
-                    format:"image/png",
-                    styles:"polygon"
-                });
+                app.sources.local.url.replace("ows","wms"), {
+                service:"WMS",
+                version: "1.1.0",
+                request:"GetMap",
+                layers:"gore:"+this.getLayerName(),
+                width:800,
+                height:600,
+                bbox: bounds,
+                srs : Viewer.getMapPanel().map.projection,
+                format:"image/png",
+                transparent:true,
+                styles:"polygon"
+            });
         
             var parcelUrl = this._createURL(
-                    app.sources.local.url.replace("ows","wms"), {
-                        service:"WMS",
-                        version: "1.1.0",
-                        request:"GetMap",
-                        layers:"gore:"+this.getLayerName(),
-                        width:400,
-                        height:300,
-                        bbox: bounds,
-                        srs : Viewer.getMapPanel().map.projection,
-                        format:"image/png",
-                        transparent:true,
-                        cql_filter: encodeURIComponent("OBJECTID = "+objectid)
-                    });
+                app.sources.local.url.replace("ows","wms"), {
+                service:"WMS",
+                version: "1.1.0",
+                request:"GetMap",
+                layers:"gore:"+this.getLayerName(),
+                width:800,
+                height:600,
+                bbox: bounds,
+                srs : Viewer.getMapPanel().map.projection,
+                format:"image/png",
+                transparent:true,
+                opacity:0.5,
+                cql_filter: encodeURIComponent("OBJECTID = "+objectid)
+            });
             
         
             // No problem using localhost here as the url will be 
@@ -461,13 +455,21 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                     params:Ext.encode({
                         outputFormat:"jpeg",
                         combine:true,
-                        outputWidth:400,
-                        outputHeight:300,
-                        images:[mapUrl, parcelUrl]
+                        outputWidth:800,
+                        outputHeight:600,
+                        images:[baseLayerUrl,mapUrl, parcelUrl]
                     })
                 },
                 success: function(response) {
                     response = Ext.decode(response.responseText);
+                     if(response.error) {
+                        console.debug(response.error);
+                        Ext.MessageBox.updateProgress(1);
+                        Ext.MessageBox.hide();
+                        Ext.MessageBox.alert("",this.errorText); 
+                        return;
+                    }
+                    
                     // We have the map data so we try creating the certificate.
                     this.pdfData.mapImageData = response.data[0].uri;
                     this.doLocalCertificateCreation();          
@@ -494,10 +496,10 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
             
             pdfDoc.setFontSize(12);
             pdfDoc.setFontType("bold");
-            this.renderCenteredText(pdfDoc, margin,margin+10,"MUNICIPALIDAD DE "+pdfData.localityName.toUpperCase());
+            jsPDFUtils.renderCenteredText(pdfDoc, margin+10,"MUNICIPALIDAD DE "+pdfData.localityName.toUpperCase());
             
             pdfDoc.setFontSize(9);
-            this.renderCenteredText(pdfDoc, margin,margin+15,"NOMBRE DEL CERTIFICADO (AÚN NO DEFINIDO)");           
+            jsPDFUtils.renderCenteredText(pdfDoc, margin+15,"NOMBRE DEL CERTIFICADO (AÚN NO DEFINIDO)");           
             
             pdfDoc.setFontType("normal");           
             pdfDoc.text(margin, margin+25, "NOMBRE DEL DEPTO RESPONSABLE DE ESTA INFORMACIÓN (MUNICIPIO LO DEBE DEFINIR)");
@@ -506,105 +508,37 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
             pdfDoc.text(margin, margin+45, "RESULTADO DE LA BÚSQUEDA:");
             
             pdfDoc.setFontType("normal");
-            var endPos=this.createPDFTable(pdfDoc, margin,margin+50, [0.3,0.7],[
+            var endPos=jsPDFUtils.renderTable(pdfDoc, margin,margin+50, [0.3,0.7],[
                        ["ROL", pdfData.ruralData.ROL?pdfData.ruralData.ROL:"Falta en capa"],
-                       ["DIRECCIÓN", this.getPDFValue(pdfData.ruralData.DIRECCION)],
-                       ["Nº MANZANA",this.getPDFValue(pdfData.blockData.blockNumber)],
-                       ["SUPERFICIE",this.getPDFValue(pdfData.ruralData.SUPERFIFICE)]]);        
+                       ["DIRECCIÓN", this._getPDFValue(pdfData.ruralData.DIRECCION)],
+                       ["Nº MANZANA",this._getPDFValue(pdfData.blockData.blockNumber)],
+                       ["SUPERFICIE",this._getPDFValue(pdfData.ruralData.SUPERFIFICE)]]);        
     
-            endPos = this.createPDFTable(pdfDoc,margin, endPos+10, [0.3, 0.7],[
-                   ["NOMBRE PROPIETARIO", this.getPDFValue(pdfData.ruralData.PROPIETARI)]]);
+            endPos = jsPDFUtils.renderTable(pdfDoc,margin, endPos+10, [0.3, 0.7],[
+                   ["NOMBRE PROPIETARIO", this._getPDFValue(pdfData.ruralData.PROPIETARI)]]);
             
-            endPos = this.createPDFTable(pdfDoc,margin, endPos+10, [0.3, 0.7],[
-                    [{content:"ZONIFICACIÓN", rowspan:2}, this.getPDFValue(pdfData.zoneData.zoneNumber)],
-                    [null, this.getPDFValue(pdfData.zoneData.zoneDescription)]]);
+            endPos = jsPDFUtils.renderTable(pdfDoc,margin, endPos+10, [0.3, 0.7],[
+                    [{content:"ZONIFICACIÓN", rowspan:2}, this._getPDFValue(pdfData.zoneData.zoneNumber)],
+                    [null, this._getPDFValue(pdfData.zoneData.zoneDescription)]]);
             
             endPos+=10;
-            endPos =this.renderCenteredImage(pdfDoc,pageWidth, endPos, avalaibleWidth*.7, pdfData.mapImageData);            
+            endPos =jsPDFUtils.renderCenteredImage(pdfDoc, endPos, avalaibleWidth*.7, pdfData.mapImageData);            
             
             pdfDoc.setFontSize(7);      
             pdfDoc.setFontType("bold");
-            this.renderCenteredText(pdfDoc,margin, endPos+10, "AQUÍ DEBIERAN IR LOS DATOS DE CONTACTO DEL MUNCIPIO (DEPTO/FONO/CORREO/ETC)");
-            this.renderCenteredText(pdfDoc,margin, endPos+14, "ADEMÁS DE DATOS DE LA PLATAFORMA DEL SIR");      
+            jsPDFUtils.renderCenteredText(pdfDoc,endPos+10, "AQUÍ DEBIERAN IR LOS DATOS DE CONTACTO DEL MUNCIPIO (DEPTO/FONO/CORREO/ETC)");
+            jsPDFUtils.renderCenteredText(pdfDoc,endPos+14, "ADEMÁS DE DATOS DE LA PLATAFORMA DEL SIR");      
             
         },
 
-        getPDFValue : function(value) {
+        _getPDFValue : function(value) {
             if(typeof(value) == "undefined" || !value) {
                 return "Sin información";
             } else {
                 return value;
             }
         },
-
-        
-        renderCenteredImage : function(pdfDoc, pageWidth, endPos, imageWidth, mapImageData) {
-            
-            var left = pageWidth/2 - imageWidth/2;
-            var imageHeight = imageWidth*3/4;
-            pdfDoc.addImage(mapImageData,"JPEG",left,endPos,imageWidth,imageHeight);
-            
-            return endPos+imageHeight;
-        },
-        
-        renderCenteredText : function(pdfDoc, margin, topPos, text) {       
-            
-            var pageWidth = pdfDoc.internal.pageSize.width;
-            var centerLeft = pageWidth/2;           
-            // Dividido entre este factor para obtener mm.
-            var mmToPFactor= 72/25.6;
-            var textLength = pdfDoc.internal.getFontSize()* pdfDoc.getStringUnitWidth(text)/mmToPFactor;
-            pdfDoc.text(centerLeft-textLength/2,topPos, text);          
-        },
-        
-        createPDFTable : function(pdfDoc, marginLeft, topPos, columnSizes, rows) {
-            var rowHeight=5;
-            var avalaibleWidth= pdfDoc.internal.pageSize.width - marginLeft*2;
-            var cellPadding =1.3;
-            for(var rowIdx=0; rowIdx<rows.length; rowIdx++) {
-                var row = rows[rowIdx];
-                
-                var cellCount = row.length;
-            
-                var cellLeft = marginLeft;
-                for(var cellIdx=0; cellIdx< row.length; cellIdx++) {
-                    var cellWidth = columnSizes[cellIdx];
-                    if(cellWidth<1) {
-                        // A percentual width.
-                        cellWidth = cellWidth* avalaibleWidth;
-                    }                   
-                    
-                    var cell = row[cellIdx];
-                    
-                    var rowspan = 1;
-                    var colspan = 1;
-                    if(cell) {          
-                        var text = cell;
-                        if(!Ext.isString(cell)) {
-                            text = cell.content;
-                            if(cell.rowspan) {
-                                rowspan = cell.rowspan;
-                            }
-                            
-                            if(cell.colspan) {
-                                colspan = cell.colspan;
-                            }
-                        } 
-                        
-                        pdfDoc.rect(cellLeft, topPos, cellWidth*colspan, rowHeight*rowspan);
-                        pdfDoc.text(cellLeft+cellPadding, topPos+rowHeight-cellPadding, text);
-                    } 
-                    
-                                        
-                    cellLeft+= cellWidth*colspan;
-                }
-                
-                
-                topPos+=rowHeight;
-            }
-            
-            return topPos;
-        },
+       
 
         getLocalityName : function(tidy) {
             // TODO: Esto depende del usuario municipal que esté logeado.           

@@ -128,6 +128,12 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             	handler: this.uploadShapeHandler,
             	scope: this
             }));
+            items.push(new Ext.menu.Item({
+                iconCls: 'gxp-icon-filebrowse',
+                text: this.uploadRasterText,
+                handler: this.uploadRasterHandler,
+                scope: this
+            }));
             if (this.uploadSource) {
                 //TODO: Activate upload buttons
                 // uploadButton = this.createUploadButton(Ext.menu.Item);
@@ -138,10 +144,10 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 // if (uploadKMLButton) {
                 //     items.push(uploadKMLButton);
                 // }
-                uploadRasterButton = this.createUploadRasterButton(Ext.menu.Item);
-                if (uploadRasterButton) {
-                    items.push(uploadRasterButton);
-                }
+                // uploadRasterButton = this.createUploadRasterButton(Ext.menu.Item);
+                // if (uploadRasterButton) {
+                //     items.push(uploadRasterButton);
+                // }
             }
             options = Ext.apply(commonOptions, {
                 menu: new Ext.menu.Menu({
@@ -200,6 +206,25 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
     	}
     	this.uploadShpWindow.show();
     	
+    },
+
+    /**
+     * api: method[uploadShapeHandler]
+     */
+    uploadRasterHandler: function() {
+        if (!this.uploadRasterWindow) {
+            this.uploadRasterWindow = new Viewer.plugins.RasterUploadPanel();
+            this.uploadRasterWindow.on({
+                'close': {
+                    fn: function() {
+                        this.uploadRasterWindow = null;                        
+                    },
+                    scope: this
+                }
+            });
+
+        }
+        this.uploadRasterWindow.show();
     },
 
     /** api: method[createUploadRasterButton]

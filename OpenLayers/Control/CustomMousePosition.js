@@ -29,6 +29,7 @@
 
 /**
  * @requires OpenLayers/Control.js
+ * @requires OpenLayers/Control/ScaleLine.js
  */
 
 /**
@@ -68,7 +69,7 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
      * {Integer} The number of digits each UTM coordinate shall have when being
      *     rendered, Defaults to 0.
      */
-    numUtmDigits: 0,    
+    numUtmDigits: 0,
 
     /**
      * APIProperty: granularity
@@ -98,10 +99,17 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
 
     /**
      * APIProperty: utmDisplayProjection
-     * {<OpenLayers.Projection>} The UTM projection in which the mouse 
+     * {<OpenLayers.Projection>} The UTM projection in which the mouse
      *     position is displayed.
      */
     utmDisplayProjection: null,
+
+    /**
+     * Property: scaleLineControl
+     * {<OpenLayers.ControlScaleLine>} An scale line to show inside the
+     * coordinates window.
+     */
+    //scaleLineControl: null,
 
 
 
@@ -115,19 +123,22 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
     /**
      * Method: destroy
      */
-     destroy: function() {
-         this.deactivate();
-         OpenLayers.Control.prototype.destroy.apply(this, arguments);
-     },
+    destroy: function () {
+        this.deactivate();
+        OpenLayers.Control.prototype.destroy.apply(this, arguments);
+    },
 
     /**
      * APIMethod: activate
      */
-    activate: function() {
-        if (OpenLayers.Control.prototype.activate.apply(this, arguments)) {
+    activate: function () {
+        if(OpenLayers.Control.prototype.activate.apply(this, arguments)) {
             this.map.events.register('mousemove', this, this.redraw);
             this.map.events.register('mouseout', this, this.reset);
             this.redraw();
+            // if(this.scaleLineControl) {
+            //     this.scaleLineControl.activate();
+            // }
             return true;
         } else {
             return false;
@@ -137,11 +148,14 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
     /**
      * APIMethod: deactivate
      */
-    deactivate: function() {
-        if (OpenLayers.Control.prototype.deactivate.apply(this, arguments)) {
+    deactivate: function () {
+        if(OpenLayers.Control.prototype.deactivate.apply(this, arguments)) {
             this.map.events.unregister('mousemove', this, this.redraw);
             this.map.events.unregister('mouseout', this, this.reset);
             this.element.innerHTML = "";
+            // if(this.scaleLineControl) {
+            //     this.scaleLineControl.activate();
+            // }
             return true;
         } else {
             return false;
@@ -152,22 +166,21 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
      * Method: draw
      * {DOMElement}
      */
-    draw: function() {
+    draw: function () {
         OpenLayers.Control.prototype.draw.apply(this, arguments);
-
-
-        if (!this.element) { 
-            var latDiv = OpenLayers.Util.createDiv(this.id + "LatDiv", null, null, null, 'static');
-            var lonDiv = OpenLayers.Util.createDiv(this.id + "LongDiv", null, null, null, 'static');
-            var xDiv = OpenLayers.Util.createDiv(this.id + "XDiv", null, null, null, 'static');
-            var yDiv = OpenLayers.Util.createDiv(this.id + "YDiv", null, null, null, 'static');
-            var coordinatesDiv = OpenLayers.Util.createDiv(this.id + "coordDiv", null, null, null, 'static');
+        if(!this.element) {
+            var latDiv = OpenLayers.Util.createDiv(this.id + "LatDiv", null, null, null, 'relative');
+            var lonDiv = OpenLayers.Util.createDiv(this.id + "LongDiv", null, null, null, 'relative');
+            var xDiv = OpenLayers.Util.createDiv(this.id + "XDiv", null, null, null, 'relative');
+            var yDiv = OpenLayers.Util.createDiv(this.id + "YDiv", null, null, null, 'relative');
+            var coordinatesDiv = OpenLayers.Util.createDiv(this.id + "coordDiv", null, null, null, 'relative');
+            coordinatesDiv.className="coordinatesDiv";
             OpenLayers.Element.addClass(latDiv, 'lonlatDiv');
             OpenLayers.Element.addClass(lonDiv, 'lonlatDiv');
             OpenLayers.Element.addClass(xDiv, 'lonlatDiv');
             OpenLayers.Element.addClass(yDiv, 'lonlatDiv');
 
-            
+
             // longitude
             var lonLabel = document.createElement('span');
             var lonLabelText = document.createTextNode('Longitud');
@@ -184,7 +197,7 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
             latLabel.appendChild(latLabelText);
             latLabel = OpenLayers.Element.addClass(latLabel, 'lonlatLabel');
             var latValue = document.createElement('span');
-            latValue = OpenLayers.Element.addClass(latValue,'lonlatValue');
+            latValue = OpenLayers.Element.addClass(latValue, 'lonlatValue');
             latDiv.appendChild(latLabel);
             latDiv.appendChild(latValue);
 
@@ -221,6 +234,17 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
             this.ySpan = yValue;
 
             this.element = this.div;
+
+            // var scaleBarDiv = OpenLayers.Util.createDiv(this.id 
+            //     + "ScaleLineDiv", null, null, null, 'relative');
+            // this.div.appendChild(scaleBarDiv);
+            // this.scaleLineControl = new OpenLayers.Control.ScaleLine({
+            //     div: scaleBarDiv,
+            //     geodesic: true,
+            //     autoActivate: false
+            // });
+            // this.map.addControl(this.scaleLineControl);
+
         }
 
         return this.div;
@@ -229,26 +253,23 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
     /**
      * Method: redraw
      */
-    redraw: function(evt) {
+    redraw: function (evt) {
 
         var lonLat;
         var lonLatDisplay;
         var lonLatUtm;
 
-        if (evt == null) {
+        if(!evt) {
             this.reset();
             return;
         } else {
-            if (this.lastXy == null ||
-                Math.abs(evt.xy.x - this.lastXy.x) > this.granularity ||
-                Math.abs(evt.xy.y - this.lastXy.y) > this.granularity)
-            {
+            if(this.lastXy === null || Math.abs(evt.xy.x - this.lastXy.x) > this.granularity || Math.abs(evt.xy.y - this.lastXy.y) > this.granularity) {
                 this.lastXy = evt.xy;
                 return;
             }
 
             lonLat = this.map.getLonLatFromPixel(evt.xy);
-            if (!lonLat) {
+            if(!lonLat) {
                 // map has not yet been properly initialized
                 return;
             }
@@ -256,13 +277,11 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
             lonLatDisplay = lonLat.clone();
             lonLatUtm = lonLat.clone();
 
-            if (this.displayProjection) {
-                lonLatDisplay.transform(this.map.getProjectionObject(),
-                                 this.displayProjection );
+            if(this.displayProjection) {
+                lonLatDisplay.transform(this.map.getProjectionObject(), this.displayProjection);
             }
-            if (this.utmDisplayProjection) {
-                lonLatUtm.transform(this.map.getProjectionObject(),
-                                 this.utmDisplayProjection );
+            if(this.utmDisplayProjection) {
+                lonLatUtm.transform(this.map.getProjectionObject(), this.utmDisplayProjection);
             }
 
 
@@ -272,11 +291,11 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
 
         var lonlatValue = this.formatOutput(lonLatDisplay);
         var xyValue = this.formatUtmOutput(lonLatUtm);
-        if (lonlatValue.lat != this.latSpan.innerHTML || lonlatValue.lon != this.lonSpan.innerHTML) {
+        if(lonlatValue.lat != this.latSpan.innerHTML || lonlatValue.lon != this.lonSpan.innerHTML) {
             this.latSpan.innerHTML = lonlatValue.lat;
             this.lonSpan.innerHTML = lonlatValue.lon;
         }
-        if (xyValue.x != this.xSpan.innerHTML || xyValue.y != this.ySpan.innerHTML) {
+        if(xyValue.x != this.xSpan.innerHTML || xyValue.y != this.ySpan.innerHTML) {
             this.xSpan.innerHTML = xyValue.x;
             this.ySpan.innerHTML = xyValue.y;
         }
@@ -285,8 +304,8 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
     /**
      * Method: reset
      */
-    reset: function(evt) {
-        if (this.emptyString != null) {
+    reset: function (evt) {
+        if (this.emptyString !== null) {
             this.lonSpan.innerHTML = this.emptyString;
             this.latSpan.innerHTML = this.emptyString;
             this.xSpan.innerHTML = this.emptyString;
@@ -301,12 +320,13 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
      * Parameters:
      * lonLat - {<OpenLayers.LonLat>} Location to display
      */
-    formatOutput: function(lonLat) {
-        var digits = parseInt(this.numDigits);
-        var result = new Object();
-        result.lon = lonLat.lon.toFixed(digits) + "º";
-        result.lat = lonLat.lat.toFixed(digits) + "º";
-        
+    formatOutput: function (lonLat) {
+        var digits = parseInt(this.numDigits, 10);
+        var result = {
+            lon: lonLat.lon.toFixed(digits) + "º",
+            lat: lonLat.lat.toFixed(digits) + "º"
+        };
+
         return result;
     },
 
@@ -317,12 +337,14 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
      * Parameters:
      * lonLat - {<OpenLayers.LonLat>} Location to display
      */
-    formatUtmOutput: function(lonLat) {
-        var digits = parseInt(this.numUtmDigits);
-        var result = new Object();
-        result.x = lonLat.lon.toFixed(digits);
-        result.y = lonLat.lat.toFixed(digits);
-        
+    formatUtmOutput: function (lonLat) {
+        var digits = parseInt(this.numUtmDigits, 10);
+        var result = {
+            x: lonLat.lon.toFixed(digits),
+            y: lonLat.lat.toFixed(digits)
+        };
+
+
         return result;
     },
 

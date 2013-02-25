@@ -132,6 +132,17 @@ Ext.ns(
     };
 
     /**
+     * Unregisters a component.
+     */
+    Viewer.unregisterComponent = function(id) {
+        if (__components__[id] === undefined) {
+            throw new Error("unregisterComponent: Compoonent "+id+" wasn't previously registered.");            
+        } else {
+            __components__[id] = undefined;
+        }
+    }
+
+    /**
      * Retrieve a component from the components object.
      */
     Viewer.getComponent = function(id) {

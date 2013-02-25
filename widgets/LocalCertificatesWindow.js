@@ -365,6 +365,7 @@ Viewer.dialog.LocalCertificatesWindow = Ext.extend(Ext.Window,{
 			
 			
 			map.zoomToExtent(layer.getDataExtent());
+			map.zoomTo(map.getZoom()-1);
 		},
 		
 		

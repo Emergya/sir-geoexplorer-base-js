@@ -113,7 +113,7 @@ Viewer.widgets.PlanificationToolsLayerRules = Ext.extend(Ext.Panel, {
 
         callback = typeof(callback) == 'function' ? callback : function() {};
 
-        var url = window.app.sources.local.url;
+        var url = layer.url || window.app.sources.local.url;
 
         url += '?' + [
             'TRANSPARENT=TRUE',
