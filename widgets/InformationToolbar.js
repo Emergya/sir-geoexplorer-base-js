@@ -64,15 +64,17 @@ Viewer.widgets.InformationToolbar = Ext.extend(Ext.Toolbar, {
         }, {
             ptype: 'gxp_metadatainformation',
             actionTarget: ['informationtbar']
-        }, {
-            ptype: 'vw_wmsgetfeatureinfo',
-            format: 'grid',
-            showButtonText: false,
-            infoActionTip: 'Información de elementos',
-            popupTitle: 'Información de elementos',
-            buttonText: 'Información de elementos',
-            actionTarget: ['informationtbar']
-        }];
+        }
+        // , {
+        //     ptype: 'vw_wmsgetfeatureinfo',
+        //     format: 'grid',
+        //     showButtonText: false,
+        //     infoActionTip: 'Información de elementos',
+        //     popupTitle: 'Información de elementos',
+        //     buttonText: 'Información de elementos',
+        //     actionTarget: ['informationtbar']
+        // }
+        ];
 
         Viewer.widgets.InformationToolbar.superclass.constructor.call(this, Ext.apply({
             id: 'informationtbar',
