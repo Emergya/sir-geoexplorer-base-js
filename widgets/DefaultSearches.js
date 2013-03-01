@@ -35,7 +35,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
     constructor: function(config) {
 
         this.listeners = {
-            show: this.onShow,
+            show: this._onShow,
             hide: this.onHide,
             beforerender: this.onBeforeRender,
             scope: this
@@ -64,7 +64,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
         }, config));
     },
 
-    onShow: function() {
+    _onShow: function() {
         this.searchByCoordinates.clear();
         this.cmbProvince.setValue('');
         this.cmbMunicipality.setValue('');

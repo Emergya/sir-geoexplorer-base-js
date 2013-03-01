@@ -56,6 +56,7 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
 
         this.on({
             beforerender: this.onBeforeRender,
+            show: this._onShow,
             scope: this
         });
 
@@ -99,7 +100,7 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
         this.hide();
     },
 
-    onShow: function() {
+    _onShow: function() {
         this.layersTree.reload();
     },
 

@@ -57,11 +57,12 @@ Viewer.dialog.PlanificationToolsLayersWindow = Ext.extend(Ext.Window, {
 
         this.on({
             beforerender: this.onBeforeRender,
+            show: this._onShow,
             scope: this
         });
     },
 
-    onShow: function() {
+    _onShow: function() {
         this.layersTree.reload();
     },
 

@@ -84,6 +84,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
         this.on({
             beforerender: this.onBeforeRender,
             beforedestroy: this.onBeforeDestroy,
+            show: this._onShow,
             scope: this
         });
 
@@ -92,7 +93,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
         //this.mapPanel.layers.on('remove', this, this.onLayerChanged);
     },
 
-    onShow: function() {
+    _onShow: function() {
 
         var layerController = Viewer.getController('Layers');
         var selectedLayer = layerController.getSelectedLayer();

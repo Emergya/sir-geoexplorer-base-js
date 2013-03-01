@@ -75,13 +75,13 @@ Viewer.dialog.LocalCertificatesWindow = Ext.extend(Ext.Window,{
 
 			this.on({
 				beforerender : this.onBeforeRender,
-				show: this.onShow,
+				show: this._onShow,
 				scope : this
 			});
 
 		},
 		
-		onShow : function() {
+		_onShow : function() {
 			// Antes de mostrar el formulario reiniciamos todos los input.		
 			this.searchCriteriaCB.setValue(null);			
 			this.searchTextField.setValue("");

@@ -49,6 +49,7 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
         this.listeners = {
             beforehide: this.onBeforeHide,
             beforerender: this.onBeforeRender,
+            show: this._onShow,
             scope: this
         };
 
@@ -73,7 +74,7 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
      * When the current window is shown clean
      * the previous data.
      */
-    onShow: function() {
+    _onShow: function() {
         this.searchByCoordinates.clear();
         this.changeActiveLayer(this.layerController.getSelectedLayer());
         this.currentState = this.STATE_NONE;

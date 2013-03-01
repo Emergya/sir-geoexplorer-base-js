@@ -86,7 +86,7 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window,{
 
 		this.on({
 			beforerender : this.onBeforeRender,
-			show: this.onShow,
+			show: this._onShow,
 			hide: function() {
 				this.destroy()
 				Viewer.unregisterComponent('PDFPrintWindow');
@@ -95,7 +95,7 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window,{
 		});
 	},
 	
-	onShow : function() {
+	_onShow : function() {
 		// Here we reset the form.
 		this._setFormValue("pageSize", "letter");
 		this._setFormValue("resolution", 75);
