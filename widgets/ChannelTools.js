@@ -44,7 +44,7 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
     selectedChannel: null,
 
 
-    constructor: function(config) {
+    constructor: function (config) {
 
         Viewer.dialog.ChannelTools.superclass.constructor.call(this, Ext.apply({
             title: config.showLayers ? 'Carpetas' : this.titleText,
@@ -63,11 +63,7 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
         this.LOAD_CHANNEL_URL = String(this.LOAD_CHANNEL_URL, this.restBaseUrl);
     },
 
-    onBeforeRender: function() {
-
-        var padding = 'padding: 10px 16px;';
-        var border = 'border: 0px solid transparent;'
-        
+    onBeforeRender: function () {
         this.layersTree = new Viewer.widgets.ChannelToolsLayersTree({
             restBaseUrl: this.restBaseUrl,
             showLayers: this.showLayers,
@@ -76,11 +72,11 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
                 scope: this
             }
         });
-        
+
         this.add(this.layersTree);
         this.addButton(this.loadButton = new Ext.Button({
             text: this.loadText,
-            disabled:!this.showLayers,
+            disabled: !this.showLayers,
             listeners: {
                 click: this.onLoadButtonClicked,
                 scope: this
@@ -95,38 +91,38 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
         }));
     },
 
-    onCancelButtonClicked: function() {
+    onCancelButtonClicked: function () {
         this.hide();
     },
 
-    onShow: function() {
+    onShow: function () {
         this.layersTree.reload();
     },
 
-    showLoading: function(show) {
+    showLoading: function (show) {
         //TODO: Show a loading mask...
     },
 
-    onTreeNodeClick: function(node, checked) {
+    onTreeNodeClick: function (node, checked) {
 
-        if(!this.showLayers){
-            if(node.isLeaf()){
+        if (!this.showLayers) {
+            if (node.isLeaf()) {
                 this.selectedChannel = node.id;
                 this.selectedChannelName = node.text;
                 this.loadButton.enable();
-            }else{
+            } else {
                 this.loadButton.disable();
             }
         }
     },
 
-    addedLayers: new Array(),
+    addedLayers: [],
 
-    clearLayers: function (){
-        for(var i=0; i< this.addedLayers.length; i++){
-            try{
+    clearLayers: function () {
+        for (var i = 0; i < this.addedLayers.length; i++) {
+            try {
                 this.persistenceGeoContext.map.removeLayer(this.addedLayers[i]);
-            }catch (e){
+            } catch (e) {
                 // nothing to do
             }
         }
@@ -134,20 +130,21 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
     },
 
     onLoadButtonClicked: function() {
-        this.clearLayers();
-        if(this.showLayers){
+        if (this.showLayers) {
             var checkedNodes = this.layersTree.getChecked();
-            for(var i = 0 ; i<checkedNodes.length; i++){
-                var layer = this.persistenceGeoContext.getLayerFromData(checkedNodes[i].attributes.data);                
+            for (var i = 0; i < checkedNodes.length; i++) {
+                var layer = this.persistenceGeoContext.getLayerFromData(checkedNodes[i].attributes.data);
                 layer.groupLayers = null;
                 layer.groupLayersIndex = null;
                 this.persistenceGeoContext.map.addLayer(layer);
+                layer.setVisibility(true);
                 this.addedLayers.push(layer);
             }
-        }else{
-            if(!!this.selectedChannel){
+        } else {
+            if ( !! this.selectedChannel) {
+                this.clearLayers();
                 Viewer.trackUrl('channels/' + this.selectedChannelName);
-                this.persistenceGeoContext.loadChannel(this.selectedChannel, this.selectedChannelName);    
+                this.persistenceGeoContext.loadChannel(this.selectedChannel, this.selectedChannelName);
             }
         }
     }
