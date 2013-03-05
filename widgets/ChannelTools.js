@@ -51,7 +51,8 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
             width: 500,
             height: 400,
             layout: 'fit',
-            closeAction: 'hide'
+            closeAction: 'hide',
+            bodyCssClass: 'vw-channel-window'
         }, config));
 
         this.on({
