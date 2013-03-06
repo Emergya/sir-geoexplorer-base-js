@@ -187,7 +187,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
         }, this);
         if (scale.length > 0) {
             scale = scale.items[0];
-            this.zoomSelector.setValue("1 : " + parseInt(scale.data.scale, 10));
+            this.zoomSelector.setValue("1 : " + Ext.util.Format.number(parseInt(scale.data.scale, 10),"0.000.000/i"));
         } else {
             if (!this.zoomSelector.rendered) {
                 return;
@@ -204,10 +204,12 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
         this.zoomStore = new GeoExt.data.ScaleStore({
             map: this.map
         });
+
         this.zoomSelector = new Ext.form.ComboBox({
             emptyText: this.zoomLevelText,
-            tpl: '<tpl for="."><div class="x-combo-list-item">1 : {[parseInt(values.scale)]}</div></tpl>',
+            tpl: '<tpl for="."><div class="x-combo-list-item">1 : {[Ext.util.Format.number(values.scale,"0.000.000/i")]}</div></tpl>',
             editable: false,
+            hiddenName:"zoomLevelControl",
             triggerAction: 'all',
             mode: 'local',
             store: this.zoomStore,
@@ -216,7 +218,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
         this.zoomSelector.on({
             click: this.stopMouseEvents,
             mousedown: this.stopMouseEvents,
-            select: function (combo, record, index) {
+            select: function (combo, record, index) {                
                 this.map.zoomTo(record.data.level);
             },
             scope: this

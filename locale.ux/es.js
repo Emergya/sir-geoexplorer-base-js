@@ -241,21 +241,22 @@ GeoExt.Lang.add("es",{
 	"Viewer.dialog.ChartWindow.prototype": {
         title: "Iniciativas de Inversi\u00f3n",
         topTitleText: "CRITERIOS DE BÚSQUEDA",
-        stageText: 'Etapa',
+        stageText: 'Financiamiento',
         yearText: 'Año',
         sourceText: 'Fuente',
         financingLineText: 'Línea Financiera',
         sectorText: "Sector",
         territorialLevelText: 'Nivel Territorial',
         groupByText: 'Agrupar por',
-        proyectosPreinversionText: 'Preinversi\u00f3n',
-        proyectosEjecucionText: 'Ejecuci\u00f3n PROPIR',
+        proyectosPreinversionText: 'Gobierno Regional',
+        proyectosEjecucionText: 'Servicios Públicos',
         graphicButtonText: 'Graficar',
         centerTitleText: 'Gráfico',
         eastTitleText: 'Gráfico',
         xAxisTitle: "Monto (M$)",
         porcionOtrosText: "Otros",
-        geoButtonText: "Buscar Iniciativas Georreferenciadas"
+        geoButtonText: "Buscar Iniciativas Georreferenciadas",
+        exchangeChartsText:"Intercambiar"
     },
 
     "gxp.plugins.PDFPrintAction.prototype" : {
