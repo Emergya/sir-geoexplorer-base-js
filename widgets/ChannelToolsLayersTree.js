@@ -39,7 +39,8 @@ var NODE_TYPES = {
 
 var FILTER_TYPES = {
     ALL_CHANNEL_IN_ZONES: 'ALL_CHANNEL_IN_ZONES',
-    SHOW_FOLDER_LAYERS: 'SHOW_FOLDER_LAYERS'
+    SHOW_FOLDER_LAYERS: 'SHOW_FOLDER_LAYERS',
+    HIDE_IPT_CHANNELS: 'HIDE_IPT_CHANNELS'
 };
 
 Viewer.widgets.ChannelToolsLayersTree = Ext.extend(Ext.tree.TreePanel, {
@@ -66,7 +67,8 @@ Viewer.widgets.ChannelToolsLayersTree = Ext.extend(Ext.tree.TreePanel, {
             expanded: true
         });
 
-        var rootFilter = null, zonesFilter = FILTER_TYPES.ALL_CHANNEL_IN_ZONES;
+        var rootFilter = null;
+        var zonesFilter = FILTER_TYPES.ALL_CHANNEL_IN_ZONES + ',' + FILTER_TYPES.HIDE_IPT_CHANNELS;
         if(this.showLayers){
             rootFilter = FILTER_TYPES.SHOW_FOLDER_LAYERS;
             zonesFilter += "," + FILTER_TYPES.SHOW_FOLDER_LAYERS;

@@ -35,6 +35,7 @@ Viewer.dialog.PointInformation = Ext.extend(Ext.Window, {
 
         this.listeners = {
             beforerender: this.onBeforeRender,
+            show: this._onShow,
             scope: this
         };
 
@@ -90,7 +91,7 @@ Viewer.dialog.PointInformation = Ext.extend(Ext.Window, {
         this.txtY.setValue('');
     },
 
-    onShow: function() {
+    _onShow: function() {
         this.reset();
         this.map.events.on({
             click: this.onMapClicked,

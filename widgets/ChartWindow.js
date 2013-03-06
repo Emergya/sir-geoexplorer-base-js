@@ -58,6 +58,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
 
         this.listeners = {
             beforerender: this.onBeforeRender,
+            show: this._onShow,
             scope: this
         };
 
@@ -128,7 +129,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
         }
         return data;
     },
-    onShow: function () {
+    _onShow: function () {
     },
 
     onHide: function () {

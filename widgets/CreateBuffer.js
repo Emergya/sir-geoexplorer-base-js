@@ -42,6 +42,7 @@ Viewer.dialog.NewBuffer = Ext.extend(Ext.Window, {
 
         this.listeners = {
             beforerender: this.onBeforeRender,
+            show: this._onShow,
             scope: this
         };
 
