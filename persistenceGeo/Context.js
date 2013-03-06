@@ -138,7 +138,7 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
         if (!!this.SAVE_MODES.GROUP == this.saveModeActive) {
             this.parser.loadLayersByGroup(this.authUser, function (layers, layerTree) {
                 this_.onLoadLayers(layers, layerTree);
-            });
+            }, false);
         } else if (!!this.SAVE_MODES.USER == this.saveModeActive) {
             this.parser.loadLayersByUser(this.userLogin, function (layers, layerTree) {
                 this_.onLoadLayers(layers, layerTree);

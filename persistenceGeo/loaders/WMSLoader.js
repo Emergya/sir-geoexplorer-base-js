@@ -73,7 +73,7 @@ PersistenceGeo.loaders.WMSLoader = Ext
                             isBaseLayer = this
                                     .toBoolean(layerData.properties.isBaseLayer) || false;
                             opacity = this
-                                    .toNumber(layerData.properties.opacity) || 0.5;
+                                    .toNumber(layerData.properties.opacity) || 0.75;
                             buffer = this.toNumber(layerData.properties.buffer) || 1;
                             format = layerData.properties.format || format;
                             layers = layerData.properties.layers || layers;

@@ -484,9 +484,18 @@ PersistenceGeo.Parser = Ext.extend(Ext.Component,{
 	 * 
 	 * Loads OpenLayers layers and call to onload callback function (layers). 
 	 * Used to load all user layers. Call to onloadcallback with an array of ``OpenLayers.Layer`` result.
+	 * @param group id of group.
+	 * @param onload callback
+	 * @loadFolders true if must load folders. Default true. 
 	 */
-	loadLayersByGroup: function(group, onload){
-		this.initFoldersByGroup(group);
+	loadLayersByGroup: function(group, onload, loadFolders){
+	    var lf = true;
+	    if (loadFolders !== undefined) {
+	        lf = loadFolders;
+	    }
+	    if (lf) {
+	        this.initFoldersByGroup(group);	        
+	    } 
 		this.loadLayers(group, onload, this.LOAD_LAYERS_BY_GROUP_BASE_URL() + group);
 	},
 	
