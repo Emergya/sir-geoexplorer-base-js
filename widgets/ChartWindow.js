@@ -134,7 +134,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
     _onResize : function() {
         if(!this.hidden) {
             this.doLayout();
-            this._doChartsCreation();
+            this._doChartsCreation(false);
         }
     },
     _onShow: function () {
@@ -223,7 +223,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
                          tooltip:true,
                          fields: ['groupBy', 'monto', 'numProyectos'],
                          
-                         template: new Ext.Template('{groupBy}: {monto:number("0.000/i")} M$ en {numProyectos} iniciativas',
+                         template: new Ext.Template('{groupBy}: {monto:number("0.000/i")} CL$ en {numProyectos} iniciativas',
                              {
                                 compiled: true
                              }) 
@@ -239,7 +239,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
             this._bigChart="pie"
         }
 
-        this._doChartsCreation();
+        this._doChartsCreation(false);
     },
 
     _createBigChart : function() {
@@ -279,7 +279,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
                               tooltip:true,
                               fields: ['monto', 'numProyectos'],
                               
-                              template: new Ext.Template('{monto}: {monto:number("0.000,000/i")} M$ en {numProyectos} iniciativas',
+                              template: new Ext.Template('{monto}: {monto:number("0.000.000/i")} CL$ en {numProyectos} iniciativas',
                                       {
                                   compiled: true
                                       }) 
@@ -328,7 +328,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
                          tooltip:true,
                          fields: ['groupBy', 'monto', 'numProyectos'],
                          
-                         template: new Ext.Template('{groupBy}: {monto:number("0.000,000/i")} M$ en {numProyectos} iniciativas',
+                         template: new Ext.Template('{groupBy}: {monto:number("0.000.000/i")} CL$ en {numProyectos} iniciativas',
                              {
                                 compiled: true
                              }) 
@@ -360,7 +360,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
                       {
                           tooltip:true,
                           fields: ['monto', 'numProyectos'],
-                          template: new Ext.Template('Monto: {monto:number("0.000,000/i")} M$ en {numProyectos} iniciativas',
+                          template: new Ext.Template('Monto: {monto:number("0.000.000/i")} CL$ en {numProyectos} iniciativas',
                              {
                                 compiled: true
                           })
@@ -691,7 +691,9 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
                 buttons: [{
                     scope: this,
                     text: this.graphicButtonText,
-                    handler: this._doChartsCreation
+                    handler: function(){
+                        this._doChartsCreation(true);
+                    }
                     
                 }]
             };
@@ -756,7 +758,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
 
     },
 
-    _doChartsCreation: function() {
+    _doChartsCreation: function(needsReload) {
         if(!this.rendered) {
             // We cant do this yet (the method was called in a resize before things were initialized)
             return;
@@ -766,16 +768,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
         var formPanel =  Ext.getCmp('inversion-form-region');
         var formValues = formPanel.getForm().getValues();
        
-        this._barStore.reload({params: formValues});
-        this._pieStore.reload({
-            params: {
-                'tipoProyecto': formValues.tipoProyecto,
-                'anyo': formValues.anyo,
-                'agruparPor': 'sector'
-            }
-        });     
-      
-       
+
         var smallChartConfig = null;
         var bigChartConfig = null;
         if(this._bigChart=="pie") {
@@ -791,14 +784,32 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
         var smallChart = Ext.getCmp('smallChartId');
         var bigChart = Ext.getCmp('bigChartId');
 
+
         Ext.apply(smallChart, smallChartConfig);
         Ext.apply(bigChart, bigChartConfig);
 
-        this._reInitChart(smallChart);
-        this._reInitChart(bigChart);
+        var self=this;   
+
+
+        if(needsReload){
+            this._barStore.reload({params: formValues});
+                
+
+            self._pieStore.reload({
+                params: {
+                    'tipoProyecto': formValues.tipoProyecto,
+                    'anyo': formValues.anyo,
+                    'agruparPor': 'sector'
+                }});
+            
+            
+        } else {
+            this._reInitChart(smallChart);                                
+            this._reInitChart(bigChart);
+        }
+         
         
-    	
-    	  
+        
     },
 
     // Does similarly to the GVisualizationPanel, but without initializing the panel itself.
@@ -820,6 +831,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
             }
         );        
         chart.store = Ext.StoreMgr.lookup(chart.store);
+         chart.store.addListener('datachanged', chart.datachanged, chart);
     },
 
     georeferenceInitiatives: function() {
@@ -858,10 +870,25 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
                     fillOpacity: 1,
                     graphicXOffset: -30/2,
                     graphicYOffset: -18/2,
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    graphicZIndex:1
+                });
+              var selectedStyle = new OpenLayers.Style(
+                {
+                    externalGraphic: baseUrl +'/img/marker-red.png',
+                    fill: false, 
+                    stroke: false, 
+                    pointRadius: 0,
+                    graphicWidth: 18 , 
+                    graphicHeight: 30,
+                    fillOpacity: 1,
+                    graphicXOffset: -30/2,
+                    graphicYOffset: -18/2,
+                    cursor: 'pointer',
+                    graphicZIndex:1000
                 });
     		
-    		var myStyles = new OpenLayers.StyleMap(defaultStyle);
+    		var myStyles = new OpenLayers.StyleMap({"default": defaultStyle, "select": selectedStyle});
     		
     		
     		var utm19Projection = new OpenLayers.Projection("EPSG:32719");
@@ -881,7 +908,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
     		    			feature: feature,
     		    			location: feature,
     		    			baseUrl: this.baseUrl,
-                            anchored: false
+                            anchored:false
     		    			
     		    		});
     		    		popupWindow.on('close', function(p){
