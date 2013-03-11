@@ -213,7 +213,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
                     legend: {
                         position: 'in'
                     },
-                    title: "Monto invertido en sector"
+                    title: "Monto Solicitado en sector"
                 },
                 store: this._barStore,
                 columns: [
@@ -239,7 +239,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
             this._bigChart="pie"
         }
 
-        this._doChartsCreation(false);
+        this._doChartsCreation(true);
     },
 
     _createBigChart : function() {
@@ -315,7 +315,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
                     width: small?"70%":"90%",
                     height: small?"70%":"75%"
                 },
-                title: "Monto invertido en sector " + formValues.sector + " - " 
+                title: "Monto Solicitado en sector: " + formValues.sector + " - " 
                     + "Fuente: " + formValues.fuente + " - " 
                     + "Año: " + formValues.anyo 
                     + " - Agrupado por: " + groupingByText
@@ -692,7 +692,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
                     scope: this,
                     text: this.graphicButtonText,
                     handler: function(){
-                        this._doChartsCreation(true);
+                        this._doChartsCreation(false);
                     }
                     
                 }]
@@ -758,7 +758,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
 
     },
 
-    _doChartsCreation: function(needsReload) {
+    _doChartsCreation: function(exchange) {
         if(!this.rendered) {
             // We cant do this yet (the method was called in a resize before things were initialized)
             return;
@@ -791,8 +791,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
         var self=this;   
 
 
-        if(needsReload){
-            this._barStore.reload({params: formValues});
+        this._barStore.reload({params: formValues});
                 
 
             self._pieStore.reload({
@@ -801,9 +800,7 @@ Viewer.dialog.ChartWindow = Ext.extend(Ext.Window, {
                     'anyo': formValues.anyo,
                     'agruparPor': 'sector'
                 }});
-            
-            
-        } else {
+        if (exchange) {
             this._reInitChart(smallChart);                                
             this._reInitChart(bigChart);
         }
