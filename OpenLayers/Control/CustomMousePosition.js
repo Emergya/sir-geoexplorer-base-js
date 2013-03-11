@@ -26,104 +26,91 @@
  * Author: Juan Luis Rodriguez Ponce <jlrodriguez@emergya.com>
  */
 
-
 /**
  * @requires OpenLayers/Control.js
  * @requires OpenLayers/Control/ScaleLine.js
  */
 
 /**
- * Class: OpenLayers.Control.CustomMousePosition
- * The MousePosition control displays geographic coordinates of the mouse
- * pointer, as it is moved about the map. It displays coordinates in two
- * reference systems.
- *
- * Inherits from:
- *  - <OpenLayers.Control>
+ * Class: OpenLayers.Control.CustomMousePosition The MousePosition control
+ * displays geographic coordinates of the mouse pointer, as it is moved about
+ * the map. It displays coordinates in two reference systems.
+ * 
+ * Inherits from: - <OpenLayers.Control>
  */
 OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
 
     /**
-     * APIProperty: autoActivate
-     * {Boolean} Activate the control when it is added to a map.  Default is
-     *     true.
+     * APIProperty: autoActivate {Boolean} Activate the control when it is added
+     * to a map. Default is true.
      */
-    autoActivate: true,
+    autoActivate : true,
 
     /**
-     * Property: element
-     * {DOMElement}
+     * Property: element {DOMElement}
      */
-    element: null,
-
+    element : null,
 
     /**
-     * APIProperty: numDigits
-     * {Integer} The number of digits each coordinate shall have when being
-     *     rendered, Defaults to 5.
+     * APIProperty: numDigits {Integer} The number of digits each coordinate
+     * shall have when being rendered, Defaults to 5.
      */
-    numDigits: 5,
+    numDigits : 5,
 
     /**
-     * APIProperty: numUtmDigits
-     * {Integer} The number of digits each UTM coordinate shall have when being
-     *     rendered, Defaults to 0.
+     * APIProperty: numUtmDigits {Integer} The number of digits each UTM
+     * coordinate shall have when being rendered, Defaults to 0.
      */
-    numUtmDigits: 0,
+    numUtmDigits : 0,
 
     /**
-     * APIProperty: granularity
-     * {Integer}
+     * APIProperty: granularity {Integer}
      */
-    granularity: 10,
+    granularity : 10,
 
     /**
-     * APIProperty: emptyString
-     * {String} Set this to some value to set when the mouse is outside the
-     *     map.
+     * APIProperty: emptyString {String} Set this to some value to set when the
+     * mouse is outside the map.
      */
-    emptyString: null,
+    emptyString : null,
 
     /**
-     * Property: lastXy
-     * {<OpenLayers.Pixel>}
+     * Property: lastXy {<OpenLayers.Pixel>}
      */
-    lastXy: null,
+    lastXy : null,
 
     /**
-     * APIProperty: displayProjection
-     * {<OpenLayers.Projection>} The projection in which the mouse position is
-     *     displayed.
+     * APIProperty: displayProjection {<OpenLayers.Projection>} The projection
+     * in which the mouse position is displayed.
      */
-    displayProjection: null,
+    displayProjection : null,
 
     /**
-     * APIProperty: utmDisplayProjection
-     * {<OpenLayers.Projection>} The UTM projection in which the mouse
-     *     position is displayed.
+     * APIProperty: utmDisplayProjection {<OpenLayers.Projection>} The UTM
+     * projection in which the mouse position is displayed.
      */
-    utmDisplayProjection: null,
+    utmDisplayProjection : null,
+    
+    utmProjections: {
+        "17": new OpenLayers.Projection("EPSG:32717"),    
+        "18": new OpenLayers.Projection("EPSG:32718"),
+        "19": new OpenLayers.Projection("EPSG:32719"),
+        "20": new OpenLayers.Projection("EPSG:32720")},
+    utmProjectionPrefix: "EPSG:327",
+    wgs84LatLonProjection: new OpenLayers.Projection("EPSG:4326"),
+    dmsCoordinatesFormat: true,
 
-    /**
-     * Property: scaleLineControl
-     * {<OpenLayers.ControlScaleLine>} An scale line to show inside the
-     * coordinates window.
-     */
-    //scaleLineControl: null,
-
-
-
+   
     /**
      * Constructor: OpenLayers.Control.MousePosition
-     *
-     * Parameters:
-     * options - {Object} Options for control.
+     * 
+     * Parameters: options - {Object} Options for control.
      */
 
     /**
      * Method: destroy
      */
-    destroy: function () {
+    destroy : function () {
         this.deactivate();
         OpenLayers.Control.prototype.destroy.apply(this, arguments);
     },
@@ -131,13 +118,13 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
     /**
      * APIMethod: activate
      */
-    activate: function () {
-        if(OpenLayers.Control.prototype.activate.apply(this, arguments)) {
+    activate : function () {
+        if (OpenLayers.Control.prototype.activate.apply(this, arguments)) {
             this.map.events.register('mousemove', this, this.redraw);
             this.map.events.register('mouseout', this, this.reset);
             this.redraw();
             // if(this.scaleLineControl) {
-            //     this.scaleLineControl.activate();
+            // this.scaleLineControl.activate();
             // }
             return true;
         } else {
@@ -148,13 +135,13 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
     /**
      * APIMethod: deactivate
      */
-    deactivate: function () {
-        if(OpenLayers.Control.prototype.deactivate.apply(this, arguments)) {
+    deactivate : function () {
+        if (OpenLayers.Control.prototype.deactivate.apply(this, arguments)) {
             this.map.events.unregister('mousemove', this, this.redraw);
             this.map.events.unregister('mouseout', this, this.reset);
             this.element.innerHTML = "";
             // if(this.scaleLineControl) {
-            //     this.scaleLineControl.activate();
+            // this.scaleLineControl.activate();
             // }
             return true;
         } else {
@@ -163,23 +150,32 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
     },
 
     /**
-     * Method: draw
-     * {DOMElement}
+     * Method: draw {DOMElement}
      */
-    draw: function () {
+    draw : function () {
         OpenLayers.Control.prototype.draw.apply(this, arguments);
-        if(!this.element) {
-            var latDiv = OpenLayers.Util.createDiv(this.id + "LatDiv", null, null, null, 'relative');
-            var lonDiv = OpenLayers.Util.createDiv(this.id + "LongDiv", null, null, null, 'relative');
-            var xDiv = OpenLayers.Util.createDiv(this.id + "XDiv", null, null, null, 'relative');
-            var yDiv = OpenLayers.Util.createDiv(this.id + "YDiv", null, null, null, 'relative');
-            var coordinatesDiv = OpenLayers.Util.createDiv(this.id + "coordDiv", null, null, null, 'relative');
-            coordinatesDiv.className="coordinatesDiv";
+        if (!this.element) {
+            var latDiv = OpenLayers.Util.createDiv(this.id + "LatDiv", null,
+                    null, null, 'relative');
+            var lonDiv = OpenLayers.Util.createDiv(this.id + "LongDiv", null,
+                    null, null, 'relative');
+            var changeDisplayDiv = OpenLayers.Util.createDiv(this.id + 
+                    "changeDisplayDiv", null, null, null, 'relative');
+            var utmZoneDiv = OpenLayers.Util.createDiv(this.id + "utmZoneDiv",
+                    null, null, null, 'relative');
+            var xDiv = OpenLayers.Util.createDiv(this.id + "XDiv", null, null,
+                    null, 'relative');
+            var yDiv = OpenLayers.Util.createDiv(this.id + "YDiv", null, null,
+                    null, 'relative');
+            var coordinatesDiv = OpenLayers.Util.createDiv(
+                    this.id + "coordDiv", null, null, null, 'relative');
+            coordinatesDiv.className = "coordinatesDiv";
             OpenLayers.Element.addClass(latDiv, 'lonlatDiv');
             OpenLayers.Element.addClass(lonDiv, 'lonlatDiv');
+            OpenLayers.Element.addClass(changeDisplayDiv, 'changeDisplayDiv');
+            OpenLayers.Element.addClass(utmZoneDiv, 'lonlatDiv');
             OpenLayers.Element.addClass(xDiv, 'lonlatDiv');
             OpenLayers.Element.addClass(yDiv, 'lonlatDiv');
-
 
             // longitude
             var lonLabel = document.createElement('span');
@@ -200,6 +196,33 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
             latValue = OpenLayers.Element.addClass(latValue, 'lonlatValue');
             latDiv.appendChild(latLabel);
             latDiv.appendChild(latValue);
+            
+            // DMS/Decimal button
+            var button = new Ext.Button({
+                cls: 'changeDisplayButton',
+                text: "Mostrar en Decimal",
+                renderTo: changeDisplayDiv,
+                listeners: {
+                   "click": {
+                       fn: this.toggleCoordinatesFormat, 
+                       scope: this
+                   }
+                }
+            });
+            this.button = button;
+          
+
+            // UTM zone
+            var utmZoneLabel = document.createElement('span');
+            var utmZoneLabelText = document.createTextNode('Huso UTM');
+            utmZoneLabel.appendChild(utmZoneLabelText);
+            utmZoneLabel = OpenLayers.Element.addClass(utmZoneLabel,
+                    'lonlatLabel');
+            var utmZoneValue = document.createElement('span');
+            utmZoneValue = OpenLayers.Element.addClass(utmZoneValue,
+                    'lonlatValue');
+            utmZoneDiv.appendChild(utmZoneLabel);
+            utmZoneDiv.appendChild(utmZoneValue);
 
             // X coord
             var xLabel = document.createElement('span');
@@ -224,27 +247,19 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
             // Add to coordinatesDiv
             coordinatesDiv.appendChild(lonDiv);
             coordinatesDiv.appendChild(latDiv);
+            coordinatesDiv.appendChild(changeDisplayDiv);
+            coordinatesDiv.appendChild(utmZoneDiv);
             coordinatesDiv.appendChild(xDiv);
             coordinatesDiv.appendChild(yDiv);
 
             this.div.appendChild(coordinatesDiv);
             this.latSpan = latValue;
             this.lonSpan = lonValue;
+            this.utmZoneSpan = utmZoneValue;
             this.xSpan = xValue;
             this.ySpan = yValue;
 
             this.element = this.div;
-
-            // var scaleBarDiv = OpenLayers.Util.createDiv(this.id 
-            //     + "ScaleLineDiv", null, null, null, 'relative');
-            // this.div.appendChild(scaleBarDiv);
-            // this.scaleLineControl = new OpenLayers.Control.ScaleLine({
-            //     div: scaleBarDiv,
-            //     geodesic: true,
-            //     autoActivate: false
-            // });
-            // this.map.addControl(this.scaleLineControl);
-
         }
 
         return this.div;
@@ -253,23 +268,26 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
     /**
      * Method: redraw
      */
-    redraw: function (evt) {
+    redraw : function (evt) {
 
         var lonLat;
         var lonLatDisplay;
         var lonLatUtm;
+        var utmZone = "";
 
-        if(!evt) {
+        if (!evt) {
             this.reset();
             return;
         } else {
-            if(this.lastXy === null || Math.abs(evt.xy.x - this.lastXy.x) > this.granularity || Math.abs(evt.xy.y - this.lastXy.y) > this.granularity) {
+            if (this.lastXy === null
+                    || Math.abs(evt.xy.x - this.lastXy.x) > this.granularity
+                    || Math.abs(evt.xy.y - this.lastXy.y) > this.granularity) {
                 this.lastXy = evt.xy;
                 return;
             }
 
             lonLat = this.map.getLonLatFromPixel(evt.xy);
-            if(!lonLat) {
+            if (!lonLat) {
                 // map has not yet been properly initialized
                 return;
             }
@@ -277,13 +295,15 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
             lonLatDisplay = lonLat.clone();
             lonLatUtm = lonLat.clone();
 
-            if(this.displayProjection) {
-                lonLatDisplay.transform(this.map.getProjectionObject(), this.displayProjection);
+            if (this.displayProjection) {
+                lonLatDisplay.transform(this.map.getProjectionObject(),
+                        this.displayProjection);
             }
-            if(this.utmDisplayProjection) {
-                lonLatUtm.transform(this.map.getProjectionObject(), this.utmDisplayProjection);
-            }
-
+            
+            utmZone = this.getUtmZone(lonLat);
+            lonLatUtm.transform(this.map.getProjectionObject(),
+                        this.getUtmProjection(lonLat, utmZone));
+            
 
             this.lastXy = evt.xy;
 
@@ -291,11 +311,15 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
 
         var lonlatValue = this.formatOutput(lonLatDisplay);
         var xyValue = this.formatUtmOutput(lonLatUtm);
-        if(lonlatValue.lat != this.latSpan.innerHTML || lonlatValue.lon != this.lonSpan.innerHTML) {
+        if (lonlatValue.lat != this.latSpan.innerHTML
+                || lonlatValue.lon != this.lonSpan.innerHTML) {
             this.latSpan.innerHTML = lonlatValue.lat;
             this.lonSpan.innerHTML = lonlatValue.lon;
         }
-        if(xyValue.x != this.xSpan.innerHTML || xyValue.y != this.ySpan.innerHTML) {
+        if (xyValue.x != this.xSpan.innerHTML
+                || xyValue.y != this.ySpan.innerHTML
+                || utmZone != this.utmZoneSpan.innerHTML) {
+            this.utmZoneSpan.innerHTML = utmZone;
             this.xSpan.innerHTML = xyValue.x;
             this.ySpan.innerHTML = xyValue.y;
         }
@@ -304,7 +328,7 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
     /**
      * Method: reset
      */
-    reset: function (evt) {
+    reset : function (evt) {
         if (this.emptyString !== null) {
             this.lonSpan.innerHTML = this.emptyString;
             this.latSpan.innerHTML = this.emptyString;
@@ -314,39 +338,100 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
     },
 
     /**
-     * Method: formatOutput
-     * Override to provide custom display output
-     *
-     * Parameters:
-     * lonLat - {<OpenLayers.LonLat>} Location to display
+     * Method: formatOutput Override to provide custom display output
+     * 
+     * Parameters: lonLat - {<OpenLayers.LonLat>} Location to display
      */
-    formatOutput: function (lonLat) {
+    formatOutput : function (lonLat) {
         var digits = parseInt(this.numDigits, 10);
-        var result = {
-            lon: lonLat.lon.toFixed(digits) + "º",
-            lat: lonLat.lat.toFixed(digits) + "º"
-        };
+        var result = null;
+        if (this.dmsCoordinatesFormat) {
+            var longitude = this.lonLatToDMS(lonLat.lon);
+            var latitude = this.lonLatToDMS(lonLat.lat);
+           result = {
+              lon: longitude[0] + "\u00B0 " + longitude[1] + "' " + longitude[2] + "\"",
+              lat: latitude[0] + "\u00B0 " + latitude[1] + "' " + latitude[2] + "\"" 
+            };            
+        } else {
+            result = {
+              lon : lonLat.lon.toFixed(digits) + "\u00B0",
+              lat : lonLat.lat.toFixed(digits) + "\u00B0"
+            };
+            
+        }
 
         return result;
     },
 
     /**
-     * Method: formatUtmOutput
-     * Override to provide custom display UTM output
-     *
-     * Parameters:
-     * lonLat - {<OpenLayers.LonLat>} Location to display
+     * Method: formatUtmOutput Override to provide custom display UTM output
+     * 
+     * Parameters: lonLat - {<OpenLayers.LonLat>} Location to display
      */
-    formatUtmOutput: function (lonLat) {
+    formatUtmOutput : function (lonLat) {
         var digits = parseInt(this.numUtmDigits, 10);
         var result = {
-            x: lonLat.lon.toFixed(digits),
-            y: lonLat.lat.toFixed(digits)
+            x : lonLat.lon.toFixed(digits),
+            y : lonLat.lat.toFixed(digits)
         };
-
 
         return result;
     },
+    
+    getUtmProjection: function(mapCoordinates, utmZone) {
+        var coord = mapCoordinates.clone();
+        coord.transform(this.map.getProjectionObject(),
+                this.wgs84LatLonProjection);
+       
+        var utmProj = this.utmProjections[utmZone];
+        if (!utmProj) {
+            if(""+utmZone)
+            utmProj = new OpenLayers.Projection(this.utmProjectionPrefix + this.lpad(utmZone, 2));
+            this.utmProjections[utmZone] = utmProj;
+        }
+        return utmProj;
+        
+    },
+    
+    getUtmZone: function (mapCoordinates) {
+        var coord = mapCoordinates.clone();
+        coord.transform(this.map.getProjectionObject(),
+                this.wgs84LatLonProjection);
+        return Math.floor((coord.lon + 186) / 6);
+    },
+    lpad: function (value, padding) {
+        var zeroes = "0";
 
-    CLASS_NAME: "OpenLayers.Control.CustomMousePosition"
+        for (var i = 0; i < padding; i++) { zeroes += "0"; }
+
+        return (zeroes + value).slice(padding * -1);
+    },
+    
+    toggleCoordinatesFormat: function() {
+        this.dmsCoordinatesFormat = !this.dmsCoordinatesFormat;
+        var evt = {
+                xy: {
+                    x: this.lastXy.x,
+                    y: this.lastXy.y
+                }
+        };
+        if (this.dmsCoordinatesFormat) {
+            this.button.setText("Mostrar en Decimal");
+        } else {
+            this.button.setText("Mostrar en GG\u00B0 MM' SS\"");
+        }
+        this.redraw(evt);
+    },
+    
+    lonLatToDMS: function(coord){
+        var d = parseInt(coord, 10);
+        var md = Math.abs(coord - d) * 60;
+        var m = parseInt(md, 10);
+        var sd = (md-m) * 60;
+        return [d, m, sd.toFixed(3)];
+    },
+    
+    
+
+    CLASS_NAME : "OpenLayers.Control.CustomMousePosition"
 });
