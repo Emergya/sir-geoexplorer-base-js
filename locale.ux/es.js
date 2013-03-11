@@ -331,6 +331,12 @@ GeoExt.Lang.add("es",{
         infoActionTip: 'Información del elemento',
         popupTitle: 'Información del elemento',
         buttonText: 'Identificar'
+    },
+
+    "Viewer.PointSymbolizerMod.prototype":{
+        uploadFileEmptyText: 'Selecciona un icono...',
+        uploadFileLabel: 'Icono',
+        waitMsgText: 'Espere...'
     }
 
 });
