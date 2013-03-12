@@ -27,10 +27,11 @@
  */
 
 Viewer.dialog.PointInformation = Ext.extend(Ext.Window, {
-
+    descriptionText: 'Please, click the map to view the coordinates of the position clicked.',
     prjGeo: null,
     prjUtm: null,
     lastEvt: null,
+    datum: "WGS84",
     utmProjections: {
         "17": new OpenLayers.Projection("EPSG:32717"),    
         "18": new OpenLayers.Projection("EPSG:32718"),
@@ -52,11 +53,9 @@ Viewer.dialog.PointInformation = Ext.extend(Ext.Window, {
             cls: 'vw_point_information_window',
             title: 'Consulta de coordenadas',
             width: 290,
-            height: 215,
+            height: 275,
             closeAction: 'hide',
             layout: 'fit',
-            datum: 'WGS84',
-            huso: 19,
             geoProjection: null,
             utmProjection: null
         }, config));
@@ -128,11 +127,17 @@ Viewer.dialog.PointInformation = Ext.extend(Ext.Window, {
             layout: 'form',
             padding: '20px 10px',
             items: [
+                {
+                    xtype: 'label',
+                    text: this.descriptionText,
+                    cls: 'toolDescription'
+
+                },
                 this.txtDatum = new Ext.form.TextField({
                     fieldLabel: 'Datum',
                     anchor: '95%',
+                    value: this.datum,
                     readOnly: true,
-                    hidden: true
                 }),
                 this.txtLat = new Ext.form.TextField({
                     fieldLabel: 'Latitud',

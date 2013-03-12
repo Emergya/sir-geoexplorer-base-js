@@ -346,6 +346,9 @@ GeoExt.Lang
                         tooltip : "Abre una ventana en la que puede seleccionar " +
                                 "capas adicionales para visualizar en el visor."
 
+                    },
+                    "Viewer.dialog.PointInformation.prototype": {
+                        descriptionText : "Haga click en el mapa para ver las coordenadas del lugar pulsado."
                     }
 
                 });

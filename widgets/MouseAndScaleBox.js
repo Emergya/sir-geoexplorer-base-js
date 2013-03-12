@@ -51,11 +51,11 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
     /** api: ptype = vw_mouseandscalebox */
     ptype: "vw_mouseandscalebox",
     bodyCssClass: 'vw_mouseandscalebox',
-    width: 240,
-    height: 160,
+    width: 250,
+    height: 175,
     x: 5,
  //   floating:true,
-    frame:true,
+    frame: true,
     resizable: false,
     draggable: false,
     closable: false,
@@ -98,8 +98,8 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
             }
             this.bind(this.map);
         }
-        this.on("beforedestroy", this.unbind, this); 
-        this.on("minimize", this.handleMinimize, this);       
+        this.on("beforedestroy", this.unbind, this);
+        this.on("minimize", this.handleMinimize, this);
     },
     
     /** private: method[addToMapPanel]
@@ -120,7 +120,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
                 
                 this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -30]);
             } else {
-                this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -165]);
+                this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -175]);
             }
             
             },
@@ -209,7 +209,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
             emptyText: this.zoomLevelText,
             tpl: '<tpl for="."><div class="x-combo-list-item">1 : {[Ext.util.Format.number(values.scale,"0.000.000/i")]}</div></tpl>',
             editable: false,
-            hiddenName:"zoomLevelControl",
+            hiddenName: "zoomLevelControl",
             triggerAction: 'all',
             mode: 'local',
             store: this.zoomStore,
@@ -218,7 +218,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
         this.zoomSelector.on({
             click: this.stopMouseEvents,
             mousedown: this.stopMouseEvents,
-            select: function (combo, record, index) {                
+            select: function (combo, record, index) {
                 this.map.zoomTo(record.data.level);
             },
             scope: this
@@ -291,8 +291,6 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
 
     handleMinimize: function () {
         var title = this.minimizedTitle || this.title;
-
-       
         this.toggleCollapse(false);
         if (!this.minimized) {
             this.minimized = true;
@@ -301,7 +299,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
         } else {
             this.setTitle(null);
             this.minimized = false;
-            this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -165]);
+            this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -175]);
         }
     }
 

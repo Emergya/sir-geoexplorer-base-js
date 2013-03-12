@@ -90,6 +90,10 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
      * projection in which the mouse position is displayed.
      */
     utmDisplayProjection : null,
+    /**
+     * APIProperty: datum {String} Set the datum displayed in the control.
+     */
+    datum: "WGS84",
     
     utmProjections: {
         "17": new OpenLayers.Projection("EPSG:32717"),    
@@ -155,6 +159,8 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
     draw : function () {
         OpenLayers.Control.prototype.draw.apply(this, arguments);
         if (!this.element) {
+            var datumDiv = OpenLayers.Util.createDiv(this.id + "DatumDiv", null, 
+                    null, null, 'relative');
             var latDiv = OpenLayers.Util.createDiv(this.id + "LatDiv", null,
                     null, null, 'relative');
             var lonDiv = OpenLayers.Util.createDiv(this.id + "LongDiv", null,
@@ -170,6 +176,7 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
             var coordinatesDiv = OpenLayers.Util.createDiv(
                     this.id + "coordDiv", null, null, null, 'relative');
             coordinatesDiv.className = "coordinatesDiv";
+            OpenLayers.Element.addClass(datumDiv, 'lonlatDiv');
             OpenLayers.Element.addClass(latDiv, 'lonlatDiv');
             OpenLayers.Element.addClass(lonDiv, 'lonlatDiv');
             OpenLayers.Element.addClass(changeDisplayDiv, 'changeDisplayDiv');
@@ -177,9 +184,22 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
             OpenLayers.Element.addClass(xDiv, 'lonlatDiv');
             OpenLayers.Element.addClass(yDiv, 'lonlatDiv');
 
+            // datum
+            var datumLabel = document.createElement('span');
+            var datumLabelText = document.createTextNode('Datum:');
+            datumLabel.appendChild(datumLabelText);
+            datumLabel = OpenLayers.Element.addClass(datumLabel, 'lonlatLabel');
+            var datumValue = document.createElement('span');
+            var datumValueText = document.createTextNode(this.datum);
+            OpenLayers.Element.addClass(datumValue, 'lonlatValue');
+            datumValue.appendChild(datumValueText);
+            datumDiv.appendChild(datumLabel);
+            datumDiv.appendChild(datumValue);
+
+
             // longitude
             var lonLabel = document.createElement('span');
-            var lonLabelText = document.createTextNode('Longitud');
+            var lonLabelText = document.createTextNode('Longitud:');
             lonLabel.appendChild(lonLabelText);
             lonLabel = OpenLayers.Element.addClass(lonLabel, 'lonlatLabel');
             var lonValue = document.createElement('span');
@@ -189,7 +209,7 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
 
             // latitude
             var latLabel = document.createElement('span');
-            var latLabelText = document.createTextNode('Latitud');
+            var latLabelText = document.createTextNode('Latitud:');
             latLabel.appendChild(latLabelText);
             latLabel = OpenLayers.Element.addClass(latLabel, 'lonlatLabel');
             var latValue = document.createElement('span');
@@ -214,7 +234,7 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
 
             // UTM zone
             var utmZoneLabel = document.createElement('span');
-            var utmZoneLabelText = document.createTextNode('Huso UTM');
+            var utmZoneLabelText = document.createTextNode('Huso UTM:');
             utmZoneLabel.appendChild(utmZoneLabelText);
             utmZoneLabel = OpenLayers.Element.addClass(utmZoneLabel,
                     'lonlatLabel');
@@ -226,7 +246,7 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
 
             // X coord
             var xLabel = document.createElement('span');
-            var xLabelText = document.createTextNode('Coordenada X');
+            var xLabelText = document.createTextNode('Coordenada X:');
             xLabel.appendChild(xLabelText);
             xLabel = OpenLayers.Element.addClass(xLabel, 'lonlatLabel');
             var xValue = document.createElement('span');
@@ -236,7 +256,7 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
 
             // Y coord
             var yLabel = document.createElement('span');
-            var yLabelText = document.createTextNode('Coordenada Y');
+            var yLabelText = document.createTextNode('Coordenada Y:');
             yLabel.appendChild(yLabelText);
             yLabel = OpenLayers.Element.addClass(yLabel, 'lonlatLabel');
             var yValue = document.createElement('span');
@@ -245,6 +265,7 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
             yDiv.appendChild(yValue);
 
             // Add to coordinatesDiv
+            coordinatesDiv.appendChild(datumDiv);
             coordinatesDiv.appendChild(lonDiv);
             coordinatesDiv.appendChild(latDiv);
             coordinatesDiv.appendChild(changeDisplayDiv);
@@ -371,8 +392,8 @@ OpenLayers.Control.CustomMousePosition = OpenLayers.Class(OpenLayers.Control, {
     formatUtmOutput : function (lonLat) {
         var digits = parseInt(this.numUtmDigits, 10);
         var result = {
-            x : lonLat.lon.toFixed(digits),
-            y : lonLat.lat.toFixed(digits)
+            x : lonLat.lon.toFixed(digits) + " m",
+            y : lonLat.lat.toFixed(digits) + " m"
         };
 
         return result;
