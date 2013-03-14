@@ -100,6 +100,7 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
 
     _onShow: function () {
         this.layersTree.reload();
+        this.loadButton.setDisabled(!this.showLayers);
     },
 
     showLoading: function (show) {
@@ -107,7 +108,6 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
     },
 
     onTreeNodeClick: function (node, checked) {
-
         if (!this.showLayers) {
             if (node.isLeaf()) {
                 this.selectedChannel = node.id;
@@ -116,7 +116,7 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
             } else {
                 this.loadButton.disable();
             }
-        }
+        } 
     },
 
     addedLayers: [],
@@ -147,7 +147,8 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
             if ( !! this.selectedChannel) {
                 this.clearLayers();
                 Viewer.trackUrl('channels/' + this.selectedChannelName);
-                this.persistenceGeoContext.loadChannel(this.selectedChannel, this.selectedChannelName);
+                this.persistenceGeoContext.loadChannelWithFilters(this.selectedChannel, this.selectedChannelName,[
+                    "ONLY_CHANNEL_MARK","RECURSIVE_FOLDER_LAYERS_MARK"]);
             }
         }
     }
