@@ -78,6 +78,8 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
     /** private: property[iconCls]
      */
     iconCls: 'vw-icon-localcertificate-toolbar',
+
+    _toolItems : null,
     
     /** private: method[constructor]
      */
@@ -97,18 +99,15 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
      */
     addActions: function() {
     	
-    	// FIXME: Este código es altamente tentativo.
-    	if(false && !this.target.isAuthorizedIn("ROLE_ADMINISTRATOR")) {
-    		// No añadimos la herramienta
-    		return;
-    	}
+    	app.on("loginstatechange", this._onLoginStateChanged, this);
 
-
-        return gxp.plugins.LocalCertificatesAction.superclass.addActions.apply(this, [{
+        var hidden = this._checkHidden(app.persistenceGeoContext.userInfo); 
+        return this._toolItems= gxp.plugins.LocalCertificatesAction.superclass.addActions.apply(this, [{
             buttonText: this.showButtonText ? this.buttonText : '',
             menuText: this.menuText,
             iconCls: this.iconCls,
             tooltip: this.tooltip,
+            hidden: hidden,
             menu: new Ext.menu.Menu({
                 items: [
                     new Ext.menu.Item({
@@ -127,6 +126,38 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
             }),
             scope: this
         }]);
+
+       
+    },
+
+    _onLoginStateChanged : function(sender, userInfo) {
+        var hidden = this._checkHidden(userInfo);
+        var toolButton = this._toolItems[0];
+        if(hidden) {
+
+            // We destroy the search form 
+            var ds =  Viewer.getComponent('LocalCertificatesWindow');
+            if (ds) {
+                Viewer.unregisterComponent("LocalCertificatesWindow");
+                ds.destroy();
+            }
+
+
+            this._cancelMapSelection();
+
+
+            toolButton.hide();
+        } else {
+            toolButton.show();
+        }
+    },
+
+    _checkHidden : function(userInfo) {
+        if(!userInfo || !userInfo.authority || userInfo.authority.indexOf("Municipalidad")==-1){
+            return true;
+        }
+
+        return false;
     },
 
     _showSearchFormHandler : function() {
@@ -143,9 +174,18 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
         if (ds.isVisible()) {
             ds.hide();
         } else {
+
+            this._cancelMapSelection();
             ds.show();
         }
 
+    },
+
+    _cancelMapSelection : function() {
+        // We change the cursor over the map to indicate selection.
+        Ext.select(".olMap").setStyle("cursor","default");
+        var map = Viewer.getMapPanel().map;
+        map.events.unregister("click",this,this._onPropertySelected);
     },
 
     _selectInMapHandler : function() {
@@ -160,7 +200,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
         var baseLayer = new OpenLayers.Layer.WMS(
                 layerName,
                 app.sources.local.url+"/wms",
-                {layers: layerName, outputFormat: "image/png", transparent: true,styles:"polygon"}
+                {layers: layerName, outputFormat: "image/png", transparent: true,styles:"Borde_comuna"}
         );  
 
         
@@ -179,7 +219,13 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
             layerPrefix = layerType;
         }
 
-        return layerPrefix+"_"+this.getLocalityName(true).toUpperCase();
+        var localityName = this.getLocalityName(true).toUpperCase();
+
+        if(!localityName) {
+            return null;
+        }
+
+        return layerPrefix+"_"+localityName;
     },
         
     _onPropertySelected : function(eventData) {
@@ -426,7 +472,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                 srs : Viewer.getMapPanel().map.projection,
                 format:"image/png",
                 transparent:true,
-                styles:"polygon"
+                styles:"Borde_comuna"
             });
         
             var parcelUrl = this._createURL(
@@ -541,12 +587,18 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
        
 
         getLocalityName : function(tidy) {
-            // TODO: Esto depende del usuario municipal que esté logeado.           
-            var result =  "Machalí";
-            if(tidy) {
-                result = this._accentsTidy(result);
+
+            if(!app.persistenceGeoContext.userInfo) {
+                return "";
             }
-            return result;
+
+            var authority = app.persistenceGeoContext.userInfo.authority;
+            var needle = "Municipalidad de";
+            var localityName = authority.substr(authority.indexOf(needle)+needle.length);            
+            if(tidy) {
+                localityName = this._accentsTidy(localityName);
+            }
+            return localityName;
         },
         
         _accentsTidy  :  function(s){
