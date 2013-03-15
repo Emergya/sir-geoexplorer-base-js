@@ -118,10 +118,7 @@
 
                             var url = layer.url || window.app.sources.local.url;
                             if (url[url.length - 1] !== "?") {
-                                url += "?renderRows(startRow, endRow)
-
-
-                        ººº     ";
+                                url += "?";
                             }
 
                             url += [
