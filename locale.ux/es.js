@@ -131,6 +131,10 @@ GeoExt.Lang
 
                     "Viewer.plugins.RasterUploadPanel.prototype" : {
                         windowTitleText : "Crear una nueva capa a partir de un fichero raster",
+                        descriptionText: "Escriba el nombre para la nueva capa, seleccione o " + 
+                            "escriba el sistema de referencia del ráster y seleccione un archivo GeoTIFF " + 
+                            "o un ZIP con un archivo imagen y un archivo world dentro del mismo." + 
+                            " (png+pgw, jpg+jgw, tif+tfw).",
                         buttonText : "Subir",
                         layerNameLabelText : "Nombre",
                         layerNameEmptyText : "Nombre de la capa",
