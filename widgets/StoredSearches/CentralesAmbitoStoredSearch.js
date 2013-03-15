@@ -70,6 +70,7 @@ Viewer.controller.CentralesAmbitoStoredSearch = Ext.extend(Viewer.controller.Sto
     },
 
     onShow: function() {
+        Viewer.controller.CentralesAmbitoStoredSearch.superclass.onShow.call(this);
     },
 
     onHide: function() {

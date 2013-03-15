@@ -76,6 +76,7 @@ Viewer.controller.CentralesCombustibleStoredSearch = Ext.extend(Viewer.controlle
     },
 
     onShow: function() {
+        Viewer.controller.CentralesCombustibleStoredSearch.superclass.onShow.call(this);
     },
 
     onHide: function() {

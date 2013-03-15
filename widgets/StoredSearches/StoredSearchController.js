@@ -116,6 +116,20 @@ Viewer.controller.StoredSearchController = Ext.extend(Viewer.controller.Controll
     onHide: function() {
     },
 
+    clearForm: function(){
+        try {
+            if(!!this.formFields){
+                for (var key in this.formFields) {
+                    this.formFields[key].setValue();
+                }
+            }
+            if(!!this.layer){
+                this.layer.filter = null;
+                this.layer.refresh({force: true});
+            }
+        } catch(e) {}
+    },
+
     validateQuery: function() {
         return true;
     },

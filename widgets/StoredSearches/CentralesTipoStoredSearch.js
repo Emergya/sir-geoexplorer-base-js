@@ -76,6 +76,7 @@ Viewer.controller.CentralesTipoStoredSearch = Ext.extend(Viewer.controller.Store
     },
 
     onShow: function() {
+        Viewer.controller.CentralesTipoStoredSearch.superclass.onShow.call(this);
     },
 
     onHide: function() {

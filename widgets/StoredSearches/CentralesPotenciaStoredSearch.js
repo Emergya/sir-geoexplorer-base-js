@@ -71,6 +71,7 @@ Viewer.controller.CentralesPotenciaStoredSearch = Ext.extend(Viewer.controller.S
     },
 
     onShow: function() {
+        Viewer.controller.CentralesPotenciaStoredSearch.superclass.onShow.call(this);
     },
 
     onHide: function() {

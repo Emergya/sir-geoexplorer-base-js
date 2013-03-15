@@ -78,6 +78,7 @@ Viewer.controller.ProyectosSEACombustiblePotenciaStoredSearch = Ext.extend(Viewe
     },
 
     onShow: function() {
+        Viewer.controller.ProyectosSEACombustiblePotenciaStoredSearch.superclass.onShow.call(this);
     },
 
     onHide: function() {

@@ -78,6 +78,7 @@ Viewer.controller.ProyectosSEAStoredSearch = Ext.extend(Viewer.controller.Stored
     },
 
     onShow: function() {
+        Viewer.controller.ProyectosSEAStoredSearch.superclass.onShow.call(this);
     },
 
     onHide: function() {
