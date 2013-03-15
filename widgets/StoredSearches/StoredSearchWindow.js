@@ -39,10 +39,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
     constructor: function(config) {
 
         var constructor = Viewer.controller[config.controller];
-        this.controller = new constructor({
-            //wfsServiceUrl: 'http://sig.minenergia.cl:80/geoserver/wfs'
-            wfsServiceUrl: 'http://localhost/geoserver/wfs'
-        });
+        this.controller = new constructor(config);
 
         // Important!
         delete config.controller;

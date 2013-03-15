@@ -71,6 +71,9 @@ gxp.plugins.StoredSearchAction = Ext.extend(gxp.plugins.Tool, {
     /** private: property[iconCls]
      */
     iconCls: 'vw-icon-point-information',
+
+    source: null,
+    url: null,
     
     /** private: method[constructor]
      */
@@ -84,6 +87,16 @@ gxp.plugins.StoredSearchAction = Ext.extend(gxp.plugins.Tool, {
     init: function(target) {
         gxp.plugins.StoredSearchAction.superclass.init.apply(this, arguments);
         this.target.on('beforerender', this.addActions, this);
+
+        // obtain default source: local
+        if(!this.source){
+            this.source = this.target.sources.local;
+        }
+        // obtain default url: source(local).url
+        if(!this.url 
+            && !!this.source){
+            this.url = this.source.url.replace('ows', 'wfs');
+        }
     },
 
     /** api: method[addActions]
@@ -102,7 +115,8 @@ gxp.plugins.StoredSearchAction = Ext.extend(gxp.plugins.Tool, {
                     ds = new Viewer.dialog.StoredSearchWindow({
                         mapPanel: mapPanel,
                         map: mapPanel.map,
-                        controller: this.controller
+                        controller: this.controller,
+                        wfsServiceUrl: this.url
                     });
                     Viewer.registerComponent(this.controller, ds);
                 }

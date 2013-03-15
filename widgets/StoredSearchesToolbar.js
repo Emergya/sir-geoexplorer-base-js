@@ -28,48 +28,84 @@
 
 Viewer.widgets.StoredSearchesToolbar = Ext.extend(Ext.Toolbar, {
 
+    source: null,
+    url: null,
+
     constructor: function(config) {
 
         Ext.apply(this, config);
 
         this.tools = [];
 
-        this.plugins = [{
-            ptype: 'viewer_storedSearchAction',
-            tooltip: 'Proyectos aprobados en SEA por ámbito',
-            controller: 'ProyectosSEAStoredSearch',
-            actionTarget: 'storedsearchestbar'
-        }, {
-            ptype: 'viewer_storedSearchAction',
-            tooltip: 'Proyectos aprobados por tipo de combustible y potencia',
-            controller: 'ProyectosSEACombustiblePotenciaStoredSearch',
-            actionTarget: 'storedsearchestbar'
-        }, {
-            ptype: 'viewer_storedSearchAction',
-            tooltip: 'Centrales generadoras por tipo de combustible',
-            controller: 'CentralesCombustibleStoredSearch',
-            actionTarget: 'storedsearchestbar'
-        }, {
-            ptype: 'viewer_storedSearchAction',
-            tooltip: 'Centrales generadoras por tipo',
-            controller: 'CentralesTipoStoredSearch',
-            actionTarget: 'storedsearchestbar'
-        }, {
-            ptype: 'viewer_storedSearchAction',
-            tooltip: 'Centrales generadoras por ámbito territorial',
-            controller: 'CentralesAmbitoStoredSearch',
-            actionTarget: 'storedsearchestbar'
-        }, {
-            ptype: 'viewer_storedSearchAction',
-            tooltip: 'Centrales generadoras por potencia',
-            controller: 'CentralesPotenciaStoredSearch',
-            actionTarget: 'storedsearchestbar'
-        }];
-
         Viewer.widgets.StoredSearchesToolbar.superclass.constructor.call(this, Ext.apply({
             id: 'storedsearchestbar',
             cls: 'viewer_storedsearchestoolbar'
         }, config));
+    }, 
+
+    initComponent: function(){
+
+        // obtain default source: local
+        if(!this.source){
+            this.source = this.target.sources.local;
+        }
+        // obtain default url: source(local).url
+        if(!this.url 
+            && !!this.source){
+            this.url = this.source.url.replace('ows', 'wfs');
+        }
+
+        this.plugins = [{
+            ptype: 'viewer_storedSearchAction',
+            tooltip: 'Proyectos aprobados en SEA por ámbito',
+            controller: 'ProyectosSEAStoredSearch',
+            actionTarget: 'storedsearchestbar',
+            target: this.target,
+            source: this.source, 
+            wfsServiceUrl: this.url 
+        }, {
+            ptype: 'viewer_storedSearchAction',
+            tooltip: 'Proyectos aprobados por tipo de combustible y potencia',
+            controller: 'ProyectosSEACombustiblePotenciaStoredSearch',
+            actionTarget: 'storedsearchestbar',
+            target: this.target,
+            source: this.source, 
+            wfsServiceUrl: this.url 
+        }, {
+            ptype: 'viewer_storedSearchAction',
+            tooltip: 'Centrales generadoras por tipo de combustible',
+            controller: 'CentralesCombustibleStoredSearch',
+            actionTarget: 'storedsearchestbar',
+            target: this.target,
+            source: this.source, 
+            wfsServiceUrl: this.url 
+        }, {
+            ptype: 'viewer_storedSearchAction',
+            tooltip: 'Centrales generadoras por tipo',
+            controller: 'CentralesTipoStoredSearch',
+            actionTarget: 'storedsearchestbar',
+            target: this.target,
+            source: this.source, 
+            wfsServiceUrl: this.url 
+        }, {
+            ptype: 'viewer_storedSearchAction',
+            tooltip: 'Centrales generadoras por ámbito territorial',
+            controller: 'CentralesAmbitoStoredSearch',
+            actionTarget: 'storedsearchestbar',
+            target: this.target,
+            source: this.source, 
+            wfsServiceUrl: this.url 
+        }, {
+            ptype: 'viewer_storedSearchAction',
+            tooltip: 'Centrales generadoras por potencia',
+            controller: 'CentralesPotenciaStoredSearch',
+            actionTarget: 'storedsearchestbar',
+            target: this.target,
+            source: this.source, 
+            wfsServiceUrl: this.url 
+        }];
+        
+        Viewer.widgets.StoredSearchesToolbar.superclass.initComponent.call(this, arguments);
     }
 
 });
