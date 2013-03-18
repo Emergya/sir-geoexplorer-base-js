@@ -87,6 +87,12 @@ gxp.plugins.ExtendedToolbar = Ext.extend(gxp.plugins.Tool, {
      *  The target parent for the toolbar. Usually ``Composer`` object.
      */
     targetParent: null,
+
+    /** api: config[config]
+     *  ``Object``
+     *  Config to copy to the toolbar. Ussually parameters needed in actions.
+     */
+    config: null,
     
     /** private: method[constructor]
      */
@@ -117,11 +123,17 @@ gxp.plugins.ExtendedToolbar = Ext.extend(gxp.plugins.Tool, {
 
                     var mapPanel = Viewer.getMapPanel();
                     var toolbarClass = Viewer.widgets[this.toolbar];
-                    
-                    toolbarInstance = new toolbarClass({
+
+                    var config = {
                         mapPanel: mapPanel,
                         target: this.targetParent
-                    });
+                    };
+
+                    if(!!this.config){ // extends config
+                        Ext.apply(config, this.config);
+                    }
+                    
+                    toolbarInstance = new toolbarClass(config);
 
                     Viewer.registerComponent(this.toolbar, toolbarInstance);
                     this.target.mapPanel.add(toolbarInstance);

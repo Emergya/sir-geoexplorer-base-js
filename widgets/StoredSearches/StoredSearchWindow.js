@@ -35,6 +35,18 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
     controller: null,
 
     formFields: null,
+    
+    /** api: config[closest]
+     *  ``Boolean`` Find the zoom level that most closely fits the specified
+     *  extent. Note that this may result in a zoom that does not exactly
+     *  contain the entire extent.  Default is false.
+     */
+    closest: false,
+    
+    /** api: config[autoExpand]
+     *  ``String`` Reference to feature grid table to expand on show
+     */
+    autoExpand: "table",
 
     constructor: function(config) {
 
@@ -68,10 +80,19 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
 
     onShow: function() {
 
+        this.manager = this.target.target.tools[this.featureManager];
+
+        this.grid = new gxp.grid.FeatureGrid({
+            map: this.map,
+            ignoreFields: ['the_geom'],
+            height: 200
+        });
+
         var options = {
             url : this.controller.wfsServiceUrl, 
             maxFeatures: 500,
-            featureType: this.controller.featureType
+            featureType: this.controller.featureType,
+            projection: this.target.target.mapPanel.map.projection
         };
 
         var _strategies = [
@@ -87,14 +108,27 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                 'strategies' : _strategies,
                 'protocol' : new OpenLayers.Protocol.WFS(options)
         });
+
+
         this.target.target.mapPanel.map.addLayer(this.controller.layer);
+        // copy to record type
+        var  recordType = GeoExt.data.LayerRecord.create([{name: "name", type: "string"}]);
+        this.recordLayer = new recordType({
+            name: this.controller.layer.name,
+            source: this.target.target.sources.local,
+            layer: this.controller.layer
+        }, this.controller.layer);
+        this.target.target.selectLayer(this.recordLayer);
         this.controller.onShow();
+
+        this.onSearchButtonClicked();
     },
 
     onHide: function() {
         if(!!this.controller.layer){
             this.target.target.mapPanel.map.removeLayer(this.controller.layer);
         }
+        this.showGrid(false);
         this.controller.onHide();
     },
 
@@ -132,62 +166,32 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
         this.controller.layer.filter = ogcFilter;
         this.controller.layer.refresh({force: true});
 
-        Ext.Ajax.request({
-            url: this.controller.wfsServiceUrl,
-            method: 'GET',
-            params: {
-                service: 'wfs',
-                version: '1.1.0',
-                request: 'describeFeatureType',
-                typeName : this.controller.featureType
-            },
-            success: function(response) {
+        this.manager.loadFeatures(ogcFilter, function (){  
 
-                var attributeStore = new GeoExt.data.AttributeStore({   
-                    listeners: {
-                        load: function(store, records, options) {
-                            var attributes = [];
-                            for (var i = 0; i< records.length; i++) {
-                                if (records[i].data.name != 'the_geom') {
-                                    attributes.push({
-                                        name: records[i].data.name,
-                                        type: records[i].data.type
-                                    });
-                                }
-                            }
+            this.grid.setStore(this.manager.featureStore);
 
-                            var store = new gxp.data.WFSFeatureStore({
-                                url: this.controller.wfsServiceUrl,
-                                featureType: this.controller.featureType,
-                                fields: attributes,
-                                ogcFilter: ogcFilter,
-                                autoLoad: true,
-                                listeners: {
-                                    load: function() {
-                                        this.loadMask.hide();
-                                    },
-                                    exception: function(e) {
-                                        this.onQueryLoadError(e);
-                                    },
-                                    scope: this
-                                }
-                            });
+            this.btnZoomToResult.setDisabled(false);
+            this.btnPrint.setDisabled(false);
 
-                            this.grid.setStore(store);
+            this.showGrid(true);
 
-                            this.btnPrint.setDisabled(false);
+            this.loadMask.hide();
+        }, this);
+    },
 
-                        },
-                        exception: function(e) {
-                            this.onQueryLoadError(e);
-                        },
-                        scope: this
-                    }
-                });;
-
-                attributeStore.loadData(response.responseXML);
-            }.createDelegate(this)
-        });
+    showGrid: function(show){
+        var expandContainer = Ext.getCmp(this.autoExpand);
+        if(show){
+            expandContainer.expand();
+            if (expandContainer.ownerCt && expandContainer.ownerCt instanceof Ext.Panel) {
+                expandContainer.ownerCt.expand();
+            }
+        }else{
+            expandContainer.collapse();
+            if (expandContainer.ownerCt && expandContainer.ownerCt instanceof Ext.Panel) {
+                expandContainer.ownerCt.collapse();
+            }
+        }
         
     },
 
@@ -239,6 +243,16 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
         var formContainer = new Ext.FormPanel({
             labelWidth: 120,
             buttons: [
+                this.btnZoomToResult = new Ext.Button({
+                    text: 'Centrar',
+                    disabled: true,
+                    listeners: {
+                        click: function(){
+                            this.zoomToLayerExtent();
+                        },
+                        scope: this
+                    }
+                }),
                 this.btnPrint = new Ext.Button({
                     text: 'Imprimir',
                     disabled: true,
@@ -263,8 +277,11 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                 this.btnClear = new Ext.Button({
                     text: 'Limpiar',
                     listeners: {
-                        click: this.controller.clearForm,
-                        scope: this.controller
+                        click: function(){
+                            this.controller.clearForm();
+                            this.onSearchButtonClicked();
+                        },
+                        scope: this
                     }   
                 }),
                 this.btnSearch = new Ext.Button({
@@ -313,19 +330,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                     }
                 }));
             }
-        }
-
-        formContainer.add(this.grid = new gxp.grid.FeatureGrid({
-            //title: 'title',
-            map: this.map,
-            ignoreFields: ['the_geom'],
-            //width: 400,
-            height: 200
-        }));
-
-        this.grid.getTitle = function (){
-            return this.title;
-        };
+        }     
 
         this.add(formContainer);
     },
@@ -348,6 +353,33 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
         }
         this.controller.formFields = this.formFields;
         this.controller.onAfterRender();
+    },
+
+    /** api: method[zoomToLayerExtent]
+     * 
+     * Zoom to layer extent
+     */
+    zoomToLayerExtent: function() {
+        var map = this.target.target.mapPanel.map;
+        var layer = this.controller.layer;
+        if (OpenLayers.Layer.Vector) {
+            dataExtent = layer instanceof OpenLayers.Layer.Vector &&
+                layer.getDataExtent();
+        }
+        var extent =  layer.restrictedExtent || dataExtent || layer.maxExtent || map.maxExtent;
+        if (extent) {
+            // respect map properties
+            var restricted = map.restrictedExtent || map.maxExtent;
+            if (restricted) {
+                extent = new OpenLayers.Bounds(
+                    Math.max(extent.left, restricted.left),
+                    Math.max(extent.bottom, restricted.bottom),
+                    Math.min(extent.right, restricted.right),
+                    Math.min(extent.top, restricted.top)
+                );
+            }
+            map.zoomToExtent(extent, this.closest);
+        }
     }
 });
 

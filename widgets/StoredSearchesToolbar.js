@@ -62,6 +62,8 @@ Viewer.widgets.StoredSearchesToolbar = Ext.extend(Ext.Toolbar, {
             actionTarget: 'storedsearchestbar',
             target: this.target,
             source: this.source, 
+            featureManager:this.featureManager,
+            featureGrid:this.featureGrid,
             wfsServiceUrl: this.url 
         }, {
             ptype: 'viewer_storedSearchAction',
@@ -70,6 +72,8 @@ Viewer.widgets.StoredSearchesToolbar = Ext.extend(Ext.Toolbar, {
             actionTarget: 'storedsearchestbar',
             target: this.target,
             source: this.source, 
+            featureManager:this.featureManager,
+            featureGrid:this.featureGrid,
             wfsServiceUrl: this.url 
         }, {
             ptype: 'viewer_storedSearchAction',
@@ -78,6 +82,8 @@ Viewer.widgets.StoredSearchesToolbar = Ext.extend(Ext.Toolbar, {
             actionTarget: 'storedsearchestbar',
             target: this.target,
             source: this.source, 
+            featureManager:this.featureManager,
+            featureGrid:this.featureGrid,
             wfsServiceUrl: this.url 
         }, {
             ptype: 'viewer_storedSearchAction',
@@ -86,6 +92,8 @@ Viewer.widgets.StoredSearchesToolbar = Ext.extend(Ext.Toolbar, {
             actionTarget: 'storedsearchestbar',
             target: this.target,
             source: this.source, 
+            featureManager:this.featureManager,
+            featureGrid:this.featureGrid,
             wfsServiceUrl: this.url 
         }, {
             ptype: 'viewer_storedSearchAction',
@@ -94,6 +102,8 @@ Viewer.widgets.StoredSearchesToolbar = Ext.extend(Ext.Toolbar, {
             actionTarget: 'storedsearchestbar',
             target: this.target,
             source: this.source, 
+            featureManager:this.featureManager,
+            featureGrid:this.featureGrid,
             wfsServiceUrl: this.url 
         }, {
             ptype: 'viewer_storedSearchAction',
@@ -102,6 +112,8 @@ Viewer.widgets.StoredSearchesToolbar = Ext.extend(Ext.Toolbar, {
             actionTarget: 'storedsearchestbar',
             target: this.target,
             source: this.source, 
+            featureManager:this.featureManager,
+            featureGrid:this.featureGrid,
             wfsServiceUrl: this.url 
         }];
         
