@@ -46,6 +46,9 @@ Ext.namespace("Viewer.plugins");
 Viewer.plugins.GraticuleTool = Ext.extend(gxp.plugins.Tool, {
 	/** api: ptype = vw_graticuletool */
     ptype: "vw_graticuletool",
+    /** private: property[iconCls]
+     */
+    iconCls: "vw-icon-graticule-tool",
     /** private: variables */
     graticuleButtonText: "Show Graticule",
     graticuleTooltip: "Show a Graticule on the map",
@@ -73,9 +76,9 @@ Viewer.plugins.GraticuleTool = Ext.extend(gxp.plugins.Tool, {
         });
         this.geoAction = geoAction;
     	return Viewer.plugins.GraticuleTool.superclass.addActions.apply(this, [{
-            text: this.graticuleButtonText,
             menuText: this.graticuleButtonText,
             tooltip: this.graticuleTooltip,
+            iconCls: this.iconCls,
             allowDepress: true,
             handler: function (button, evt){
             	if (!this.geoAction.control.active){
