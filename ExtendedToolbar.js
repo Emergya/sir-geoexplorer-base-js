@@ -104,7 +104,7 @@ gxp.plugins.ExtendedToolbar = Ext.extend(gxp.plugins.Tool, {
      */
     addActions: function() {
         return gxp.plugins.ExtendedToolbar.superclass.addActions.apply(this, [{
-            text: this.showButtonText ? this.buttonText : '',
+        	buttonText: this.showButtonText ? this.buttonText : '',
             menuText: this.menuText,
             iconCls: this.iconCls,
             tooltip: this.tooltip,
