@@ -42,7 +42,8 @@
                         width : 240,
                         height : 400,
                         layout : 'fit',
-                        closeAction : 'hide'
+                        closeAction : 'hide',
+                        cls: 'planification-rules-window'
                     }, config));
 
             this.on({

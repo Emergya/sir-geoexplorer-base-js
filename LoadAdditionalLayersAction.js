@@ -102,7 +102,8 @@ gxp.plugins.LoadAdditionalLayersAction = Ext.extend(gxp.plugins.Tool, {
                         mapPanel: mapPanel,
                         map: mapPanel.map, 
                         showLayers: true,
-                        persistenceGeoContext: this.target.persistenceGeoContext
+                        persistenceGeoContext: this.target.persistenceGeoContext,
+                        cls: 'additional-layers-window'
                     });
                     Viewer.registerComponent('AdditionalLayersTools', ds);
                 }
