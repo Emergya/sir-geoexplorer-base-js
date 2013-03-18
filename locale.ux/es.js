@@ -203,7 +203,7 @@ GeoExt.Lang.add(
         backText: "Atr\u00e1s",
         nextText: "Siguiente",
         loginText: "Login",
-        logoutText: "Salir, {user}",
+        logoutText: "Salir",
         loginErrorText: "Contrase\u00f1a o nombre de usuario incorrecto.",
         userFieldText: "Usuario",
         passwordFieldText: "Contrase\u00f1a",
