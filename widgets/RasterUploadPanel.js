@@ -134,7 +134,7 @@ Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
                             store: [
                                 ["GEOTIFF", "GeoTIFF"],
                                 ["IMAGE_WORLD", "Image World"],
-                                ["IMAGE_MOSAIC", "Mos\u00e1ico"]
+                                ["IMAGE_MOSAIC", "Mosaico"]
                             ], 
                             autoSelect: true,
                             editable: false,

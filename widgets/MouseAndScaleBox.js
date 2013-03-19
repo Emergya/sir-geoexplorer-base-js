@@ -299,7 +299,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
         } else {
             this.setTitle(null);
             this.minimized = false;
-            this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -height]);
+            this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -this.height]);
         }
     }
 
