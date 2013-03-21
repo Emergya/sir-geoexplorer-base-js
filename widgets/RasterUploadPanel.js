@@ -39,9 +39,13 @@ Ext.namespace("Viewer.plugins");
  *      A panel for uploading new layer data to GeoServer.
  */
 Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
-    
+    xtype: 'gxp_rasteruploadpanel',
+
     /** i18n */
     windowTitleText: "Create a new layer from raster file",
+    fileTypeLabelText: "Type of File",
+    fileTypeEmptyText: "Choose a file type",
+    descriptionText: "Select a geoTIFF file or a ZIP file with an image and a world file.",
     buttonText: "Upload",
     layerNameLabelText: "Title",
     layerNameEmptyText: "Layer title",
@@ -56,6 +60,8 @@ Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
     crsLabel: "CRS",
     crsEmptyText: "Coordinate Reference System ID",
     invalidCrsText: "CRS identifier should be an EPSG code (e.g. EPSG:4326)",
+    fileTypeSelected: null,
+
 
     /** api: config[validFileExtensions]
      *  ``Array``
@@ -63,18 +69,23 @@ Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
      *  file input value.  Default is ``[".zip", ".tif", ".tiff", ".gz", ".tar.bz2", 
      *  ".tar", ".tgz", ".tbz2"]``.
      */
-    validFileExtensions: [".tif", ".tiff"], 
+    validFileExtensions: {
+        GEOTIFF: [".tiff", ".tif"],
+        IMAGE_WORLD: [".zip"],
+        IMAGE_MOSAIC: [".zip"],
+        ALL: [".tiff", ".tif", ".zip"]
+    },
 
     /** private: method[initComponent]
      */
-    initComponent: function() {
+    initComponent: function () {
         var me = this;
         this.self = me;
 
         var defaultOptions = {
             title: this.windowTitleText,
             width: 400,
-            height: 200,
+            height: 275,
             boxMaxHeight: 400,
             layout: 'card',
             autoScroll: true,
@@ -100,29 +111,71 @@ Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
                     frame: true,
                     autoHeight: true,
                     height: 200,
-                    fileUpload: true,
                     labelWidth: 100,
                     defaults: {
                         anchor: '90%',
                         allowBlank: false,
                         msgTarget: 'side'
                     },
-                    items:[
+                    items: [
+                        {
+                            xtype: 'label',
+                            cls: 'toolDescription',
+                            text: this.descriptionText
+                            
+                        }, {
+                            xtype: 'combo',
+                            id: 'fileType',
+                            name: 'fileTypeVisible',
+                            hiddenName: 'fileType',
+                            allowBlank: false,
+                            forceSelection: true,
+                            fieldLabel: this.fileTypeLabelText,
+                            store: [
+                                ["GEOTIFF", "GeoTIFF"],
+                                ["IMAGE_WORLD", "Image World"],
+                                ["IMAGE_MOSAIC", "Mosaico"]
+                            ], 
+                            autoSelect: true,
+                            editable: false,
+                            emptyText: this.fileTypeEmptyText,
+                            triggerAction: 'all',
+                            listeners: {
+                                select: {
+                                    fn: function (combo, record, index) {
+                                        this.fileTypeSelected = record.data.field1;
+
+                                    },
+                                    scope: this
+                                }
+                            }
+
+
+
+                        },
                         {
                             xtype: 'textfield',
                             id: 'name',
                             emptyText: this.layerNameEmptyText,
                             name: 'name',
                             fieldLabel: this.layerNameLabelText
-                        },{
-                            xtype: "textfield",
-                            name: "nativeCRS",
+                        }, {
+                            xtype: "combo",
+                            name: "nativeCRSVisible",
+                            hiddenName: 'nativeCRS',
                             fieldLabel: this.crsLabel,
                             emptyText: this.crsEmptyText,
-                            allowBlank: true,
+                            allowBlank: false,
                             regex: /^epsg:\d+$/i,
-                            regexText: this.invalidCrsText
-                        },{
+                            regexText: this.invalidCrsText,
+                            typeAhead: true,
+                            triggerAction: 'all',
+                            store: [
+                                "EPSG:32719",
+                                "EPSG:32718",
+                                "EPSG:4326"
+                            ]
+                        }, {
                             xtype: "fileuploadfield",
                             id: "file",
                             anchor: "90%",
@@ -134,9 +187,9 @@ Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
                                 iconCls: "gxp-icon-filebrowse"
                             },
                             listeners: {
-                                "fileselected": function(cmp, value) {
+                                "fileselected": function (cmp, value) {
                                     // remove the path from the filename - avoids C:/fakepath etc.
-                                    cmp.setValue(value.split(/[/\\]/).pop());
+                                    cmp.setValue(value.substring(value.lastIndexOf("/") + 1, value.length));
                                 }
                             },
                             validator: this.fileNameValidator.createDelegate(this)
@@ -151,25 +204,30 @@ Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
         Viewer.plugins.RasterUploadPanel.superclass.initComponent.apply(me, arguments);
 
     },
-    
+
     /** private: method[fileNameValidator]
      *  :arg name: ``String`` The chosen filename.
      *  :returns: ``Boolean | String``  True if valid, message otherwise.
      */
-    fileNameValidator: function(name) {
+    fileNameValidator: function (name) {
         var valid = false;
-        var ext, len = name.length;
-        for (var i=0, ii=this.validFileExtensions.length; i<ii; ++i) {
-            ext = this.validFileExtensions[i];
-            if (name.slice(-ext.length).toLowerCase() === ext) {
-                valid = true;
-                break;
+        var ext;
+        var vfeIndex = this.fileTypeSelected || "ALL" ;
+        if (this.fileTypeSelected !== null) {
+           var validFileExt = this.validFileExtensions[this.fileTypeSelected];
+            for (var i = 0, ii = validFileExt.length; i < ii; ++i) {
+                ext = validFileExt[i];
+                if (name.slice(-ext.length).toLowerCase() === ext) {
+                    valid = true;
+                    break;
+                }
             }
+
         }
-        return valid || this.invalidFileExtensionText + '<br/>' + this.validFileExtensions.join(", ");
+        return valid || this.invalidFileExtensionText + '<br/>' + this.validFileExtensions[vfeIndex].join(", ");
     },
 
-    navHandler: function(direction){
+    navHandler: function (){
         var fp = this.items.get(0);
         if (fp.getForm().isValid()) { 
             fp.getForm().submit({
@@ -177,13 +235,13 @@ Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
                 url: '../../uploadRasterFile',
                 waitMsg: this.createLayerWaitMsgText,
                 waitTitle: this.createLayerWaitMsgTitleText,
-                success: function(fp, o) {
+                success: function (fp, o) {
                     var resp = Ext.util.JSON.decode(o.response.responseText);
                     if (resp && resp.success && resp.data && resp.data.status==="success") {
                         //Add layer to map and close window
                         var layerName = resp.data.layerName;
                         var layerTitle = resp.data.layerTitle;
-                        var geoserverUrl = app.sources.local.url + "/wms";
+                        var geoserverUrl = resp.data.url || (app.sources.local.url + "/wms");
                         var layer = new OpenLayers.Layer.WMS(layerTitle,
                             geoserverUrl,
                             {
@@ -202,14 +260,13 @@ Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
                         Ext.Msg.alert('Error', "Se ha producido un error creando la capa.");
                     }
                 },
-                failure: function(form, action) {
+                failure: function (form, action) {
                     Ext.Msg.alert(this.errorMsgTitle, this.errorMsg);
                 }
             });
         }                           
-    },
-
+    }
 });
 
-/** api: xtype = gxp_layeruploadpanel */
-Ext.reg("gxp_layeruploadpanel", gxp.LayerUploadPanel);
+/** api: xtype = gxp_rasteruploadpanel */
+Ext.reg(Viewer.plugins.RasterUploadPanel.prototype.xtype, Viewer.plugins.RasterUploadPanel);

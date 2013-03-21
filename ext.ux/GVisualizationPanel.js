@@ -45,6 +45,13 @@ Ext.ux.GDataTableAdapter = function(config) {
                 	}
                 }
             }
+
+
+            if(config.formatter) {
+                var formatter = new google.visualization.PatternFormat(config.formatter.pattern);
+                formatter.format(tbl, config.formatter.srcIdxs, config.formatter.outIdx);
+            }
+
             return tbl;
         }
     };
@@ -131,7 +138,8 @@ Ext.ux.GVisualizationPanel = Ext.extend(Ext.Panel, {
     datachanged: function(store) {
     	var tableCfg = {
     	    store: this.store,
-    	    columns: this.columns
+    	    columns: this.columns,
+            formatter : this.formatter
     	};
     	this.datatable = Ext.ux.GDataTableAdapter.adapt(tableCfg);
     	if (this.visualization) {
@@ -158,7 +166,8 @@ Ext.ux.GVisualizationPanel = Ext.extend(Ext.Panel, {
     onLoadCallback: function() {
         var tableCfg = {
             store: this.store,
-            columns: this.columns
+            columns: this.columns,
+            formatter: this.formatter
         };
         this.datatable = Ext.ux.GDataTableAdapter.adapt(tableCfg);
         

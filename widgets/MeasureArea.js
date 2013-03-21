@@ -46,7 +46,7 @@ Ext.namespace("gxp.plugins");
  *
  *    Provides measuring area.
  */
-gxp.plugins.MeasureArea = Ext.extend(gxp.plugins.Measure, {
+gxp.plugins.MeasureArea = Ext.extend(gxp.plugins.CustomMeasure, {
     
     /** api: ptype = gxp_measurearea */
     ptype: "gxp_measurearea",
@@ -90,7 +90,7 @@ gxp.plugins.MeasureArea = Ext.extend(gxp.plugins.Measure, {
 
         this.geoAction = geoAction;
 
-        return gxp.plugins.Measure.superclass.addActions.apply(this, [{
+        return gxp.plugins.CustomMeasure.superclass.addActions.apply(this, [{
             text: this.showButtonText ? this.buttonText : '',
             menuText: this.areaMenuText,
             iconCls: "gxp-icon-measure-area",
@@ -98,14 +98,16 @@ gxp.plugins.MeasureArea = Ext.extend(gxp.plugins.Measure, {
             toggleGroup: this.toggleGroup,
             enableToggle: true,
             allowDepress: true,
-            handler: function(action, evt) {
-                if (action.pressed) {
-                    this.geoAction.control.activate();
-                } else {
-                    this.geoAction.control.deactivate();
-                }
-            },
-            scope: this
+            listeners : {
+            	toggle: function(button, pressed) {
+                    if (pressed) {
+                        this.geoAction.control.activate();
+                    } else {
+                        this.geoAction.control.deactivate();
+                    }
+                },
+                scope: this
+            }
         }]);
     }
         

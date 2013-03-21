@@ -89,7 +89,7 @@ gxp.plugins.MetadataInformation = Ext.extend(gxp.plugins.Tool, {
             disabled: true,
             handler: function(action, evt) {
             	var layerID = selectedLayer.layerID;
-                var urlToGetMetadataInfo = "../sir-ohiggins/admin/cartografico/mostrarMetadatosDeCapa/";
+                var urlToGetMetadataInfo = "../../visor-api/mostrarMetadatosDeCapa/";
                 var win = new Ext.Window({
                     title: this.windowTitle,
                     width: 300,

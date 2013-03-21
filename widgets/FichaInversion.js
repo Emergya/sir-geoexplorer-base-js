@@ -39,7 +39,10 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
     /** private: method[constructor]
      */
     constructor: function(config) {       
-        Viewer.plugins.FichaInversion.superclass.constructor.call(this, config);
+        Viewer.plugins.FichaInversion.superclass.constructor.call(this, Ext.apply({
+        	cls: "vw_fichainversion",
+        	width: 487*1.5
+        },config));
     },
     
     /** private: method[initComponent]
@@ -77,9 +80,8 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
         var accordion = new Ext.Panel({
         	region:'west',
         	margins:'5 0 5 5',
-        	split:true,
-        	width: 487,
-        	height: 200,
+        	split:true,        	
+        	height: 250,
         	layout:'accordion',
         	items: [this.item1, this.item2, this.item3, this.item4]
         });

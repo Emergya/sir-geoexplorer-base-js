@@ -54,23 +54,29 @@ gxp.plugins.ChannelToolsAction = Ext.extend(gxp.plugins.Tool, {
     /** api: config[buttonText]
      *  ``String`` Text to show button
      */
-    buttonText: 'Canales Temáticos',
+    buttonText: 'Thematic Channels',
      
     /** api: config[menuText]
      *  ``String``
      *  Text for show in menu item (i18n).
      */
-    menuText: 'Canales Temáticos',
+    menuText: 'Thematic Channels',
 
     /** api: config[tooltip]
      *  ``String``
      *  Text for channel tool tooltip (i18n).
      */
-    tooltip: 'Canales Temáticos',
+    tooltip: 'Thematic Channels',
     
     /** private: property[iconCls]
      */
     iconCls: 'vw-icon-channel-tools',
+     
+    /** api: config[track]
+     *  ``Boolean``
+     *  Send a call to stats module to track this component.
+     */
+    track: true,
     
     /** private: method[constructor]
      */
@@ -102,7 +108,8 @@ gxp.plugins.ChannelToolsAction = Ext.extend(gxp.plugins.Tool, {
                     ds = new Viewer.dialog.ChannelTools({
                         mapPanel: mapPanel,
                         map: mapPanel.map, 
-                        persistenceGeoContext: this.target.persistenceGeoContext
+                        persistenceGeoContext: this.target.persistenceGeoContext,
+                        showZones: this.showZones
                     });
                     Viewer.registerComponent('ChannelTools', ds);
                 }
@@ -110,7 +117,9 @@ gxp.plugins.ChannelToolsAction = Ext.extend(gxp.plugins.Tool, {
                     ds.hide();
                 } else {
                     ds.show();
-                    Viewer.trackUrl('modules/Canales_Tematicos');
+                    if(this.track){
+                        Viewer.trackUrl('modules/Canales_Tematicos');
+                    }
                 }
 
             },

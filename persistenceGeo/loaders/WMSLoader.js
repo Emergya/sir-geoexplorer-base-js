@@ -24,14 +24,13 @@
  * Authors: Alejandro Diaz Torres (mailto:adiaz@emergya.com)
  */
 
-/** api: (define)
- *  module = PersistenceGeo
+/**
+ * api: (define) module = PersistenceGeo
  */
 Ext.namespace("PersistenceGeo.loaders");
 
-/** api: (define)
- *  module = PersistenceGeo.loaders
- *  class = WMSLoader
+/**
+ * api: (define) module = PersistenceGeo.loaders class = WMSLoader
  */
 Ext.namespace("PersistenceGeo.loaders.WMSLoader");
 
@@ -41,46 +40,60 @@ Ext.namespace("PersistenceGeo.loaders.WMSLoader");
  * Loader for WMS Layers
  * 
  */
-PersistenceGeo.loaders.WMSLoader 
-	= Ext.extend(PersistenceGeo.loaders.AbstractLoader,{
+PersistenceGeo.loaders.WMSLoader = Ext
+        .extend(
+                PersistenceGeo.loaders.AbstractLoader,
+                {
 
-	load: function (layerData, layerTree){
-		var visibility = false;
-		var transparent = true;
-		var isBaseLayer = false;
-		var opacity = 0.5;
-		var buffer = 0;
-		var format = 'image/png';
-		var layers = layerData.name;
-		
-		if(!!layerData.properties){
-			visibility = this.toBoolean(layerData.properties.visibility) || false;
-			transparent = this.toBoolean(layerData.properties.transparent) || true;
-			isBaseLayer = this.toBoolean(layerData.properties.isBaseLayer) || false;
-			opacity = this.toNumber(layerData.properties.opacity) || 0.5;
-			buffer = this.toNumber(layerData.properties.buffer) || 0;	
-			format = layerData.properties.format;
-			layers = layerData.properties.layers;
-		}
-		
-		var layer = new OpenLayers.Layer.WMS(
-				layerData.name,
-				layerData.server_resource,
-				{
-					layers: layers,
-	    			transparent: transparent
-				},
-				{
-					format: format,
-	    			isBaseLayer: isBaseLayer,
-	    			visibility: visibility,
-	     			opacity: opacity,
-	    			buffer : buffer
-				});
-		
-		//TODO: Wrap 
-		this.postFunctionsWrapper(layerData, layer, layerTree);
-		
-		return layer;
-	}
-});
+                    load : function (layerData, layerTree) {
+                        var visibility = false;
+                        var transparent = true;
+                        var isBaseLayer = false;
+                        var opacity = 0.5;
+                        var buffer = 0;
+                        var format = 'image/png';
+                        var layers = layerData.name;
+                        var layerTitle = layerData.layerTitle;
+                        if (!layerTitle) {
+                            // if no layerTitle use layer name without workspace
+                            // component
+                            var layerComponents = layerData.name.split(':');
+                            if (layerComponents.length > 1) {
+                                layerTitle = layerComponents[1].replace(/_/g, " ");
+                            } else {
+                                layerTitle = layerData.name;
+                            }
+                        }
+
+                        if (!!layerData.properties) {
+                            visibility = this
+                                    .toBoolean(layerData.properties.visibility) || false;
+                            transparent = this
+                                    .toBoolean(layerData.properties.transparent) || true;
+                            isBaseLayer = this
+                                    .toBoolean(layerData.properties.isBaseLayer) || false;
+                            opacity = this
+                                    .toNumber(layerData.properties.opacity) || 0.75;
+                            buffer = this.toNumber(layerData.properties.buffer) || 1;
+                            format = layerData.properties.format || format;
+                            layers = layerData.properties.layers || layers;
+                        }
+
+                        var layer = new OpenLayers.Layer.WMS(layerTitle,
+                                layerData.server_resource, {
+                                    layers : layers,
+                                    transparent : transparent
+                                }, {
+                                    format : format,
+                                    isBaseLayer : isBaseLayer,
+                                    visibility : visibility,
+                                    opacity : opacity,
+                                    buffer : buffer
+                                });
+
+                        // TODO: Wrap
+                        this.postFunctionsWrapper(layerData, layer, layerTree);
+
+                        return layer;
+                    }
+                });

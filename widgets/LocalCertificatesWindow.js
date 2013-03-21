@@ -326,7 +326,7 @@ Viewer.dialog.LocalCertificatesWindow = Ext.extend(Ext.Window,{
 			var baseLayer = new OpenLayers.Layer.WMS(
 					layerName,
 	                app.sources.local.url+"/wms",
-	                {layers: layerName, outputFormat: "image/png", transparent: true,styles:"polygon"}
+	                {layers: layerName, outputFormat: "image/png", transparent: true,styles:"Borde_comuna"}
             );	
 			
 			this.action.addLayerIfNotExists(baseLayer);

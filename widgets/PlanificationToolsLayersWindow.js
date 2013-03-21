@@ -50,7 +50,8 @@ Viewer.dialog.PlanificationToolsLayersWindow = Ext.extend(Ext.Window, {
             width: 320,
             height: 400,
             layout: 'fit',
-            closeAction: 'hide'
+            closeAction: 'hide',
+            cls: 'planification-layers-window'
         }, config));
 
         this.addEvents({

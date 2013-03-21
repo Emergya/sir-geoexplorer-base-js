@@ -53,19 +53,19 @@ gxp.plugins.LoadAdditionalLayersAction = Ext.extend(gxp.plugins.Tool, {
     /** api: config[buttonText]
      *  ``String`` Text to show next to the zoom button
      */
-    buttonText: 'Ver más capas',
+    buttonText: 'Show more Layers',
      
     /** api: config[menuText]
      *  ``String``
      *  Text for zoom menu item (i18n).
      */
-    menuText: 'Ver más capas',
+    menuText: 'Show more Layers',
 
     /** api: config[tooltip]
      *  ``String``
      *  Text for zoom action tooltip (i18n).
      */
-    tooltip: 'Ver más capas',
+    tooltip: 'Show more Layers',
     
     /** private: property[iconCls]
      */
@@ -102,7 +102,8 @@ gxp.plugins.LoadAdditionalLayersAction = Ext.extend(gxp.plugins.Tool, {
                         mapPanel: mapPanel,
                         map: mapPanel.map, 
                         showLayers: true,
-                        persistenceGeoContext: this.target.persistenceGeoContext
+                        persistenceGeoContext: this.target.persistenceGeoContext,
+                        cls: 'additional-layers-window'
                     });
                     Viewer.registerComponent('AdditionalLayersTools', ds);
                 }

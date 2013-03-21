@@ -51,11 +51,11 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
     /** api: ptype = vw_mouseandscalebox */
     ptype: "vw_mouseandscalebox",
     bodyCssClass: 'vw_mouseandscalebox',
-    width: 240,
-    height: 130,
+    width: 250,
+    height: 190,
     x: 5,
  //   floating:true,
-    frame:true,
+    frame: true,
     resizable: false,
     draggable: false,
     closable: false,
@@ -98,8 +98,8 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
             }
             this.bind(this.map);
         }
-        this.on("beforedestroy", this.unbind, this); 
-        this.on("minimize", this.handleMinimize, this);       
+        this.on("beforedestroy", this.unbind, this);
+        this.on("minimize", this.handleMinimize, this);
     },
     
     /** private: method[addToMapPanel]
@@ -120,7 +120,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
                 
                 this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -30]);
             } else {
-                this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -135]);
+                this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -this.height]);
             }
             
             },
@@ -187,7 +187,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
         }, this);
         if (scale.length > 0) {
             scale = scale.items[0];
-            this.zoomSelector.setValue("1 : " + parseInt(scale.data.scale, 10));
+            this.zoomSelector.setValue("1 : " + Ext.util.Format.number(parseInt(scale.data.scale, 10),"0.000.000/i"));
         } else {
             if (!this.zoomSelector.rendered) {
                 return;
@@ -204,10 +204,12 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
         this.zoomStore = new GeoExt.data.ScaleStore({
             map: this.map
         });
+
         this.zoomSelector = new Ext.form.ComboBox({
             emptyText: this.zoomLevelText,
-            tpl: '<tpl for="."><div class="x-combo-list-item">1 : {[parseInt(values.scale)]}</div></tpl>',
+            tpl: '<tpl for="."><div class="x-combo-list-item">1 : {[Ext.util.Format.number(values.scale,"0.000.000/i")]}</div></tpl>',
             editable: false,
+            hiddenName: "zoomLevelControl",
             triggerAction: 'all',
             mode: 'local',
             store: this.zoomStore,
@@ -289,13 +291,6 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
 
     handleMinimize: function () {
         var title = this.minimizedTitle || this.title;
-
-        var buttonConfig = {
-            window: this,
-            text: title,
-            handler: this.showHandler
-        };
-
         this.toggleCollapse(false);
         if (!this.minimized) {
             this.minimized = true;
@@ -304,7 +299,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
         } else {
             this.setTitle(null);
             this.minimized = false;
-            this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -135]);
+            this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -this.height]);
         }
     }
 

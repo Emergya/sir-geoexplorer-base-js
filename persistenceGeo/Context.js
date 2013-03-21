@@ -98,7 +98,8 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
      * @Param {Exception} saving layer
      */
     onSaveLayerException: function (e) {
-        // TOOD: handle exception
+        
+        console.error(e);
     },
 
     constructor: function (config) {
@@ -138,7 +139,7 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
         if (!!this.SAVE_MODES.GROUP == this.saveModeActive) {
             this.parser.loadLayersByGroup(this.authUser, function (layers, layerTree) {
                 this_.onLoadLayers(layers, layerTree);
-            });
+            }, false);
         } else if (!!this.SAVE_MODES.USER == this.saveModeActive) {
             this.parser.loadLayersByUser(this.userLogin, function (layers, layerTree) {
                 this_.onLoadLayers(layers, layerTree);
@@ -151,6 +152,15 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
      * Load all channel layers marked as channel.
      */
     loadChannel: function (idChannel, nameChannel, onLoadLayers, onFailure) {
+      
+        this.loadChannelWithFilters(idChannel,nameChannel,"ONLY_CHANNEL_MARK", onLoadLayers, onFailure);
+    },
+
+    /**
+     * api: method[loadChannelWithFilters]
+     * Load all channel layers with the specified filter.
+     */
+    loadChannelWithFilters : function(idChannel, nameChannel, filters, onLoadLayers, onFailure) {
         var this_ = this;
         // clear group
         if (!!this.loadedChannel) {
@@ -165,7 +175,12 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
             groupIndex: channelGroup
         });
         this.loadedChannel = channelGroup;
-        this.parser.loadFolderById(idChannel, "ONLY_CHANNEL_MARK",
+
+        if(Ext.isArray(filters)) {
+            filters = filters.join(",");
+        }
+
+        this.parser.loadFolderById(idChannel, filters,
 
         function (form, action) {
             /*
@@ -187,7 +202,7 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
             if (!!onFailure) {
                 onFailure(form, action);
             } else {
-                this_.onSaveLayerException(e);
+                //this_.onSaveLayerException(e);
             }
         });
     },
@@ -414,29 +429,38 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
     },
 
     parseLayers: function(form, action, overrideProperties, storeOn) {
-        try {
-            var json = Ext.util.JSON.decode(action.response.responseText);
-            if ( !! json && !! json.results && !! json.data && json.results > 0) {
-                for (var i = 0; i < json.results; i++) {
-                    var layerData = json.data[i];
-                    if (!layerData.server_resource && !! layerData.data && !! layerData.data.server_resource) {
-                        layerData = layerData.data;
-                    }
-                    var layer = this.getLayerFromData(layerData);
-                    if ( !! overrideProperties) {
-                        for (var key in overrideProperties) {
-                            layer[key] = overrideProperties[key];
-                        }
-                    }
-                    if ( !! storeOn) {
-                        this.loadedLayers[storeOn].push(layer);
-                    }
-                    this.addToMap(layer);
-                }
-            }
-        } catch (e) {
-            this.onSaveLayerException(e);
+        var json = Ext.util.JSON.decode(action.response.responseText);
+        if ( ! json || ! json.results || ! json.data || ! json.results ) {
+            // We do nothing.
+            return;
         }
+
+        for (var i = 0; i < json.results; i++) {
+            try {
+              
+                var layerData = json.data[i];
+                if (!layerData.server_resource && !! layerData.data && !! layerData.data.server_resource) {
+                    layerData = layerData.data;
+                }
+                var layer = this.getLayerFromData(layerData);
+                if ( !! overrideProperties) {
+                    for (var key in overrideProperties) {
+                        layer[key] = overrideProperties[key];
+                    }
+                }
+                if(!layer) {
+                    continue;
+                }
+                if ( !! storeOn) {
+                    this.loadedLayers[storeOn].push(layer);
+                }
+                this.addToMap(layer);
+              
+            } catch (e) {
+                this.onSaveLayerException(e);
+            }
+        }
+        
     },
 
     parseLayer: function(form, action) {
@@ -454,15 +478,21 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
         if ( !! json.data && !! json.data.type) {
             // normal (layer on 'data' of json)
             type = json.data.type;
-            layer = this.parser.LOADERS_CLASSES[type].load(json.data);
+            json = json.data;
         } else if ( !! json.type) {
             // layer on json root
-            type = json.type;
-            layer = this.parser.LOADERS_CLASSES[type].load(json);
-        } else {
-            // unknown json. Try WMS loader
-            layer = this.parser.LOADERS_CLASSES[type].load(json);
+            type = json.type;           
         }
+
+        var loaderClass = this.parser.LOADERS_CLASSES[type];
+
+        if(!loaderClass) {
+            // Type not supported, we do nothing.
+            return null;
+        }
+
+        layer = loaderClass.load(json);
+
         var groupLayers;
         if ( !! this.SAVE_MODES.GROUP == this.saveModeActive) {
             groupLayers = String.format(this.defaultAuthGroup, this.userInfo.authority);

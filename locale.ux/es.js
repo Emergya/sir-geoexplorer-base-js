@@ -1,114 +1,114 @@
-GeoExt.Lang.add("es",{
+GeoExt.Lang.add(
+    "es", {
 
-    "gxp.plugins.AddLayers.prototype" : {
-        addActionMenuText : "A\u00F1adir Capas",
-        addActionTip : "A\u00F1adir Capas",
-        addServerText : "A\u00F1adir servidor",
-        addButtonText : "A\u00F1adir Capas",
-        untitledText : "Sin T\u00EDtulo",
-        addLayerSourceErrorText : "Error obteniendo capabilities de WMS ({msg}).\nPor favor, compruebe la URL y vuelva a intentarlo.",
-        availableLayersText : "Capas disponibles",
-        expanderTemplateText : "<p><b>Resumen:</b> {abstract}</p>",
-        panelTitleText : "T\u00EDtulo",
-        layerSelectionText : "Ver datos disponibles de:",
-        doneText : "Hecho",
-        uploadText : "Subir Datos"
+    "gxp.plugins.AddLayers.prototype": {
+        addActionMenuText: "A\u00F1adir Capas",
+        addActionTip: "A\u00F1adir Capas",
+        addServerText: "A\u00F1adir servidor",
+        addButtonText: "A\u00F1adir Capas",
+        untitledText: "Sin T\u00EDtulo",
+        addLayerSourceErrorText: "Error obteniendo capabilities de WMS ({msg}).\nPor favor, compruebe la URL y vuelva a intentarlo.",
+        availableLayersText: "Capas disponibles",
+        expanderTemplateText: "<p><b>Resumen:</b> {abstract}</p>",
+        panelTitleText: "T\u00EDtulo",
+        layerSelectionText: "Ver datos disponibles de:",
+        doneText: "Hecho",
+        uploadText: "Subir Datos"
     },
 
-    "Viewer.plugins.AddLayers.prototype" : {
-        nameHeaderText : "Nombre",
-        titleHeaderText : "T\u00EDtulo",
-        queryableHeaderText : "Consultable",
-        layerSelectionLabel : "Ver datos disponibles de:",
-        layerAdditionLabel : "o a\u00F1adir otro servidor.",
-        previewLayerText : "Vista previa de la capa '{0}'",
-        expanderTemplateText : "<p><b>Resumen:</b> {abstract}</p>",
+    "Viewer.plugins.AddLayers.prototype": {
+        nameHeaderText: "Nombre",
+        titleHeaderText: "T\u00EDtulo",
+        queryableHeaderText: "Consultable",
+        layerSelectionLabel: "Ver datos disponibles de:",
+        layerAdditionLabel: "o a\u00F1adir otro servidor.",
+        previewLayerText: "Vista previa de la capa '{0}'",
+        expanderTemplateText: "<p><b>Resumen:</b> {abstract}</p>",
         folderSaved: "Capa guardada",
         folderSavedText: "La capa %s% ha sido guardada correctamente.",
         folderCancel: "Aviso",
-        folderCancelText: "Error al guardar la capa. Inténtelo de nuevo.",
-        addActionMenuText : "A\u00F1adir Capas",
-        addActionTip : "Añadir Capas",
-        addServerText : "Añadir servidor",
-        addButtonText : "Añadir Capas",
-        untitledText : "Sin T\u00EDtulo",
-        addLayerSourceErrorText : "Error obteniendo capabilities de WMS ({msg}).\nPor favor, compruebe la URL y vuelva a intentarlo.",
-        availableLayersText : "Capas disponibles",
-        expanderTemplateText : "<p><b>Resumen:</b> {abstract}</p>",
-        panelTitleText : "T\u00EDtulo",
+        folderCancelText: "Error al guardar la capa. Int\u00e9ntelo de nuevo.",
+        addActionMenuText: "A\u00F1adir Capas",
+        addActionTip: "A\u00f1adir Capas",
+        addServerText: "A\u00f1adir servidor",
+        addButtonText: "A\u00f1adir Capas",
+        untitledText: "Sin T\u00EDtulo",
+        addLayerSourceErrorText: "Error obteniendo capabilities de WMS ({msg}).\nPor favor, compruebe la URL y vuelva a intentarlo.",
+        availableLayersText: "Capas disponibles",
+        panelTitleText: "T\u00EDtulo",
         panelIdText: "Nombre",
         panelAbstractText: "Descripci\u00F3n",
         panelSRSText: "Projecci\u00F3n",
-        layerSelectionText : "Ver datos disponibles de:",
-        doneText : "Hecho",
-        uploadText : "Subir capas",
+        layerSelectionText: "Ver datos disponibles de:",
+        doneText: "Hecho",
+        uploadText: "Subir capas",
         onlyCompatibleText: "S\u00f3lo compatibles",
-        makePersistentText: "¿Desea hacerla persistente?",
+        makePersistentText: "\u00bfDesea hacerla persistente?",
         uploadKMLText: "Subir un KML",
         uploadRasterText: "Subir un Raster",
         uploadShapeText: "Subir archivo ZIP con SHP"
     },
 
-    "OpenLayers.Control.LoadLayerWizard.prototype" : {
-        loadText : "Cargar",
+    "OpenLayers.Control.LoadLayerWizard.prototype": {
+        loadText: "Cargar",
         uploadingText: 'Cargando...',
         emptyText: 'Seleccione un {0}',
         layerLoadedTitleText: '\u00E9xito',
         layerLoadedText: 'La capa {0} se ha cargado',
         inProjectionText: "Proyecci\u00F3n",
-        selectFileText : "Selecciona el fichero {0} a cargar",
+        selectFileText: "Selecciona el fichero {0} a cargar",
         titleWindowLocationLayer: "Introduce el nombre de la capa y el de su carpeta padre",
-        labelLayerName : "Nombre de la capa",
-        labelLayerParentFolderName : "Selecciona la carpeta",
+        labelLayerName: "Nombre de la capa",
+        labelLayerParentFolderName: "Selecciona la carpeta",
         selectNameText: "Introduce el nombre de la capa",
-        selectComboBoxText : "Selecciona la carpeta donde guardar la capa",
-        buttonFormLayer : "Guardar",
+        selectComboBoxText: "Selecciona la carpeta donde guardar la capa",
+        buttonFormLayer: "Guardar",
         nameFolderUser: "Carpeta del usuario",
         rootFolderNameUserText: "Carpetas del usuario {0}",
         rootFolderNameGroupText: "Carpetas del grupo {0}"
     },
 
     "Viewer.view.search.QueryPanel.prototype": {
-        maxFeaturesText : "L\u00EDmite de resultados",
-        searchWFSDefaultStateText : "Pulsa en 'Consultar' para realizar la petici\u00F3n",
-        searchWFSNotFoundStateText : "No se han encontrado elementos con los criterios indicados",
-        searchWFSFoundsStateText : "<ul><li>Se han encontrado {0} elementos</li><li>Se han volcado en la capa '{1}'</li></ul>",    
-        errorWFSText: "El servicio WFS de SIGESCAT no est\u00E1 disponible. <a href='#' id='error_msg_wfs_detail'\">Informaci00F3n técnica</a>",
+        maxFeaturesText: "L\u00EDmite de resultados",
+        searchWFSDefaultStateText: "Pulsa en 'Consultar' para realizar la petici\u00F3n",
+        searchWFSNotFoundStateText: "No se han encontrado elementos con los criterios indicados",
+        searchWFSFoundsStateText: "<ul><li>Se han encontrado {0} elementos</li><li>Se han volcado en la capa '{1}'</li></ul>",
+        errorWFSText: "El servicio WFS de SIGESCAT no est\u00E1 disponible. <a href='#' id='error_msg_wfs_detail'\">Informaci00F3n t\u00e9cnica</a>",
         errorWFSDetailsTitleText: "Detalles",
-        queryText : "Consultar",
-        searcherTitleText : "Buscador",
-        searchButtonWFSButtonText : "WFS",
-        searchButtonWFSButtonTooltipText : "B\u00FAsqueda en capas WFS configuradas",
+        queryText: "Consultar",
+        searcherTitleText: "Buscador",
+        searchButtonWFSButtonText: "WFS",
+        searchButtonWFSButtonTooltipText: "B\u00FAsqueda en capas WFS configuradas",
         layerResultNameText: "Resultado de consulta WFS"
     },
 
-    "Viewer.view.map.MapToolbar.prototype":{
-        searchButtonWFSButtonText : "WFS",
-        searchButtonWFSButtonTooltipText : "B\u00FAsqueda en capas WFS configuradas"
+    "Viewer.view.map.MapToolbar.prototype": {
+        searchButtonWFSButtonText: "WFS",
+        searchButtonWFSButtonTooltipText: "B\u00FAsqueda en capas WFS configuradas"
     },
 
-    "Ext.ux.StatusBar.prototype":{
+    "Ext.ux.StatusBar.prototype": {
         busyText: "Cargando..."
     },
 
-    "Viewer.widgets.SaveLayerPanel.prototype":{
+    "Viewer.widgets.SaveLayerPanel.prototype": {
         title: "Hacer permanente",
         titleWindowLocationLayer: "Introduzca el nombre de la capa a publicar",
-        labelLayerName : "Nombre de la capa",
-        labelLayerParentFolderName : "Seleccionar carpeta",
+        labelLayerName: "Nombre de la capa",
+        labelLayerParentFolderName: "Seleccionar carpeta",
         selectNameText: "Introduzca el nombre de la capa",
-        selectComboBoxText : "Seleccione la carpeta en la que quiere guardar la capa",
-        buttonFormLayer : "Hacer permanente",
+        selectComboBoxText: "Seleccione la carpeta en la que quiere guardar la capa",
+        buttonFormLayer: "Hacer permanente",
         nameFolderUser: "Carpeta de usuario",
-        selectFileText : "Seleccione un fichero {0} a cargar",
-        uploadingText : 'Subiendo...',
-        emptyText : 'Seleccione un {0}',
-        layerLoadedTitleText : 'Correcto',
-        layerLoadedText : 'La capa {0} se ha cargado',
-        inProjectionText : "Proyeci\u00F3n del fichero",
-        loadText : "Cargar",
-        saveLayerTitleText: "Capa a\u00F1adida", 
-        saveLayerText: "La capa '{0}' se ha a\u00F1adido de formapermanente.",
+        selectFileText: "Seleccione un fichero {0} a cargar",
+        uploadingText: 'Subiendo...',
+        emptyText: 'Seleccione un {0}',
+        layerLoadedTitleText: 'Correcto',
+        layerLoadedText: 'La capa {0} se ha cargado',
+        inProjectionText: "Proyeci\u00F3n del fichero",
+        loadText: "Cargar",
+        saveLayerTitleText: "Capa a\u00F1adida",
+        saveLayerText: "La capa '{0}' se ha a\u00F1adido de forma permanente.",
         saveLayerErrorTitleText: "Se ha producido un error",
         saveLayerErrorText: "se ha producido un error al salvar la capa '{0}'. Por favor, contacte con su administrador",
         labelLayerMaxFeatures: "M\u00e1ximas figuras",
@@ -116,19 +116,25 @@ GeoExt.Lang.add("es",{
         cancelText: "Cancelar"
     },
 
-    "Viewer.widgets.WMSLayerPanelMod.prototype":{
+    "Viewer.widgets.WMSLayerPanelMod.prototype": {
         notLoggedSaveTitleText: "Sin logar",
         notLoggedSaveText: "Necesitas logarte para activar esta opci\u00f3n"
     },
 
-    "Viewer.plugins.KMLUploadPanel.prototype":{
+    "Viewer.plugins.KMLUploadPanel.prototype": {
         titleLabel: "Nombre",
         titleEmptyText: "Nombre de la capa",
-        makePersistentText: "¿Desea hacer persistente la capa KML '{0}'?"
+        makePersistentText: "\u00bfDesea hacer persistente la capa KML '{0}'?"
     },
 
-    "Viewer.plugins.RasterUploadPanel.prototype":{
+    "Viewer.plugins.RasterUploadPanel.prototype": {
         windowTitleText: "Crear una nueva capa a partir de un fichero raster",
+        descriptionText: "Escriba el nombre para la nueva capa, seleccione o " + 
+            "escriba el sistema de referencia del r\u00e1ster y seleccione un archivo GeoTIFF " + 
+            "o un ZIP con un archivo imagen y un archivo world dentro del mismo." + 
+            " (png+pngw, jpg+jpgw, tif+tifw).",
+        fileTypeLabelText: "Formato de la imagen",
+        fileTypeEmptyText: "Seleccione el formato de la imagen",
         buttonText: "Subir",
         layerNameLabelText: "Nombre",
         layerNameEmptyText: "Nombre de la capa",
@@ -138,18 +144,18 @@ GeoExt.Lang.add("es",{
         chooseFileText: "Buscar",
         titleLabel: "Nombre",
         titleEmptyText: "Nombre de la capa",
-        abstractLabel: "Descripción",
-        abstractEmptyText: "Descripción de la capa",
+        abstractLabel: "Descripci\u00f3n",
+        abstractEmptyText: "Descripci\u00f3n de la capa",
         createLayerWaitMsgText: "Enviando archivo. Por favor espere.",
         createLayerWaitMsgTitleText: "Subida de archivo",
         errorMsgTitle: "Error",
         errorMsg: "Ha habido un error al enviar los datos al servidor",
-        invalidFileExtensionText: "La extensión del archivo debe ser una de: ",
+        invalidFileExtensionText: "La extensi\u00f3n del archivo debe ser una de: ",
         crsEmptyText: "ID del Sistema de Referencia de Coordenadas",
-        invalidCrsText: "El identificador CRS debe ser un código EPSG (ej. EPSG:4326)"
+        invalidCrsText: "El identificador CRS debe ser un c\u00f3digo EPSG (ej. EPSG:4326)"
     },
 
-    "Viewer.plugins.ExportToSHP.prototype":{
+    "Viewer.plugins.ExportToSHP.prototype": {
         exportToSHPText: "Exportar a SHP",
         exportToSHPTooltipText: "Exportar capa a un fichero shape",
         exportToSHPMsg: "Generando el fichero ZIP ...",
@@ -157,7 +163,7 @@ GeoExt.Lang.add("es",{
         exportToSHPErrorContent: "Error al exportar la capa"
     },
 
-    "Viewer.plugins.ExportToKML.prototype":{
+    "Viewer.plugins.ExportToKML.prototype": {
         exportToKMLText: "Exportar a KML",
         exportToKMLTooltipText: "Exportar capa a un fichero kml",
         exportToKMLMsg: "Generando el fichero KML ...",
@@ -165,13 +171,13 @@ GeoExt.Lang.add("es",{
         exportToKMLErrorContent: "Error al exportar la capa"
     },
 
-    "PersistenceGeo.Context.prototype":{
+    "PersistenceGeo.Context.prototype": {
         defaultAuthGroup: "Capas de '{0}'",
         defaultUsersGroup: "Capas del usuario '{0}'",
         channelGroupText: "Capas del canal '{0}'"
     },
 
-    "PersistenceGeo.tree.MakeLayerPersistent.prototype":{
+    "PersistenceGeo.tree.MakeLayerPersistent.prototype": {
         makePersistentText: "Hacer capa persistente",
         makePersistentTooltipText: "Hacer capa persistente en la instituci\u00f3n a la que pertenece el usuario logado"
     },
@@ -197,116 +203,118 @@ GeoExt.Lang.add("es",{
         backText: "Atr\u00e1s",
         nextText: "Siguiente",
         loginText: "Login",
-        logoutText: "Salir, {user}",
+        logoutText: "Salir",
         loginErrorText: "Contrase\u00f1a o nombre de usuario incorrecto.",
         userFieldText: "Usuario",
         passwordFieldText: "Contrase\u00f1a",
         saveErrorText: "Error al salvar: ",
         tableText: "Datos",
-        queryText: "Consultar"        
+        queryText: "Consultar"
     },
 
-    "Viewer.dialog.ChannelTools.prototype":{
-        titleText: "Canales Temáticos",
+    "Viewer.dialog.ChannelTools.prototype": {
+        titleText: "Canales Tem\u00e1ticos",
         loadText: 'Cargar',
-        closeText: 'Cerrar'
+        closeText: 'Cerrar',
+        folderWindowTitleText: 'Carpetas'
     },
 
-    "Viewer.widgets.ChannelToolsLayersTree.prototype":{
+    "Viewer.widgets.ChannelToolsLayersTree.prototype": {
         channelsNodeText: 'Generales',
         zonesNodeText: 'Municipios'
     },
 
-    "gxp.plugins.ChannelToolsAction.prototype":{
-        buttonText: 'Canales Temáticos',
-        menuText: 'Canales Temáticos',
-        tooltip: 'Cargar canales de capas'
+    "gxp.plugins.ChannelToolsAction.prototype": {
+        buttonText: 'Canales Tem\u00e1ticos',
+        menuText: 'Canales Tem\u00e1ticos',
+        tooltip: "Muestra una ventana con una lista de canales " + 
+            "tem\u00e1ticos que cargan una serie de capas de una tem\u00e1tica " + 
+            "determinada en el \u00e1rbol de capas."
     },
-    
-    
 
-    "gxp.plugins.AddTagToMap.prototype":{
-        addTagToMapTooltipText: "Añadir etiqueta al mapa",
+    "gxp.plugins.AddTagToMap.prototype": {
+        addTagToMapTooltipText: "A\u00f1adir etiqueta al mapa",
         titlePrompt: "Escriba",
         promptText: "Introduzca el nombre de la etiqueta",
         labelTitleLayer: "Capa de Etiquetas"
     },
-    "gxp.plugins.MetadataInformation.prototype":{
+    "gxp.plugins.MetadataInformation.prototype": {
         menuText: "Mostrar metadatos de la capa seleccionada",
         tooltip: "Mostrar metadatos de la capa seleccionada",
         windowTitle: 'Metadatos de la capa',
         windowLoadingMsg: 'Cargando...'
     },
 
-	"Viewer.dialog.ChartWindow.prototype": {
+    "Viewer.dialog.ChartWindow.prototype": {
         title: "Iniciativas de Inversi\u00f3n",
-        topTitleText: "CRITERIOS DE BÚSQUEDA",
-        stageText: 'Etapa',
-        yearText: 'Año',
+        topTitleText: "CRITERIOS DE B\u00daSQUEDA",
+        stageText: 'Financiamiento',
+        yearText: 'A\u00f1o',
         sourceText: 'Fuente',
-        financingLineText: 'Línea Financiera',
+        financingLineText: 'L\u00ednea Financiera',
         sectorText: "Sector",
         territorialLevelText: 'Nivel Territorial',
         groupByText: 'Agrupar por',
-        proyectosPreinversionText: 'Preinversi\u00f3n',
-        proyectosEjecucionText: 'Ejecuci\u00f3n PROPIR',
+        proyectosPreinversionText: 'Gobierno Regional',
+        proyectosEjecucionText: 'Servicios P\u00fablicos',
         graphicButtonText: 'Graficar',
-        centerTitleText: 'Gráfico',
-        eastTitleText: 'Gráfico',
+        centerTitleText: 'Gr\u00e1fico',
+        eastTitleText: 'Gr\u00e1fico',
         xAxisTitle: "Monto (M$)",
         porcionOtrosText: "Otros",
-        geoButtonText: "Buscar Iniciativas Georreferenciadas"
+        geoButtonText: "Buscar Iniciativas Georreferenciadas",
+        exchangeChartsText: "Intercambiar"
     },
 
-    "gxp.plugins.PDFPrintAction.prototype" : {
-        buttonText:"Imprimir",
-        menuText:"Imprimir",
-        tooltip : "Imprimir",
-        errorText:"Ocurrió un error, vuelva a intentarlo en unos instantes."
+    "gxp.plugins.PDFPrintAction.prototype": {
+        buttonText: "Imprimir",
+        menuText: "Imprimir",
+        tooltip: "Imprimir",
+        errorText: "Ocurri\u00f3 un error, vuelva a intentarlo en unos instantes."
     },
 
-    "Viewer.dialog.PDFPrintWindow.prototype" : {
-        printText : 'Imprimir',   
+    "Viewer.dialog.PDFPrintWindow.prototype": {
+        printText: 'Imprimir',
         downloadImageText: "Descargar imagen",
-        sizeText:"Tamaño",
-        resolutionText:"Resolución",
-        gridText:"Grilla",
+        sizeText: "Tama\u00f1o",
+        resolutionText: "Resoluci\u00f3n",
+        gridText: "Grilla",
         legendText: "Leyenda",
         logoText: "Logotipo",
         browseText: "Examinar",
-        textText : "Texto",
-        titleText: "Título",
+        textText: "Texto",
+        titleText: "T\u00edtulo",
         fontText: "Fuente",
-        descriptionText: "Descripción",
+        descriptionText: "Descripci\u00f3n",
         northArrowText: "Flecha de norte",
         waitText: "Por favor espere...",
         closeText: "Cerrar",
         logoFileTypeUnsupportedText: "Los tipos de imagen soportados son PNG y JPEG",
-        errorText:"Ocurrió un error, vuelva a intentarlo en unos instantes."
+        errorText: "Ocurri\u00f3 un error, vuelva a intentarlo en unos instantes."
     },
 
-    "gxp.plugins.LocalCertificatesAction.prototype" : {
-        selectInMapText:"Seleccionar en el mapa",
-        searchFormText: "Formulario de búsqueda...",
+    "gxp.plugins.LocalCertificatesAction.prototype": {
+        selectInMapText: "Seleccionar en el mapa",
+        searchFormText: "Formulario de b\u00fasqueda...",
         selectPropertyInMapText: "Por favor, seleccione una propiedad en el mapa.",
-        noParcelSelectedText:"No se seleccionó ninguna parcela, por favor pulse 'Seleccionar en mapa' de nuevo.",
-        errorText:"Ocurrió un error, vuelva a intentarlo en unos instantes.",
+        noParcelSelectedText: "No se seleccion\u00f3 ninguna parcela, por favor pulse 'Seleccionar en mapa' de nuevo.",
+        errorText: "Ocurri\u00f3 un error, vuelva a intentarlo en unos instantes.",
         waitText: "Por favor espere..."
     },
-    
-    "Viewer.dialog.LocalCertificatesWindow.prototype":{
-    	titleText: "Certificados Municipales",
-    	printText:"Imprimir",
-    	viewText:"Ver",
-    	closeText:"Cerrar",
-    	searchText:"Buscar",
-    	ownerHeaderText:"Propietario",
-		roleHeaderText:"Rol",
-		predioHeaderText:"Predio",
-		noSearchResultsText:"No hay datos para mostrar, pruebe a cambiar el filtro y pulsar 'Buscar'",
-		waitText: "Por favor espere...",
-		errorText:"Ocurrió un error, vuelva a intentarlo en unos instantes.",
-        selectInMapText:"Seleccionar en el mapa"        
+
+    "Viewer.dialog.LocalCertificatesWindow.prototype": {
+        titleText: "Certificados Municipales",
+        printText: "Imprimir",
+        viewText: "Ver",
+        closeText: "Cerrar",
+        searchText: "Buscar",
+        ownerHeaderText: "Propietario",
+        roleHeaderText: "Rol",
+        predioHeaderText: "Predio",
+        noSearchResultsText: "No hay datos para mostrar, pruebe a cambiar el filtro y pulsar 'Buscar'",
+        waitText: "Por favor espere...",
+        errorText: "Ocurri\u00f3 un error, vuelva a intentarlo en unos instantes.",
+        selectInMapText: "Seleccionar en el mapa"
     },
 
     "gxp.plugins.ZoomToInitialValues.prototype": {
@@ -314,9 +322,9 @@ GeoExt.Lang.add("es",{
     },
 
     "gxp.plugins.Zoom.prototype": {
-        zoomInMenuText: "Zoom más",
+        zoomInMenuText: "Zoom m\u00e1s",
         zoomOutMenuText: "Zoom menos",
-        zoomInTooltip: "Zoom más",
+        zoomInTooltip: "Zoom m\u00e1s",
         zoomOutTooltip: "Zoom menos"
     },
 
@@ -328,8 +336,8 @@ GeoExt.Lang.add("es",{
     },
 
     "gxp.plugins.WMSGetFeatureInfo.prototype": {
-        infoActionTip: 'Información del elemento',
-        popupTitle: 'Información del elemento',
+        infoActionTip: 'Informaci\u00f3n del elemento',
+        popupTitle: 'Informaci\u00f3n del elemento',
         buttonText: 'Identificar'
     },
 
@@ -337,6 +345,25 @@ GeoExt.Lang.add("es",{
         uploadFileEmptyText: 'Selecciona un icono...',
         uploadFileLabel: 'Icono',
         waitMsgText: 'Espere...'
+    },
+
+    "gxp.plugins.LayerTree.prototype": {
+        overlayNodeText: "Capas",
+        baseNodeText: "Capa base"
+    },
+    "gxp.plugins.LoadAdditionalLayersAction.prototype": {
+        menuText: "Ver m\u00e1s Capas",
+        buttonText: "Ver m\u00e1s Capas",
+        tooltip: "Abre una ventana en la que puede seleccionar " + "capas adicionales para visualizar en el visor."
+
+    },
+    "Viewer.dialog.PointInformation.prototype": {
+        descriptionText: "Haga click en el mapa para ver las coordenadas del lugar pulsado."
+    },
+    "Ext.form.TextField.prototype": {
+        blankText: "Este campo no puede estar vacío",
+        minLengthText : 'La longitud mínima de este campo es {0}',    
+        maxLengthText : 'La longitud máxima de este campo es {0}'
     }
 
 });
