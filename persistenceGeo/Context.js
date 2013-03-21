@@ -137,9 +137,11 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
         var this_ = this;
         this.clearLayers();
         if (!!this.SAVE_MODES.GROUP == this.saveModeActive) {
-            this.parser.loadLayersByGroup(this.authUser, function (layers, layerTree) {
-                this_.onLoadLayers(layers, layerTree);
-            }, false);
+            if (this.authUser) {
+                this.parser.loadLayersByGroup(this.authUser, function (layers, layerTree) {
+                    this_.onLoadLayers(layers, layerTree);
+                }, false);
+            }
         } else if (!!this.SAVE_MODES.USER == this.saveModeActive) {
             this.parser.loadLayersByUser(this.userLogin, function (layers, layerTree) {
                 this_.onLoadLayers(layers, layerTree);
