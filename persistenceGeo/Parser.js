@@ -95,6 +95,21 @@ PersistenceGeo.Parser = Ext.extend(Ext.Component,{
         	restBaseUrl: this.getRestBaseUrl(),
         	map: this.map
         });
+        
+        this.LOADERS_CLASSES["geotiff"] = new PersistenceGeo.loaders.WMSLoader({
+        	restBaseUrl: this.getRestBaseUrl(),
+        	map: this.map
+        });
+        
+        this.LOADERS_CLASSES["imagewold"] = new PersistenceGeo.loaders.WMSLoader({
+        	restBaseUrl: this.getRestBaseUrl(),
+        	map: this.map
+        });
+        
+        this.LOADERS_CLASSES["imagemosaic"] = new PersistenceGeo.loaders.WMSLoader({
+        	restBaseUrl: this.getRestBaseUrl(),
+        	map: this.map
+        });
 
         PersistenceGeo.Parser.superclass.initComponent.call(this);
     },
