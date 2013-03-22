@@ -54,6 +54,7 @@ PersistenceGeo.loaders.WMSLoader = Ext
                         var format = 'image/png';
                         var layers = layerData.name;
                         var layerTitle = layerData.layerTitle;
+                        var authId = layerData.authId;
                         if (!layerTitle) {
                             // if no layerTitle use layer name without workspace
                             // component
@@ -88,7 +89,8 @@ PersistenceGeo.loaders.WMSLoader = Ext
                                     isBaseLayer : isBaseLayer,
                                     visibility : visibility,
                                     opacity : opacity,
-                                    buffer : buffer
+                                    buffer : buffer,
+                                    authId: authId
                                 });
 
                         // TODO: Wrap

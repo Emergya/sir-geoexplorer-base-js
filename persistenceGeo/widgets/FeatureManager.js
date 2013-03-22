@@ -65,7 +65,8 @@ PersistenceGeo.widgets.FeatureManager = Ext.extend(gxp.plugins.FeatureManager, {
                     }
                 }, this);
         }else{
-            var url = record.getLayer().url.replace("wms", "wfs").replace("WMS", "WFS");
+            //var url = record.getLayer().url.replace("wms", "wfs").replace("WMS", "WFS");
+        	var url = "http://sir-libertador-apps/geoserver/wfs/WfsDispatcher?";
             var typeName = record.getLayer().params.LAYERS;
             this.fetchSchema(url, typeName, function(schema){
                     this.prepareWFS(filter, autoLoad, record, source, schema);
@@ -139,9 +140,9 @@ PersistenceGeo.widgets.FeatureManager = Ext.extend(gxp.plugins.FeatureManager, {
             request: "DescribeFeatureType",
             typeName: typeName
         };
-        if(url.indexOf("?") > 0){
+        /*if(url.indexOf("?") > 0){
             urlRet = url.split("?")[0];
-        }
+        }*/
         // if(url.indexOf("service") == -1
         //     && url.indexOf("SERVICE") == -1){
         //     baseParams["SERVICE"] = "WFS";

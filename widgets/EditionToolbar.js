@@ -47,6 +47,18 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
             titlePrompt: "Añadir etiqueta",
             promptText: "Inserte el texto de la etiqueta"
         },{
+        	ptype: 'gxp_addpointtomap',
+        	id: 'addpointtomap',
+        	actionTarget: 'editiontbar'
+        },{
+        	ptype: 'gxp_addlinetomap',
+        	id: 'addlinetomap',
+        	actionTarget: 'editiontbar'
+        },{
+        	ptype: 'gxp_addpolygontomap',
+        	id: 'addpolygontomap',
+        	actionTarget: 'editiontbar'
+        },{
             ptype: 'gxp_createbuffer',
             actionTarget: 'editiontbar'
         }, {
