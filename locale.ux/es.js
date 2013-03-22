@@ -346,7 +346,7 @@ GeoExt.Lang.add(
         uploadFileLabel: 'Icono',
         waitMsgText: 'Espere...'
     },
-
+    
     "gxp.plugins.LayerTree.prototype": {
         overlayNodeText: "Capas",
         baseNodeText: "Capa base"

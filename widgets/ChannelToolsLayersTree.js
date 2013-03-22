@@ -178,7 +178,6 @@
             if(this.showZones){
                 this.loader.load(this.zonesNode, function () {}, this);
             }
-            
         },
 
         onBeforeAppend: function (tree, parent, node) {

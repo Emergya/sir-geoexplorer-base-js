@@ -161,7 +161,7 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
             if ( !! this.selectedChannel) {
                 this.clearLayers();
                 if(this.track){
-                    Viewer.trackUrl('modules/Canales_Tematicos');
+                    Viewer.trackUrl('channels/' + this.selectedChannelName);
                 }
                 this.persistenceGeoContext.loadChannelWithFilters(this.selectedChannel, this.selectedChannelName,[
                     "ONLY_CHANNEL_MARK","RECURSIVE_FOLDER_LAYERS_MARK"]);
