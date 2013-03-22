@@ -29,9 +29,21 @@
 Viewer.plugins.XmlQueryAdapter = Ext.extend(Ext.util.Observable, {
     
     queryDef: null,
+    parsedQuery: null,
+        
+    filters: {
+        '1.0.0': new OpenLayers.Format.Filter({version: "1.0.0"}),
+        '1.1.0': new OpenLayers.Format.Filter({version: "1.1.0"})
+    },
 
     constructor: function(config) {
         Viewer.plugins.XmlQueryAdapter.superclass.constructor.call(this, config);
+        Ext.apply(this, config);
+    },
+
+    getParse: function(){
+        return this.parsedQuery? this.parsedQuery : 
+            this.parsedQuery = this.parse(this.queryDef);
     },
 
     parse: function(queryDef) {
@@ -73,5 +85,21 @@ Viewer.plugins.XmlQueryAdapter = Ext.extend(Ext.util.Observable, {
         });
 
         return filter;
+    },
+
+    getWMSFilterParam: function(version){
+        var filter = this.filters['1.1.0'];
+        if(!!version){
+            if(!!this.filters[version]){
+                filter = this.filters[version];
+            }else{
+                try{
+                console.error('Version '+version + ' invalid. Must be:' + this.filters.keys);
+                }catch(e){}
+            }
+        }
+        var xml = new OpenLayers.Format.XML(); 
+        var filter_param = xml.write(filter.write(this.getParse()));
+        return filter_param;
     }
 });

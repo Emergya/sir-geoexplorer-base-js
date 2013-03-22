@@ -48,6 +48,8 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
      */
     autoExpand: "table",
 
+    showWMSLayer: true,
+
     constructor: function(config) {
 
         var constructor = Viewer.controller[config.controller];
@@ -80,7 +82,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
 
     onShow: function() {
 
-        this.manager = this.target.target.tools[this.featureManager];
+        this._manager = this.target.target.tools[this.featureManager];
 
         this.grid = new gxp.grid.FeatureGrid({
             map: this.map,
@@ -88,45 +90,38 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
             height: 200
         });
 
-        var options = {
-            url : this.controller.wfsServiceUrl, 
-            maxFeatures: 500,
-            featureType: this.controller.featureType,
-            projection: this.target.target.mapPanel.map.projection
-        };
+        var layer = new OpenLayers.Layer.WMS(this.controller.title,
+                this.controller.wfsServiceUrl.replace('wfs', 'wms'), {
+                    layers : this.controller.featureType,
+                    transparent : true
+                }, {
+                    format : 'image/png',
+                    isBaseLayer : false,
+                    visibility : true,
+                    opacity : 0.9,
+                    buffer : 0
+                });
 
-        var _strategies = [
-                new OpenLayers.Strategy.BBOX(),
-                new OpenLayers.Strategy.Refresh({
-                    interval : 5000
-                }) ];
-
-        this.controller.layer = new OpenLayers.Layer.Vector(
-            this.controller.title,
-            {
-                'visibility' : true,
-                'strategies' : _strategies,
-                'protocol' : new OpenLayers.Protocol.WFS(options)
-        });
-
-
-        this.target.target.mapPanel.map.addLayer(this.controller.layer);
+        if(this.showWMSLayer){
+            this.controller.layer = this.wmsLayer = layer;
+            this.target.target.mapPanel.map.addLayer(this.wmsLayer);
+        }
         // copy to record type
         var  recordType = GeoExt.data.LayerRecord.create([{name: "name", type: "string"}]);
         this.recordLayer = new recordType({
-            name: this.controller.layer.name,
+            name: layer.name,
             source: this.target.target.sources.local,
-            layer: this.controller.layer
-        }, this.controller.layer);
+            layer: layer
+        }, layer);
         this.target.target.selectLayer(this.recordLayer);
-        this.controller.onShow();
-
         this.onSearchButtonClicked();
+
+        this.controller.onShow();
     },
 
     onHide: function() {
-        if(!!this.controller.layer){
-            this.target.target.mapPanel.map.removeLayer(this.controller.layer);
+        if(!!this.wmsLayer){
+            this.target.target.mapPanel.map.removeLayer(this.wmsLayer);
         }
         this.showGrid(false);
         this.controller.onHide();
@@ -160,22 +155,21 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
 
         //TODO: HANDLE here this.controller.doRequest();
 
-        var ogcFilter = new Viewer.plugins.XmlQueryAdapter()
-            .parse(this.controller.queryDef);
+        var xmlQueryAdapter = new Viewer.plugins.XmlQueryAdapter({
+            queryDef:this.controller.queryDef
+        });
 
-        this.controller.layer.filter = ogcFilter;
-        this.controller.layer.refresh({force: true});
+        var ogcFilter = xmlQueryAdapter.getParse();
 
-        this.manager.loadFeatures(ogcFilter, function (){  
+        this.controller.layer.params['FILTER'] = xmlQueryAdapter.getWMSFilterParam();
+        this.controller.layer.redraw();
 
-            this.grid.setStore(this.manager.featureStore);
-
+        this._manager.loadFeatures(ogcFilter, function (){  
+            this.grid.setStore(this._manager.featureStore);
+            this.showGrid(true);
+            this.loadMask.hide();
             this.btnZoomToResult.setDisabled(false);
             this.btnPrint.setDisabled(false);
-
-            this.showGrid(true);
-
-            this.loadMask.hide();
         }, this);
     },
 
@@ -198,19 +192,6 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
     onQueryLoaded: function(features) {
         this.loadMask.hide();
         console.info('load', features);
-
-        //var store = new gxp.data.WFSFeatureStore({
-        //    url: this.controller.wfsServiceUrl,
-        //    featureType: this.controller.featureType,
-        //    fields: [
-        //        'NOMBRE'
-        //    ],
-        //    autoLoad: true
-        //});
-
-        //store.setOgcFilter(new Viewer.plugins.XmlQueryAdapter()
-        //        .parse(this.controller.queryDef));
-        //this.grid.setStore(store);
     },
 
     onQueryLoadError: function(response) {
@@ -361,12 +342,17 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
      */
     zoomToLayerExtent: function() {
         var map = this.target.target.mapPanel.map;
-        var layer = this.controller.layer;
-        if (OpenLayers.Layer.Vector) {
-            dataExtent = layer instanceof OpenLayers.Layer.Vector &&
-                layer.getDataExtent();
+
+        var extent = this._manager.getPageExtent(); // get extent from page
+        if(!extent){
+            var layer = this.controller.layer;
+            if (OpenLayers.Layer.Vector) {
+                dataExtent = layer instanceof OpenLayers.Layer.Vector &&
+                    layer.getDataExtent();
+            }
+            extent =  layer.restrictedExtent || dataExtent || layer.maxExtent || map.maxExtent;
         }
-        var extent =  layer.restrictedExtent || dataExtent || layer.maxExtent || map.maxExtent;
+        
         if (extent) {
             // respect map properties
             var restricted = map.restrictedExtent || map.maxExtent;

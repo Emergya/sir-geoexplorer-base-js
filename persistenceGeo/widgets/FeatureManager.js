@@ -67,7 +67,7 @@ PersistenceGeo.widgets.FeatureManager = Ext.extend(gxp.plugins.FeatureManager, {
         }else{
             var url = record.getLayer().url.replace("wms", "wfs").replace("WMS", "WFS");
             var typeName = record.getLayer().params.LAYERS;
-            console.log(typeName);
+            //console.log(typeName);
             this.fetchSchema(url, typeName, function(schema){
                     this.prepareWFS(filter, autoLoad, record, source, schema);
             }, this);

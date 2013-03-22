@@ -71,14 +71,10 @@ Ext.ux.GridPrinter = {
         '</body>',
       '</html>'
     ).apply(data);
-    
-    //open up a new printing window, write to it, print it and close
-    var win = window.open('', 'printgrid');
-    
-    win.document.write(html);
 
-    win.print();
-    //win.close();
+    this.windowPrint(html);
+    //this.jsPDF();
+    
   },
   
   /**
@@ -88,6 +84,44 @@ Ext.ux.GridPrinter = {
    */
 
   rootPath: '/',
+
+  windowPrint: function(html){
+    //open up a new printing window, write to it, print it and close
+    var win = window.open('', 'printgrid');
+    
+    win.document.write(html);
+    setTimeout(function() {
+      win.print();
+      win.close();
+    }, 1000);
+  },
+
+  //TODO
+  jsPDF: function(){
+
+
+    var pdfDoc = new jsPDF();
+    //pdfDoc.addPage(html);// We'll make our own renderer to skip this editor
+    var specialElementHandlers = {
+      '#editor': function(element, renderer){
+        return true;
+      }
+    };
+
+    // All units are in the set measurement for the document
+    // This can be changed to "pt" (points), "mm" (Default), "cm", "in"
+    pdfDoc.fromHTML($('#table').get(0), 15, 15, {
+      'width': 170
+      , 
+      'elementHandlers': specialElementHandlers
+    });
+
+    // All units are in the set measurement for the document
+    // This can be changed to "pt" (points), "mm" (Default), "cm", "in"
+    //pdfDoc.fromHTML(html);
+    pdfDoc.save(title ? title : grid.getTitle()+".pdf");
+    //jsPDFUtils.downloadPDF(title ? title : grid.getTitle()+".pdf", pdfDoc); 
+  },
   
   /**
    * @property headerTpl
