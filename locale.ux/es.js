@@ -174,7 +174,9 @@ GeoExt.Lang.add(
     "PersistenceGeo.Context.prototype": {
         defaultAuthGroup: "Capas de '{0}'",
         defaultUsersGroup: "Capas del usuario '{0}'",
-        channelGroupText: "Capas del canal '{0}'"
+        channelGroupText: "Capas del canal '{0}'",
+        publicLayersGroupText: "Capas públicas",
+        publishRequestsGroupText: "Solicitudes de publicación"
     },
 
     "PersistenceGeo.tree.MakeLayerPersistent.prototype": {

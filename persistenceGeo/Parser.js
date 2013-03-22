@@ -209,6 +209,14 @@ PersistenceGeo.Parser = Ext.extend(Ext.Component,{
 		return this.getRestBaseUrl() + "/persistenceGeo/loadFoldersById/";
 	},
 	
+	LOAD_PUBLIC_LAYERS_URL : function() {
+		return this.getRestBaseUrl() + "/persistenceGeo/loadPublicLayers/";
+	},
+	
+	LOAD_PENDING_LAYER_REQUESTS_URL : function () {
+		return this.getRestBaseUrl() + "/persistenceGeo/loadPendingLayerRequestsLayers/";
+	},
+	
 	getFolder: function (nameFolder){
 		return this.LOADED_FOLDERS[nameFolder];
 	},
@@ -515,6 +523,32 @@ PersistenceGeo.Parser = Ext.extend(Ext.Component,{
 	},
 	
 	/**
+	 * Function: loadPublicLayers
+	 * 
+	 * Loads OpenLayers layers and call to onload callback function (layers). 
+	 * Used to load all publicized layers. Call to onloadcallback with an array of ``OpenLayers.Layer`` result.
+	 * @param user name of user
+	 * @param onload callback
+	 * @loadFolders true if must load folders. Default true. 
+	 */
+	loadPublicLayers : function(user, onload) {
+		this.loadLayers(user, onload,this.LOAD_PUBLIC_LAYERS_URL()+user);
+	},
+	
+	/**
+	 * Function: loadPublicLayers
+	 * 
+	 * Loads OpenLayers layers and call to onload callback function (layers). 
+	 * Used to load all pending publication requests layers. Call to onloadcallback with an array of ``OpenLayers.Layer`` result.
+	 * @param user name
+	 * @param onload callback
+	 * @loadFolders true if must load folders. Default true. 
+	 */
+	loadPendingLayerRequests : function(user, onload) {
+		this.loadLayers(user, onload,this.LOAD_PENDING_LAYER_REQUESTS_URL()+user);
+	},
+	
+	/**
 	 * Function: loadLayers
 	 * 
 	 * Loads OpenLayers layers and call to onload callback function (layers). 
@@ -534,7 +568,7 @@ PersistenceGeo.Parser = Ext.extend(Ext.Component,{
                       'user','folderList','styles',
                       'createDate','server_resource',
                       'publicized','enabled','updateDate', 
-                      'folderId', 'authId', 'userId'],
+                      'folderId', 'authId', 'userId',"layerTitle"],
              listeners: {
                  load: function(store, records, options) {
                 	 if(!!onload){
