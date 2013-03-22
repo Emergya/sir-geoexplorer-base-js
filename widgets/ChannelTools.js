@@ -64,7 +64,7 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
         });
 
         this.restBaseUrl = this.persistenceGeoContext.defaultRestUrl;
-        this.LOAD_CHANNEL_URL = String(this.LOAD_CHANNEL_URL, this.restBaseUrl);
+        this.LOAD_CHANNEL_URL = String(this.LOAD_CHANNEL_URL);
     },
 
     onBeforeRender: function () {

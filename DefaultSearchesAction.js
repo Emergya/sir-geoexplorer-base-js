@@ -100,7 +100,8 @@ gxp.plugins.DefaultSearchesAction = Ext.extend(gxp.plugins.Tool, {
                     var mapPanel = Viewer.getMapPanel();
                     ds = new Viewer.dialog.DefaultSearches({
                         mapPanel: mapPanel,
-                        map: mapPanel.map
+                        map: mapPanel.map,
+                        persistenceGeoContext: app.persistenceGeoContext.defaultRestUrl
                     });
                     Viewer.registerComponent('DefaultSearches', ds);
                 }

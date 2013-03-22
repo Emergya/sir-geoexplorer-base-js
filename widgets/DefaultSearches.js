@@ -29,6 +29,7 @@
 Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
 
     LAYER_NAME: 'DefaultSearchLayer',
+    layerTitle: 'Resultado de la búsqueda',
 
     mapProjection: null,
 
@@ -45,12 +46,15 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
         this.vectorLayer = layerController.create({
             type: 'Vector',
             name: this.LAYER_NAME,
+            title: this.layerTitle,
             options: {}
         });
 
         // This window is never destroyed so adding the layer once
         // in the constructor is enough.
         config.map.addLayer(this.vectorLayer);
+        
+        
 
         this.mapProjection = config.map.getProjectionObject();
 
@@ -106,13 +110,17 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
 
     onBtnMunicipalitySearchClicked: function() {
 
+
         var record = this.cmbMunicipality.store.getById(this.cmbMunicipality.getValue());
-        var center = record.get('center');
-        var zoom = record.get('zoom');
-        var geometry = record.get('geometry');
+        var geometryString = record.get('extension');
+        var format = new OpenLayers.Format.GeoJSON();
+        var featureCollection = format.read(geometryString);
+        var reprojected = featureCollection[0].geometry.clone().transform("EPSG:32719", this.map.getProjectionObject());
+        var center = reprojected.getCentroid();
+        
 
         this.vectorLayer.removeAllFeatures();
-        this.drawPolygon(center, zoom, geometry);
+        this.drawPolygon(center, reprojected);
     },
 
     setCenter: function(pCenter, zoom) {
@@ -155,25 +163,22 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
         //this.vectorLayer.addFeatures([hLineFeature, vLineFeature]);
     },
 
-    drawPolygon: function(center, zoom, geometry) {
+    drawPolygon: function(center,  geometry) {
+
 
         var style_green = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
         style_green.strokeColor = 'green'; 
         style_green.fillColor = 'green';
 
         var points = [];
-        for (var i = 0, l = geometry.length; i < l; i++) {
-            points.push(new OpenLayers.Geometry.Point(geometry[i].lon, geometry[i].lat));
-        }
 
-        var lring = new OpenLayers.Geometry.LinearRing(points);
-        var polygon = new OpenLayers.Geometry.Polygon([lring]);
-        var polygonFeature = new OpenLayers.Feature.Vector(polygon, null, style_green);
+        
+        var polygonFeature = new OpenLayers.Feature.Vector(geometry, null, style_green);
 
         this.vectorLayer.addFeatures([polygonFeature]);
 
-        var pCenter = new OpenLayers.LonLat(center.lon, center.lat);
-        this.setCenter(pCenter, zoom);
+        var pCenter = new OpenLayers.LonLat(center.x, center.y);
+        this.map.zoomToExtent(geometry.getBounds());
     },
 
     onBeforeRender: function() {
@@ -187,7 +192,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
                 // store configs
                 autoDestroy: true,
                 proxy: new Ext.data.HttpProxy({
-                    url: 'http://localhost:8080/sir-ohiggins/rest/persistenceGeo/getZonesByType?type=P',
+                    url: app.persistenceGeoContext.defaultRestUrl + '/persistenceGeo/getZonesByType?type=P',
                     method: 'GET'
                 }),
                 storeId: 'store-provinces',
@@ -195,7 +200,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
                 // reader configs
                 root: 'data',
                 idProperty: 'id',
-                fields: ['id', 'code', 'name', 'type', 'extension', 'createDate', 'updateDate', 'enabled']
+                fields: ['id', 'code', 'name', 'type', 'extension']
             }),
             valueField: 'id',
             displayField: 'name',
@@ -218,7 +223,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
                 // store configs
                 autoDestroy: true,
                 proxy: new Ext.data.HttpProxy({
-                    url: 'http://localhost:8080/sir-ohiggins/rest/persistenceGeo/getZonesByParent',
+                    url: app.persistenceGeoContext.defaultRestUrl + '/persistenceGeo/getZonesByParent',
                     method: 'GET'
                 }),
                 storeId: 'store-municipalities',
@@ -226,7 +231,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
                 // reader configs
                 root: 'data',
                 idProperty: 'id',
-                fields: ['id', 'code', 'name', 'type', 'extension', 'createDate', 'updateDate', 'enabled']
+                fields: ['id', 'code', 'name', 'type', 'extension']
             }),
             valueField: 'id',
             displayField: 'name',
@@ -248,7 +253,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
         });
 
         var padding = 'padding: 10px 16px;';
-        var border = 'border: 0px solid transparent;'
+        var border = 'border: 0px solid transparent;';
 
         var c = {
             xtype: 'panel',
