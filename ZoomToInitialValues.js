@@ -107,7 +107,7 @@ gxp.plugins.ZoomToInitialValues = Ext.extend(gxp.plugins.Tool, {
             menuText: this.menuText,
             iconCls: this.iconCls,
             tooltip: this.tooltip,
-            handler: this.doZoomToInitialValues,
+            handler: this.zoomToInitialValues,
             scope: this
         }]);
     },
