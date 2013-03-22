@@ -54,8 +54,9 @@ Ext.ux.GridPrinter = {
       '<html>',
         '<head>',
           '<meta content="text/html; charset=UTF-8" http-equiv="Content-Type" />',
-          '<link href="' + Ext.ux.GridPrinter.stylesheetPath + '" rel="stylesheet" type="text/css" media="screen,print" />',
-          '<link rel="stylesheet" type="text/css" href="'+ Ext.ux.GridPrinter.rootPath +'/theme/ux/ohiggins.css" />',
+          '<link rel="stylesheet" type="text/css" href="'+ Ext.ux.GridPrinter.rootPath +'/theme/ux/fonts/fonts.css" media="screen,print" />',
+          '<link rel="stylesheet" type="text/css" href="'+ Ext.ux.GridPrinter.rootPath +'/theme/ux/ohiggins.css" media="screen,print" />',
+          '<link rel="stylesheet" type="text/css" href="' + Ext.ux.GridPrinter.rootPath + '/theme/ux/ext.ux/print.css" media="screen,print" />',
           '<title>' + title ? title : grid.getTitle() + '</title>',
         '</head>',
         '<body>',
@@ -85,7 +86,6 @@ Ext.ux.GridPrinter = {
    * @type String
    * The path at which the print stylesheet can be found (defaults to '/stylesheets/print.css')
    */
-  stylesheetPath: '/theme/ux/ext.ux/print.css',
 
   rootPath: '/',
   

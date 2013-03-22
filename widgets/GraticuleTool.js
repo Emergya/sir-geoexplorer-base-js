@@ -44,7 +44,7 @@ Ext.namespace("Viewer.plugins");
  *    Plugin to display a grid of latitude and longitude
  */
 Viewer.plugins.GraticuleTool = Ext.extend(gxp.plugins.Tool, {
-	/** api: ptype = vw_graticuletool */
+    /** api: ptype = vw_graticuletool */
     ptype: "vw_graticuletool",
     /** private: property[iconCls]
      */
@@ -55,7 +55,7 @@ Viewer.plugins.GraticuleTool = Ext.extend(gxp.plugins.Tool, {
     /** private: method[constructor]
      */
     constructor: function(config) {
-    	Viewer.plugins.GraticuleTool.superclass.constructor.apply(this, arguments);
+        Viewer.plugins.GraticuleTool.superclass.constructor.apply(this, arguments);
     },
     /** private: method[init]
      * :arg target: ``Object`` The object initializing this plugin.
@@ -66,26 +66,26 @@ Viewer.plugins.GraticuleTool = Ext.extend(gxp.plugins.Tool, {
     },
     /** api: method[addActions] */
     addActions: function(){
-    	var graticuleControl = new OpenLayers.Control.Graticule({
-    		autoActivate: false,
-    		displayInLayerSwitcher: false
-    	});
-    	var geoAction = new GeoExt.Action({
+        var graticuleControl = new OpenLayers.Control.Graticule({
+            autoActivate: false,
+            displayInLayerSwitcher: false
+        });
+        var geoAction = new GeoExt.Action({
             map: this.target.mapPanel.map,
             control: graticuleControl
         });
         this.geoAction = geoAction;
-    	return Viewer.plugins.GraticuleTool.superclass.addActions.apply(this, [{
+        return Viewer.plugins.GraticuleTool.superclass.addActions.apply(this, [{
             menuText: this.graticuleButtonText,
             tooltip: this.graticuleTooltip,
             iconCls: this.iconCls,
-            allowDepress: true,
+        enableToggle: true,
             handler: function (button, evt){
-            	if (!this.geoAction.control.active){
-            		this.geoAction.control.activate();
-            	}else{
-            		this.geoAction.control.deactivate();
-            	}
+                if (!this.geoAction.control.active){
+                    this.geoAction.control.activate();
+                }else{
+                    this.geoAction.control.deactivate();
+                }
             },
             scope: this
         }]);
