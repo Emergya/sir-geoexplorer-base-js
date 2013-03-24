@@ -94,6 +94,11 @@ gxp.plugins.ZoomToInitialValues = Ext.extend(gxp.plugins.Tool, {
     /** api: method[addActions]
      */
     addActions: function() {
+
+        app.on("loginstatechange", this._onLoginStateChanged, this);
+
+        this._onLoginStateChanged(this, app.persistenceGeoContext.userInfo);
+
         if (this.center === null) {
             this.center = this.target.mapPanel.map.getCenter();
         } else if (this.center instanceof Array) {
@@ -113,7 +118,41 @@ gxp.plugins.ZoomToInitialValues = Ext.extend(gxp.plugins.Tool, {
     },
 
     zoomToInitialValues: function() {
-        this.target.mapPanel.map.setCenter(this.center, this.zoom, false, false);
+        if(this._initialViewBBox) {
+            this.target.mapPanel.map.zoomToExtent(this._initialViewBBox,false);
+        } else {
+            this.target.mapPanel.map.setCenter(this.center, this.zoom, false, false);
+        }
+        
+    },
+
+    _onLoginStateChanged : function(sender, userInfo) {
+
+        if(!userInfo || !userInfo.id) {
+            // The user is not logged, we clear the initial bbox so well load the default view.
+            this._initialViewBBox =null;
+            this.zoomToInitialValues();
+            return;
+        }
+
+        // We retrieve the initial view bbox.
+        Ext.Ajax.request({
+            url: app.defaultRestUrl +"/persistenceGeo/getUserZoneGeom/"+userInfo.id+"/"+this.target.mapPanel.map.projection,
+            failure: function(response) {
+                console.debug("Error getting initial view bbox.")
+                this._initialViewBBox =null;
+            },
+            success: function(response) {
+                var result = Ext.decode(response.responseText);
+
+                var wktFmtr = new OpenLayers.Format.WKT();
+                this._initialViewBBox = wktFmtr.read(result.data).geometry.getBounds();
+
+                this.zoomToInitialValues();
+
+            },
+            scope: this
+        });
     }
         
 });

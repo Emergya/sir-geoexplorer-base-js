@@ -106,6 +106,8 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                         listeners: {
                             scope: this,
                             loadcapabilities : function() {
+                                Ext.MessageBox.updateProgress(1);
+                                Ext.MessageBox.hide();
                                 // We modifiy the service urls so they actually work.
                                 printProvider.capabilities.createURL = app.sources.local.url.replace("ows","pdf/create.json");
                                 printProvider.capabilities.printURL = app.sources.local.url.replace("ows","pdf/print.pdf");                                
@@ -122,7 +124,7 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
 
                             printexception : function(printProvider, response) {
                                 Ext.MessageBox.updateProgress(1);
-                                Ext.MessageBox.hide(),
+                                Ext.MessageBox.hide();
                                 Ext.MessageBox.alert("",this.errorText);
                             },
                             beforedownload : function(provider, mapPDFUrl) {
@@ -135,6 +137,7 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                         }
                     });
                     printProvider.customParams.imageName = "";
+                    Ext.Msg.wait("Por favor, espere...");
                     printProvider.loadCapabilities();
                 } else {
                     if (ds.isVisible()) {
