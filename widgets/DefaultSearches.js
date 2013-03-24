@@ -47,7 +47,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
             type: 'Vector',
             name: this.LAYER_NAME,
             title: this.layerTitle,
-            options: {}
+            options: {displayInLayerSwitcher:false}
         });
 
         // This window is never destroyed so adding the layer once
@@ -72,34 +72,37 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
         this.searchByCoordinates.clear();
         this.cmbProvince.setValue('');
         this.cmbMunicipality.setValue('');
+        this.vectorLayer.setVisibility(true);
     },
 
     onHide: function() {
         this.vectorLayer.removeAllFeatures();
+        this.vectorLayer.setVisibility(true);
     },
 
     onBtnUtmClicked: function(coords) {
         this.vectorLayer.removeAllFeatures();
-        this.setCenter(coords.getPoint(this.mapProjection));
+        this.setCenter(coords.getPoint(this.mapProjection), 14);
     },
 
     onBtnLonLatClicked: function(coords) {
         this.vectorLayer.removeAllFeatures();
-        this.setCenter(coords.getPoint(this.mapProjection));
+        this.setCenter(coords.getPoint(this.mapProjection), 14);
     },
 
     onBtnDecimalClicked: function(coords) {
         this.vectorLayer.removeAllFeatures();
-        this.setCenter(coords.getPoint(this.mapProjection));
+        this.setCenter(coords.getPoint(this.mapProjection), 14);
     },
 
     onCmbProvinceSelected: function(combo, record, index) {
         this.btnMunicipalitySearch.disable();
         this.cmbMunicipality.enable();
         this.cmbMunicipality.clearValue();
-        this.cmbMunicipality.store.load({
+        var id = record.get('id');
+        this.cmbMunicipality.store.reload({
             params: {
-                parentId: record.get('id')
+                parentId: id
             }
         });
     },
@@ -129,46 +132,31 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
     },
 
     drawCenter: function(pCenter) {
-
-        var style_blue = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
-        style_blue.strokeColor = 'blue'; 
-        style_blue.fillColor = 'blue';
+        var styleYellow = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
+        styleYellow.externalGraphic = '../../img/marker-yellow.png';
+        styleYellow.fill = false;
+        styleYellow.stroke = false;
+        styleYellow.pointRadius = 0;
+        styleYellow.graphicWidth = 18;
+        styleYellow.graphicHeight = 30;
+        styleYellow.fillOpacity = 1;
+        styleYellow.graphicXOffset = -30 / 2;
+        styleYellow.graphicYOffset = -18 / 2;
+        styleYellow.graphicZIndex = 1;
+        
         var point = new OpenLayers.Geometry.Point(pCenter.lon, pCenter.lat);
-        var pointFeature = new OpenLayers.Feature.Vector(point, null, style_blue);
+        var pointFeature = new OpenLayers.Feature.Vector(point, null, styleYellow);
 
         this.vectorLayer.addFeatures([pointFeature]);
 
-        //var style = { 
-        //    strokeColor: '#000000',
-        //    strokeOpacity: 0.8,
-        //    strokeWidth: 1
-        //};
-
-        //var hPoints = [
-        //    new OpenLayers.Geometry.Point(pCenter.lon - 10, pCenter.lat),
-        //    new OpenLayers.Geometry.Point(pCenter.lon + 10, pCenter.lat)
-        //];
-
-        //var vPoints = [
-        //    new OpenLayers.Geometry.Point(pCenter.lon, pCenter.lat - 10),
-        //    new OpenLayers.Geometry.Point(pCenter.lon, pCenter.lat + 10)
-        //];
-
-        //var hLine = new OpenLayers.Geometry.LineString(hPoints);
-        //var vLine = new OpenLayers.Geometry.LineString(vPoints);
-
-        //var hLineFeature = new OpenLayers.Feature.Vector(hLine, null, style);
-        //var vLineFeature = new OpenLayers.Feature.Vector(vLine, null, style);
-
-        //this.vectorLayer.addFeatures([hLineFeature, vLineFeature]);
     },
 
     drawPolygon: function(center,  geometry) {
 
 
         var style_green = OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style['default']);
-        style_green.strokeColor = 'green'; 
-        style_green.fillColor = 'green';
+        style_green.strokeColor = '#FFD700'; 
+        style_green.fillColor = '#FFD700';
 
         var points = [];
 
@@ -196,7 +184,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
                     method: 'GET'
                 }),
                 storeId: 'store-provinces',
-                restFul: true,
+                restFul: false,
                 // reader configs
                 root: 'data',
                 idProperty: 'id',
@@ -218,7 +206,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
             emptyText: 'Seleccione una provincia primero',
             disabled: true,
             editable: false,
-            store: new Viewer.store.Municipalities(),
+            //store: new Viewer.store.Municipalities(),
             store: new Ext.data.JsonStore({
                 // store configs
                 autoDestroy: true,
@@ -227,7 +215,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
                     method: 'GET'
                 }),
                 storeId: 'store-municipalities',
-                restFul: true,
+                restFul: false,
                 // reader configs
                 root: 'data',
                 idProperty: 'id',
@@ -236,8 +224,10 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
             valueField: 'id',
             displayField: 'name',
             triggerAction: 'all',
+            mode: 'local',
             flex: 1,
             anchor: '98%',
+            autoLoad: false,
             listeners: {
                 select: this.onCmbMunicipalitySelected,
                 scope: this
