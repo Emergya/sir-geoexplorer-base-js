@@ -49,8 +49,8 @@ PersistenceGeo.loaders.WMSLoader = Ext
                         var visibility = false;
                         var transparent = true;
                         var isBaseLayer = false;
-                        var opacity = 0.5;
-                        var buffer = 0;
+                        var opacity = 1;
+                        var buffer = 1;
                         var format = 'image/png';
                         var layers = layerData.name;
                         var layerTitle = layerData.layerTitle;
@@ -74,8 +74,8 @@ PersistenceGeo.loaders.WMSLoader = Ext
                             isBaseLayer = this
                                     .toBoolean(layerData.properties.isBaseLayer) || false;
                             opacity = this
-                                    .toNumber(layerData.properties.opacity) || 0.75;
-                            buffer = this.toNumber(layerData.properties.buffer) || 1;
+                                    .toNumber(layerData.properties.opacity) || opacity;
+                            buffer = this.toNumber(layerData.properties.buffer) || buffer;
                             format = layerData.properties.format || format;
                             layers = layerData.properties.layers || layers;
                         }
