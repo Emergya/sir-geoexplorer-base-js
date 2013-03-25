@@ -32,6 +32,9 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
     layerTitle: 'Resultado de la búsqueda',
 
     mapProjection: null,
+    
+    /** i18n **/
+    titleTool: "Predetermine searches",
 
     constructor: function(config) {
 
@@ -60,7 +63,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
 
         Viewer.dialog.DefaultSearches.superclass.constructor.call(this, Ext.apply({
             cls: 'vw_default_searches_window',
-            title: 'Búsquedas predeterminadas',
+            title: this.titleTool,
             width: 380,
             height: 260,
             closeAction: 'hide',

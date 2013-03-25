@@ -94,7 +94,8 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
         var options, uploadButton, uploadKMLButton, uploadRasterButton;
         if (this.initialConfig.search || (this.uploadSource)) {
             var items = [new Ext.menu.Item({
-                iconCls: 'vw-icon-add-layer-wms', 
+                iconCls: 'vw-icon-add-layer-wms',
+                tooltip: "slvnñsklnvlksdn",
                 text: this.addActionMenuText, 
                 handler: this.showCapabilitiesGrid,
                 scope: this

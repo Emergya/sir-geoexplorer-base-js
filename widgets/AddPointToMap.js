@@ -51,8 +51,6 @@ gxp.plugins.AddPointToMap = Ext.extend(gxp.plugins.Tool, {
     iconCls: 'vw-icon-add-point',
     /** private: property[featuremanager]*/
     featureManager: "featuremanager",
-    /** i18n **/
-    addPointToMapTooltipText: 'Add point to map',
     /** private: method[constructor]*/
     constructor: function(config) {
         gxp.plugins.AddPointToMap.superclass.constructor.apply(this, arguments);
@@ -87,7 +85,7 @@ gxp.plugins.AddPointToMap = Ext.extend(gxp.plugins.Tool, {
 		control.setMap(Viewer.getMapPanel().map);
 		var actions = [];
 		actions.push(new GeoExt.Action({
-			tooltip: this.addPointToMapTooltipText,
+			tooltip: this.tooltip,
             iconCls: this.iconCls,
             disabled: true,
             enableToggle: true,

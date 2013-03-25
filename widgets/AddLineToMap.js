@@ -51,8 +51,6 @@ gxp.plugins.AddLineToMap = Ext.extend(gxp.plugins.Tool, {
     iconCls: 'vw-icon-add-line',
     /** private: property[featuremanager]*/
     featureManager: "featuremanager",
-    /** i18n **/
-    addLineToMapTooltipText: 'Add line to map',
     /** private: method[constructor]*/
     constructor: function(config) {
         gxp.plugins.AddLineToMap.superclass.constructor.apply(this, arguments);
@@ -88,7 +86,7 @@ gxp.plugins.AddLineToMap = Ext.extend(gxp.plugins.Tool, {
 		control.setMap(Viewer.getMapPanel().map);
 		var actions = [];
 		actions.push(new GeoExt.Action({
-			tooltip: this.addLineToMapTooltipText,
+			tooltip: this.tooltip,
             iconCls: this.iconCls,
             disabled: true,
             enableToggle: true,
@@ -186,7 +184,7 @@ gxp.plugins.AddLineToMap = Ext.extend(gxp.plugins.Tool, {
      */
     setHandler: function(multi){
     	this.actions[0].control.handler.destroy();
-    	this.actions[0].control.handler = new OpenLayers.Handler.Polygon(this.actions[0].control, this.actions[0].control.callbacks,
+    	this.actions[0].control.handler = new OpenLayers.Handler.Path(this.actions[0].control, this.actions[0].control.callbacks,
                 Ext.apply(this.actions[0].control.handlerOptions, {multi: multi}));
     }
 });

@@ -66,7 +66,7 @@ gxp.plugins.PanControlAction = Ext.extend(gxp.plugins.Tool, {
      *  ``String``
      *  Text for zoom action tooltip (i18n).
      */
-    tooltip: 'Paneo',
+    tooltip: 'Pan',
     
     /** private: property[iconCls]
      */

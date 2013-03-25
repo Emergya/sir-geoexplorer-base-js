@@ -27,6 +27,15 @@
  */
 
 Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
+	
+	/** i18n **/
+	tooltipSelectFeature: "Select Feature",
+	tooltipAddTag: "Add Tag to Map",
+	tooltipAddPoint: "Add Point to Map",
+	tooltipAddLine: "Add Line to Map",
+	tooltipAddPolygon: "Add Polygon to Map",
+	tooltipAddBuffer: "Create a new buffer",
+	tooltipAddNewElement: "Create a new element",
 
     constructor: function(config) {
 
@@ -38,40 +47,38 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
 
         this.plugins = [{
             ptype: 'gxp_selectfeature',
-            actionTarget: 'editiontbar'
+            actionTarget: 'editiontbar',
+            tooltip: this.tooltipSelectFeature
         },{
             ptype: 'gxp_addtagtomap',
             id: 'addtagtomap',
             actionTarget: 'editiontbar',
-            addTagToMapTooltipText: "Añadir etiqueta al mapa",
+            addTagToMapTooltipText: this.tooltipAddTag,
             titlePrompt: "Añadir etiqueta",
             promptText: "Inserte el texto de la etiqueta"
         },{
         	ptype: 'gxp_addpointtomap',
         	id: 'addpointtomap',
-        	actionTarget: 'editiontbar'
+        	actionTarget: 'editiontbar',
+        	tooltip: this.tooltipAddPoint
         },{
         	ptype: 'gxp_addlinetomap',
         	id: 'addlinetomap',
-        	actionTarget: 'editiontbar'
+        	actionTarget: 'editiontbar',
+        	tooltip: this.tooltipAddLine
         },{
         	ptype: 'gxp_addpolygontomap',
         	id: 'addpolygontomap',
-        	actionTarget: 'editiontbar'
+        	actionTarget: 'editiontbar',
+        	tooltip: this.tooltipAddPolygon
         },{
             ptype: 'gxp_createbuffer',
-            actionTarget: 'editiontbar'
+            actionTarget: 'editiontbar',
+            tooltip: this.tooltipAddBuffer
         }, {
             ptype: 'gxp_newelementfromcoords',
-            actionTarget: 'editiontbar'
-        }, {
-            ptype: 'vw_featureeditor',
-            featureManager: 'featuremanager',
-            autoLoadFeature: true,
-            splitButton: true,
-            showButtonText: true,
-            //toggleGroup: 'interaction',
-            actionTarget: 'editiontbar'
+            actionTarget: 'editiontbar',
+            tooltip: this.tooltipAddNewElement
         }];
 
         Viewer.widgets.EditionToolbar.superclass.constructor.call(this, Ext.apply({

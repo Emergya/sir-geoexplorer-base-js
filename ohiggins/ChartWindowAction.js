@@ -65,7 +65,7 @@ Viewer.plugins.ChartWindowAction = Ext.extend(gxp.plugins.Tool, {
      *  ``String``
      *  Text for zoom action tooltip (i18n).
      */
-    tooltip: 'Abre la ventana que muestra las Iniciativas de Inversión',
+    tooltip: 'Open the window that shows the investment initiatives',
 
     /** private: property[iconCls]
      */

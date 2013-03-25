@@ -66,7 +66,7 @@ gxp.plugins.PlanificationToolsAction = Ext.extend(gxp.plugins.Tool, {
      *  ``String``
      *  Text for zoom action tooltip (i18n).
      */
-    tooltip: 'Instrumentos de planificación',
+    tooltip: 'Planification Instruments',
     
     /** private: property[iconCls]
      */

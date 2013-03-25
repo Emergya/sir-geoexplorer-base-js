@@ -27,7 +27,15 @@
  */
 
 Viewer.widgets.InformationToolbar = Ext.extend(Ext.Toolbar, {
-
+	
+	/** i18n **/
+	tooltipDefaultSearches: "Default Searches",
+	tooltipLengthMeasure: "Length Measure",
+	tooltipAreaMeasure: "Area Measure",
+	tooltipQueryLayer: "Query Layer",
+	tooltipPointInformation: "Point Information",
+	tooltipMetadataLayer: "Show metadata information",
+	
     constructor: function(config) {
 
         Ext.apply(this, config);
@@ -36,17 +44,18 @@ Viewer.widgets.InformationToolbar = Ext.extend(Ext.Toolbar, {
 
         this.plugins = [{
             ptype: 'gxp_defaultsearches',
-            actionTarget: 'informationtbar'
+            actionTarget: 'informationtbar',
+            tooltip: this.tooltipDefaultSearches
         },{
             ptype: 'gxp_measurelength',
             lengthMenuText: 'Medir longitud',
-            lengthTooltip: 'Medir longitud',
+            lengthTooltip: this.tooltipLengthMeasure,
             actionTarget: 'informationtbar',
             toggleGroup: 'measure'
         },{
             ptype: 'gxp_measurearea',
             areaMenuText: 'Medir área',
-            areaTooltip: 'Medir área',
+            areaTooltip: this.tooltipAreaMeasure,
             actionTarget: 'informationtbar',
             toggleGroup: 'measure'
         },{
@@ -57,13 +66,11 @@ Viewer.widgets.InformationToolbar = Ext.extend(Ext.Toolbar, {
             outputTarget: "query",
             target: this,
             queryMenutext: 'Consultar la capa seleccionada',
-            queryActionTip: 'Consultar la capa seleccionada'
+            queryActionTip: this.tooltipQueryLayer
         }, {
             ptype: 'gxp_pointinformation',
-            actionTarget: 'informationtbar'
-        }, {
-            ptype: 'gxp_metadatainformation',
-            actionTarget: ['informationtbar']
+            actionTarget: 'informationtbar',
+            tooltip: this.tooltipPointInformation
         }
         // , {
         //     ptype: 'vw_wmsgetfeatureinfo',

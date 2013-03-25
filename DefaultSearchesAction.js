@@ -65,7 +65,7 @@ gxp.plugins.DefaultSearchesAction = Ext.extend(gxp.plugins.Tool, {
      *  ``String``
      *  Text for zoom action tooltip (i18n).
      */
-    tooltip: 'Búsquedas predeterminadas',
+    tooltip: 'Default Searches',
     
     /** private: property[iconCls]
      */

@@ -51,8 +51,7 @@ gxp.plugins.AddPolygonToMap = Ext.extend(gxp.plugins.Tool, {
     iconCls: 'vw-icon-add-polygon',
     /** private: property[featuremanager]*/
     featureManager: "featuremanager",
-    /** i18n **/
-    addPolygonToMapTooltipText: 'Add polygon to map',
+    
     /** private: method[constructor]*/
     constructor: function(config) {
         gxp.plugins.AddPolygonToMap.superclass.constructor.apply(this, arguments);
@@ -96,7 +95,7 @@ gxp.plugins.AddPolygonToMap = Ext.extend(gxp.plugins.Tool, {
 		control.setMap(Viewer.getMapPanel().map);
 		var actions = [];
 		actions.push(new GeoExt.Action({
-			tooltip: this.addPolygonToMapTooltipText,
+			tooltip: this.tooltip,
             iconCls: this.iconCls,
             disabled: true,
             enableToggle: true,

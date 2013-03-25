@@ -27,7 +27,11 @@
  */
 
 Viewer.widgets.ImportExportToolbar = Ext.extend(Ext.Toolbar, {
-
+	
+	/** i18n **/
+	tooltipExportKML: "Export KML tool",
+	tooltipExportSHP: "Export SHP tool",
+	
     constructor: function(config) {
 
         this.tools = [];
@@ -36,7 +40,7 @@ Viewer.widgets.ImportExportToolbar = Ext.extend(Ext.Toolbar, {
             ptype: "vw_exporttokml",
             actionTarget: ["importexporttbar"],
             exportToKMLText: "Exportar a KML",
-            exportToKMLTooltipText: "Exportar capa a un fichero kml",
+            exportToKMLTooltipText: this.tooltipExportKML,
             exportToKMLMsg: "Generando el fichero KML ...",
             exportToKMLErrorTitle: "Error",
             exportToKMLErrorContent: "Error al exportar la capa",
@@ -45,7 +49,7 @@ Viewer.widgets.ImportExportToolbar = Ext.extend(Ext.Toolbar, {
             ptype: "vw_exporttoshp",
             actionTarget: ["importexporttbar"],
             exportToSHPText: "Exportar a SHP",
-            exportToSHPTooltipText: "Exportar capa a un fichero shape",
+            exportToSHPTooltipText: this.tooltipExportSHP,
             exportToSHPMsg: "Generando el fichero ZIP ...",
             exportToSHPErrorTitle: "Error",
             exportToSHPErrorContent: "Error al exportar la capa",

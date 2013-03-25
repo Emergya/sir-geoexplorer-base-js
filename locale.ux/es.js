@@ -1,20 +1,7 @@
 GeoExt.Lang.add(
     "es", {
 
-    "gxp.plugins.AddLayers.prototype": {
-        addActionMenuText: "A\u00F1adir Capas",
-        addActionTip: "A\u00F1adir Capas",
-        addServerText: "A\u00F1adir servidor",
-        addButtonText: "A\u00F1adir Capas",
-        untitledText: "Sin T\u00EDtulo",
-        addLayerSourceErrorText: "Error obteniendo capabilities de WMS ({msg}).\nPor favor, compruebe la URL y vuelva a intentarlo.",
-        availableLayersText: "Capas disponibles",
-        expanderTemplateText: "<p><b>Resumen:</b> {abstract}</p>",
-        panelTitleText: "T\u00EDtulo",
-        layerSelectionText: "Ver datos disponibles de:",
-        doneText: "Hecho",
-        uploadText: "Subir Datos"
-    },
+    
 
     "Viewer.plugins.AddLayers.prototype": {
         nameHeaderText: "Nombre",
@@ -29,7 +16,6 @@ GeoExt.Lang.add(
         folderCancel: "Aviso",
         folderCancelText: "Error al guardar la capa. Int\u00e9ntelo de nuevo.",
         addActionMenuText: "A\u00F1adir Capas",
-        addActionTip: "A\u00f1adir Capas",
         addServerText: "A\u00f1adir servidor",
         addButtonText: "A\u00f1adir Capas",
         untitledText: "Sin T\u00EDtulo",
@@ -242,7 +228,6 @@ GeoExt.Lang.add(
     },
     "gxp.plugins.MetadataInformation.prototype": {
         menuText: "Mostrar metadatos de la capa seleccionada",
-        tooltip: "Mostrar metadatos de la capa seleccionada",
         windowTitle: 'Metadatos de la capa',
         windowLoadingMsg: 'Cargando...'
     },
@@ -267,14 +252,125 @@ GeoExt.Lang.add(
         geoButtonText: "Buscar Iniciativas Georreferenciadas",
         exchangeChartsText: "Intercambiar"
     },
-
+    
+    /** Herramientas de la barra de Heraramientas principal **/
+    /* Imprimir en pdf */
     "gxp.plugins.PDFPrintAction.prototype": {
         buttonText: "Imprimir",
         menuText: "Imprimir",
-        tooltip: "Imprimir",
+        tooltip: "Herramienta de impresión de la vista actual del mapa",
         errorText: "Ocurri\u00f3 un error, vuelva a intentarlo en unos instantes."
     },
-
+    /* Vista inicial */
+    "gxp.plugins.ZoomToInitialValues.prototype": {
+        tooltip: 'Vista inicial: volver al zoom inicial del mapa'
+    },
+    /* Acercar/Alejar (Zoom in/out) */
+    "gxp.plugins.Zoom.prototype": {
+        zoomInMenuText: "Zoom m\u00e1s",
+        zoomOutMenuText: "Zoom menos",
+        zoomInTooltip: "Acercar: acercar el zoom del mapa",
+        zoomOutTooltip: "Alejar: alejar el zoom del mapa"
+    },
+    /* Vista anterior/siguiente */
+    "gxp.plugins.NavigationHistory.prototype": {
+        previousMenuText: 'Vista anterior',
+        nextMenuText: 'Vista siguiente',
+        previousTooltip: 'Vista anterior: vuelve al encuadre anterior del mapa',
+        nextTooltip: 'Vista siguiente: vuelve al encuandre anterior al uso de vista anterior'
+    },
+    /* Paneo */
+    "gxp.plugins.PanControlAction.prototype": {
+    	tooltip: 'Movimiento'
+    },
+    /* Barra de herramientas de informacion, edicion y exportar */
+    "GeoExplorer.Composer.prototype": {
+    	/* Información */
+        tooltipInfo: "Herramientas de información",
+        /* Edición */
+        tooltipEdition: "Herramientas de edición",
+        /* Exportar */
+        tooltipExport: "Herramientas de exportación",
+        /* Información de elementos */
+        tooltipGetFeatureInfo: "Herramienta de información de los elementos de una capa"
+    },
+    /* Añadir capas */
+    "gxp.plugins.AddLayers.prototype": {
+        addActionMenuText: "A\u00F1adir Capas",
+        addActionTip: "Herramientas para importar capas de diferentes formatos",
+        addServerText: "A\u00F1adir servidor",
+        addButtonText: "A\u00F1adir Capas",
+        untitledText: "Sin T\u00EDtulo",
+        addLayerSourceErrorText: "Error obteniendo capabilities de WMS ({msg}).\nPor favor, compruebe la URL y vuelva a intentarlo.",
+        availableLayersText: "Capas disponibles",
+        expanderTemplateText: "<p><b>Resumen:</b> {abstract}</p>",
+        panelTitleText: "T\u00EDtulo",
+        layerSelectionText: "Ver datos disponibles de:",
+        doneText: "Hecho",
+        uploadText: "Subir Datos"
+    },
+    /* Certificados municipales */
+    "gxp.plugins.LocalCertificatesAction.prototype": {
+        selectInMapText: "Seleccionar en el mapa",
+        searchFormText: "Formulario de b\u00fasqueda...",
+        selectPropertyInMapText: "Por favor, seleccione una propiedad en el mapa.",
+        noParcelSelectedText: "No se seleccion\u00f3 ninguna parcela, por favor pulse 'Seleccionar en mapa' de nuevo.",
+        errorText: "Ocurri\u00f3 un error, vuelva a intentarlo en unos instantes.",
+        waitText: "Por favor espere...",
+        tooltip: "Herramientas para emitir certificados municipales"
+    },
+    
+    /* Instrumentos de planificación */
+    "gxp.plugins.PlanificationToolsAction.prototype": {
+    	tooltip: "Instrumentos de planificación territorial"
+    },
+    /* Iniciativas de inversión*/
+    "Viewer.plugins.ChartWindowAction.prototype": {
+    	tooltip: "Abre la ventana que muestra las Iniciativas de Inversión"
+    },
+    /* Log in/out */
+    //TODO
+    
+    /** Barra de herramientas de información **/
+    "Viewer.widgets.InformationToolbar.prototype": {
+    	/* Búsquedas predeterminadas */
+    	tooltipDefaultSearches: "Abre un cuadro de diálogo en el que se permiten realizar búsquedas predetermindas",
+    	/* Medir longitud */
+    	tooltipLengthMeasure: "Permite dibujar una línea en el mapa, de la que se mostrará su longitud",
+    	/* Medir área */
+    	tooltipAreaMeasure: "Permite dibujar un polígono en el mapa, del que se mostrrá su área",
+        /* Consultar la capa seleccionada */
+    	tooltipQueryLayer: "Permite realizar una consulta sobre la capa seleccionada",
+        /* Consultar coordenadas */
+    	tooltipPointInformation: "Muestra información sobre las coordenadas seleccionadas",
+        /* Consultar metadatos */
+    	tooltipMetadataLayer: "Muestra información de los metadatos de la capa seleccionada."
+    },    
+    /** Barra de herramientas de edición **/
+    "Viewer.widgets.EditionToolbar.prototype": {
+    	/* Selección de elementos */
+    	tooltipSelectFeature: "Permite seleccionar un elemento en el mapa",
+    	/* Añadir etiqueta */
+    	tooltipAddTag: "Permite añadir una etiqueta en el mapa",
+    	/* Añadir punto */
+    	tooltipAddPoint: "Permite añadir un punto a una capa de puntos",
+    	/* Añadir línea */
+    	tooltipAddLine: "Permite añadir una línea a una capa de líneas",
+    	/* Añadir polígono */
+    	tooltipAddPolygon: "Permite añadir un polígono a una capa de polígonos",
+    	/* Crear bufer */
+    	tooltipAddBuffer: "Permite crear un bufer sobre un elemente del mapa",
+    	/* Crear nuevo elemento */
+    	tooltipAddNewElement: "Permite crear un nuevo elemento sobre una capa",
+    },
+    /** Barra de herramientas de exportación **/
+    "Viewer.widgets.ImportExportToolbar.prototype": {
+    	/* Exportar KML */
+    	tooltipExportKML: "Permite exportar una capa a formato KML",
+    	/* Exportar SHP */
+    	tooltipExportSHP: "Permite exportar una capa a formato SHP"
+    },
+    
     "Viewer.dialog.PDFPrintWindow.prototype": {
         printText: 'Imprimir',
         downloadImageText: "Descargar imagen",
@@ -295,15 +391,6 @@ GeoExt.Lang.add(
         errorText: "Ocurri\u00f3 un error, vuelva a intentarlo en unos instantes."
     },
 
-    "gxp.plugins.LocalCertificatesAction.prototype": {
-        selectInMapText: "Seleccionar en el mapa",
-        searchFormText: "Formulario de b\u00fasqueda...",
-        selectPropertyInMapText: "Por favor, seleccione una propiedad en el mapa.",
-        noParcelSelectedText: "No se seleccion\u00f3 ninguna parcela, por favor pulse 'Seleccionar en mapa' de nuevo.",
-        errorText: "Ocurri\u00f3 un error, vuelva a intentarlo en unos instantes.",
-        waitText: "Por favor espere..."
-    },
-
     "Viewer.dialog.LocalCertificatesWindow.prototype": {
         titleText: "Certificados Municipales",
         printText: "Imprimir",
@@ -319,23 +406,11 @@ GeoExt.Lang.add(
         selectInMapText: "Seleccionar en el mapa"
     },
 
-    "gxp.plugins.ZoomToInitialValues.prototype": {
-        tooltip: 'Vista inicial'
-    },
+    
 
-    "gxp.plugins.Zoom.prototype": {
-        zoomInMenuText: "Zoom m\u00e1s",
-        zoomOutMenuText: "Zoom menos",
-        zoomInTooltip: "Zoom m\u00e1s",
-        zoomOutTooltip: "Zoom menos"
-    },
+    
 
-    "gxp.plugins.NavigationHistory.prototype": {
-        previousMenuText: 'Vista anterior',
-        nextMenuText: 'Vista siguiente',
-        previousTooltip: 'Vista anterior',
-        nextTooltip: 'Vista siguiente'
-    },
+    
 
     "gxp.plugins.WMSGetFeatureInfo.prototype": {
         infoActionTip: 'Informaci\u00f3n del elemento',
