@@ -68,38 +68,38 @@ gxp.plugins.AddLineToMap = Ext.extend(gxp.plugins.Tool, {
 	addActions: function(){
 		var featureManager = this.getFeatureManager();
 		var featureLayer = featureManager.featureLayer;
+		featureManager.schemaCache = {};
+		featureManager = this.updateFeatureManager(featureManager);
 		var control = new OpenLayers.Control.DrawFeature(
 	            featureLayer,
 	            OpenLayers.Handler.Path, 
 	            {
+	            	multi: true,
 	                eventListeners: {
 	                    featureadded: function(evt) {
 	                        if (this.autoLoadFeature === true) {
 	                            this.autoLoadedFeature = evt.feature;
 	                        }
 	                    },
-	                    activate: function() {
-	                        this.target.doAuthorized(this.roles, function() {
-	                            featureManager.showLayer(
-	                                this.id, this.showSelectedOnly && "selected"
-	                            );
-	                        }, this);
-	                    },
-	                    deactivate: function() {
-	                        featureManager.hideLayer(this.id);
-	                    },
 	                    scope: this
 	                }
 	            }
 	        );
-		var action = gxp.plugins.AddLineToMap.superclass.addActions.apply(this, [{
+		control.setMap(Viewer.getMapPanel().map);
+		var actions = [];
+		actions.push(new GeoExt.Action({
+			tooltip: this.addLineToMapTooltipText,
             iconCls: this.iconCls,
-            tooltip: this.addLineToMapTooltipText,
             disabled: true,
+            enableToggle: true,
+            allowDepress: true,
             control: control,
-            scope: this
-        }]);
+            deactivateOnDisable: true,
+            map: this.target.mapPanel.map
+		}));
+		actions = gxp.plugins.AddLineToMap.superclass.addActions.apply(this, actions);
 		featureManager.on("layerchange", this.onLayerChange, this);
+		return actions;
 	},
 	/** private: method[getFeatureManager]
      *  :returns: :class:`gxp.plugins.FeatureManager`
@@ -144,9 +144,14 @@ gxp.plugins.AddLineToMap = Ext.extend(gxp.plugins.Tool, {
         		if(!!mgr.geometryType){
         			if(mgr.geometryType.indexOf("Multi") != -1){
         				geometryType = mgr.geometryType.replace("Multi", "");
+        			}else{
+        				geometryType = mgr.geometryType;
         			}
         			if(!!geometryType && (geometryType == "Curve" || geometryType == "Line")){
+        				this.setActionControlLayer(mgr.featureLayer);
         				this.actions[0].enable();
+        			}else{
+        				this.actions[0].disable();
         			}
         		}
         	}
@@ -154,6 +159,35 @@ gxp.plugins.AddLineToMap = Ext.extend(gxp.plugins.Tool, {
     		// Disable the edit options
     		this.actions[0].disable();
     	}
+    },
+    /** private: method[setActionControlLayer]
+     *  :arg layer: OpenLayers.Layer
+     */
+    setActionControlLayer: function(layer){
+    	if(this.actions.length > 0){
+    		this.actions[0].control.layer = layer;
+    	}
+    },
+    /** private: method[updateFeatureManager]
+     *  :arg featureManager: :class:`gxp.plugins.FeatureManager`
+     *  :returns: :class:`gxp.plugins.FeatureManager`
+     */
+    updateFeatureManager: function(featureManager){
+    	var queryManager = this.getFeatureManager("querymanager");
+    	featureManager.fetchSchema = queryManager.fetchSchema;
+    	featureManager.getSchemaFromWMS = queryManager.getSchemaFromWMS;
+    	featureManager.setFeatureStore = queryManager.setFeatureStore;
+    	featureManager.getBaseParamsAndUrl = queryManager.getBaseParamsAndUrl;
+    	featureManager.prepareWFS = queryManager.prepareWFS;
+    	return featureManager;
+    },
+    /** private: method[setHandler]
+     *  :arg multi: boolean
+     */
+    setHandler: function(multi){
+    	this.actions[0].control.handler.destroy();
+    	this.actions[0].control.handler = new OpenLayers.Handler.Polygon(this.actions[0].control, this.actions[0].control.callbacks,
+                Ext.apply(this.actions[0].control.handlerOptions, {multi: multi}));
     }
 });
 

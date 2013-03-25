@@ -83,7 +83,6 @@ gxp.plugins.AddPolygonToMap = Ext.extend(gxp.plugins.Tool, {
 	            featureLayer,
 	            OpenLayers.Handler.Polygon,
 	            {
-	            	multi: true,
 	            	eventListeners: {
 	                    featureadded: function(evt) {
 	                        if (this.autoLoadFeature === true) {
@@ -153,10 +152,15 @@ gxp.plugins.AddPolygonToMap = Ext.extend(gxp.plugins.Tool, {
         		if(!!mgr.geometryType){
         			if(mgr.geometryType.indexOf("Multi") != -1){
         				geometryType = mgr.geometryType.replace("Multi", "");
+        				this.setHandler(true);
+        			}else{
+        				geometryType = mgr.geometryType;
         			}
         			if(!!geometryType && (geometryType == "Polygon" || geometryType == "Surface")){
         				this.setActionControlLayer(mgr.featureLayer);
         				this.actions[0].enable();
+        			}else{
+        				this.actions[0].disable();
         			}
         		}
         	}
@@ -180,6 +184,12 @@ gxp.plugins.AddPolygonToMap = Ext.extend(gxp.plugins.Tool, {
     	featureManager.getBaseParamsAndUrl = queryManager.getBaseParamsAndUrl;
     	featureManager.prepareWFS = queryManager.prepareWFS;
     	return featureManager;
+    },
+    
+    setHandler: function(multi){
+    	this.actions[0].control.handler.destroy();
+    	this.actions[0].control.handler = new OpenLayers.Handler.Polygon(this.actions[0].control, this.actions[0].control.callbacks,
+                Ext.apply(this.actions[0].control.handlerOptions, {multi: multi}));
     }
 });
 

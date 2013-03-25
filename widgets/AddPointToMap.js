@@ -68,15 +68,8 @@ gxp.plugins.AddPointToMap = Ext.extend(gxp.plugins.Tool, {
 	addActions: function(){
 		var featureManager = this.getFeatureManager();
 		var featureLayer = featureManager.featureLayer;
-		featureLayer.events.on({
-			"sketchcomplete": function(evt) {
-                featureManager.featureLayer.events.register("featuresadded", this, function(evt) {
-                    featureManager.featureLayer.events.unregister("featuresadded", this, arguments.callee);
-                    //this.actions[0].control.deactivate();
-                });
-            },
-            scope: this
-		});
+		featureManager.schemaCache = {};
+		featureManager = this.updateFeatureManager(featureManager);
 		var control = new OpenLayers.Control.DrawFeature(
 	            featureLayer,
 	            OpenLayers.Handler.Point, 
@@ -87,28 +80,25 @@ gxp.plugins.AddPointToMap = Ext.extend(gxp.plugins.Tool, {
 	                            this.autoLoadedFeature = evt.feature;
 	                        }
 	                    },
-	                    activate: function() {
-	                        this.target.doAuthorized(this.roles, function() {
-	                            featureManager.showLayer(
-	                                this.id, this.showSelectedOnly && "selected"
-	                            );
-	                        }, this);
-	                    },
-	                    deactivate: function() {
-	                        featureManager.hideLayer(this.id);
-	                    },
 	                    scope: this
 	                }
 	            }
 	        );
-		var action = gxp.plugins.AddPointToMap.superclass.addActions.apply(this, [{
+		control.setMap(Viewer.getMapPanel().map);
+		var actions = [];
+		actions.push(new GeoExt.Action({
+			tooltip: this.addPointToMapTooltipText,
             iconCls: this.iconCls,
-            tooltip: this.addPointToMapTooltipText,
-            control: control,
             disabled: true,
-            scope: this
-        }]);
+            enableToggle: true,
+            allowDepress: true,
+            control: control,
+            deactivateOnDisable: true,
+            map: this.target.mapPanel.map
+		}));
+		actions = gxp.plugins.AddPointToMap.superclass.addActions.apply(this, actions);
 		featureManager.on("layerchange", this.onLayerChange, this);
+		return actions;
 	},
 	/** private: method[getFeatureManager]
      *  :returns: :class:`gxp.plugins.FeatureManager`
@@ -130,21 +120,65 @@ gxp.plugins.AddPointToMap = Ext.extend(gxp.plugins.Tool, {
      */
     onLayerChange: function(mgr, layer, schema) {
     	var geometryType = null;
-    	// There's a schema
-    	if(!schema){
+    	var authIdLayer = null;
+    	var authIdUser = null;
+    	// Institución de la capa
+    	if(!!layer && !!layer.data && !!layer.data.layer && layer.data.layer.authId){
+    		authIdLayer = layer.data.layer.authId;
+    	}
+    	// Institución del usuario
+    	if(!!app && !!app.persistenceGeoContext 
+    			&& !!app.persistenceGeoContext.userInfo 
+    			&& !!app.persistenceGeoContext.userInfo.authorityId){
+    		authIdUser = app.persistenceGeoContext.userInfo.authorityId;
+    	}
+    	// Comprobamos si el usuario tiene permisos en la capa
+    	if(!!authIdLayer && !!authIdUser && authIdLayer == authIdUser){
+    		// There's a schema
+        	if(!schema){
+        		// Disable the edit options
+        		this.actions[0].disable();
+        	}else{
+        		// Feature Types
+        		if(!!mgr.geometryType){
+        			if(mgr.geometryType.indexOf("Multi") != -1){
+        				geometryType = mgr.geometryType.replace("Multi", "");
+        			}else{
+        				geometryType = mgr.geometryType;
+        			}
+        			if(!!geometryType && geometryType == "Point"){
+        				this.setActionControlLayer(mgr.featureLayer);
+        				this.actions[0].enable();
+        			}else{
+        				this.actions[0].disable();
+        			}
+        		}
+        	}
+    	}else{
     		// Disable the edit options
     		this.actions[0].disable();
-    	}else{
-    		// Feature Types
-    		if(!!mgr.geometryType){
-    			if(mgr.geometryType.indexOf("Multi") != -1){
-    				geometryType = mgr.geometryType.replace("Multi", "");
-    			}
-    			if(!!geometryType && geometryType == "Point"){
-    				this.actions[0].enable();
-    			}
-    		}
     	}
+    },
+    /** private: method[setActionControlLayer]
+     *  :arg layer: OpenLayers.Layer
+     */
+    setActionControlLayer: function(layer){
+    	if(this.actions.length > 0){
+    		this.actions[0].control.layer = layer;
+    	}
+    },
+    /** private: method[updateFeatureManager]
+     *  :arg featureManager: :class:`gxp.plugins.FeatureManager`
+     *  :returns: :class:`gxp.plugins.FeatureManager`
+     */
+    updateFeatureManager: function(featureManager){
+    	var queryManager = this.getFeatureManager("querymanager");
+    	featureManager.fetchSchema = queryManager.fetchSchema;
+    	featureManager.getSchemaFromWMS = queryManager.getSchemaFromWMS;
+    	featureManager.setFeatureStore = queryManager.setFeatureStore;
+    	featureManager.getBaseParamsAndUrl = queryManager.getBaseParamsAndUrl;
+    	featureManager.prepareWFS = queryManager.prepareWFS;
+    	return featureManager;
     }
 });
 
