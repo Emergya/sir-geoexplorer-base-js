@@ -342,24 +342,33 @@ GeoExt.Lang.add(
         popupTitle: 'Informaci\u00f3n del elemento',
         buttonText: 'Identificar'
     },
+
+    "Viewer.PointSymbolizerMod.prototype":{
+        uploadFileEmptyText: 'Selecciona un icono...',
+        uploadFileLabel: 'Icono',
+        waitMsgText: 'Espere...'
+    },
+
     "gxp.plugins.LayerTree.prototype": {
         overlayNodeText: "Capas",
         baseNodeText: "Capa base"
     },
+    
     "gxp.plugins.LoadAdditionalLayersAction.prototype": {
         menuText: "Ver m\u00e1s Capas",
         buttonText: "Ver m\u00e1s Capas",
         tooltip: "Abre una ventana en la que puede seleccionar " + "capas adicionales para visualizar en el visor."
 
     },
+
     "Viewer.dialog.PointInformation.prototype": {
         descriptionText: "Haga click en el mapa para ver las coordenadas del lugar pulsado."
     },
+
     "Ext.form.TextField.prototype": {
         blankText: "Este campo no puede estar vacío",
         minLengthText : 'La longitud mínima de este campo es {0}',    
         maxLengthText : 'La longitud máxima de este campo es {0}'
-    
     }
 
 });

@@ -26,7 +26,7 @@
  * Author: Alejandro Díaz Torres <adiaz@emergya.com>
  */
 
-(function () {
+(function() {
 
     var ADDITIONAL_LAYERS_URL = '{0}/persistenceGeo/treeServiceMap';
 
@@ -53,11 +53,17 @@
         // rest component
         restBaseUrl: "rest",
 
+        /** api: config[showZones]
+         *  ``Boolean``
+         *  Show zones node.
+         */
+        showZones: true,
+
         /** i18n **/
         channelsNodeText: 'Channels',
         zonesNodeText: 'Zones',
 
-        constructor: function (config) {
+        constructor: function(config) {
 
             Ext.apply(this, config);
 
@@ -83,15 +89,18 @@
                 filter: rootFilter,
                 expanded: true
             }));
-            // Zone nodes
-            rootNode.appendChild(this.zonesNode = new Ext.tree.TreeNode({
-                id: 'zone-node',
-                filter: zonesFilter,
-                text: this.zonesNodeText,
-                type: NODE_TYPES.ZONES_ROOT,
-                leaf: false,
-                expanded: true
-            }));
+
+            if (this.showZones) {
+                // Zone nodes
+                rootNode.appendChild(this.zonesNode = new Ext.tree.TreeNode({
+                    id: 'zone-node',
+                    filter: zonesFilter,
+                    text: this.zonesNodeText,
+                    type: NODE_TYPES.ZONES_ROOT,
+                    leaf: false,
+                    expanded: true
+                }));
+            }
 
             Viewer.widgets.ChannelToolsLayersTree.superclass.constructor.call(this, Ext.apply({
                 border: false,
@@ -100,7 +109,7 @@
                     dataUrl: String.format(ADDITIONAL_LAYERS_URL, this.restBaseUrl),
                     nodeParameter: 'node',
                     listeners: {
-                        beforeload: function (treeLoader, node) {
+                        beforeload: function(treeLoader, node) {
                             if (node.attributes.type !== undefined) {
                                 treeLoader.baseParams.type = node.attributes.type;
                             }
@@ -110,7 +119,7 @@
                                 delete treeLoader.baseParams.filter;
                             }
                         },
-                        load: function (treeLoader, node, action) {
+                        load: function(treeLoader, node, action) {
                             var json = Ext.util.JSON.decode(action.responseText);
                             var i = 0;
                             for (i = 0; i < json.results; i++) {
@@ -120,11 +129,11 @@
                                 // that assume just one type of data (nodes) with mutually
                                 // exclusive identifiers.
                                 var nodeIsLeaf = json.data[i].leaf;
-                                var id= json.data[i].id;
-                                if(nodeIsLeaf) {
-                                    id+=10000000;
+                                var id = json.data[i].id;
+                                if (nodeIsLeaf) {
+                                    id += 10000000;
                                 }
-                                node.appendChild(new Ext.tree.AsyncTreeNode({                                    
+                                node.appendChild(new Ext.tree.AsyncTreeNode({
                                     id: id,
                                     text: this.parseNodeTitle(json.data[i].text),
                                     leaf: nodeIsLeaf || !this.showLayers,
@@ -149,7 +158,7 @@
                 nodeLoaded: true
             });
         },
-        parseNodeTitle: function (text) {
+        parseNodeTitle: function(text) {
             var result = text;
             if (text) {
                 var components = text.split(":");
@@ -164,22 +173,23 @@
 
         },
 
-        reload: function () {
+        reload: function() {
             this._lastIdNode = 0;
-            this.loader.load(this.channelsNode, function () {}, this);    
-            this.loader.load(this.zonesNode, function () {}, this);
-            
+            this.loader.load(this.channelsNode, function() {}, this);
+            if (this.showZones) {
+                this.loader.load(this.zonesNode, function() {}, this);
+            }
         },
 
-        onBeforeAppend: function (tree, parent, node) {
-           
+        onBeforeAppend: function(tree, parent, node) {
+
             if (node.attributes.type === NODE_TYPES.LAYER) {
                 node.attributes.checked = false;
             }
         },
 
-        onNodeLoaded: function (treeLoader, node, response) {
-            this.fireEvent('nodeLoaded', treeLoader, node);            
+        onNodeLoaded: function(treeLoader, node, response) {
+            this.fireEvent('nodeLoaded', treeLoader, node);
         }
 
 

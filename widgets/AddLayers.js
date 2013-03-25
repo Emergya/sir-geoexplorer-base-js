@@ -486,6 +486,8 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                     layer.temporal = true;
                     this.showSaveLayerWindow(records[i]);
                 }
+                // #78426: Set layerSource in layer.source
+                layer.source = source;
                 this.target.mapPanel.map.addLayer(layer);
             }
         }

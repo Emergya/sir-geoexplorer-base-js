@@ -69,6 +69,37 @@ Viewer.widgets.WMSLayerPanelMod = Ext.extend(gxp.WMSLayerPanel, {
             };
         }
         return savePanel;
+    },
+
+    /** private: method[createStylesPanel]
+     *  :arg url: ``String`` url to save styles to
+     *
+     *  Creates the Styles panel.
+     */
+    createStylesPanel: function(url) {
+        var config = gxp.WMSStylesDialog.createGeoServerStylerConfig(
+            this.layerRecord, url
+        );
+        
+        if (this.rasterStyling === true) {
+            config.plugins.push({
+                ptype: "gxp_wmsrasterstylesdialog"
+            });
+        }
+        var ownerCt = this.ownerCt;
+        if (!(ownerCt.ownerCt instanceof Ext.Window)) {
+            config.dialogCls = Ext.Panel;
+            config.showDlg = function(dlg) {
+                dlg.layout = "fit";
+                dlg.autoHeight = false;
+                ownerCt.add(dlg);
+            };
+        }
+        return Ext.apply(config, {
+            title: this.stylesText,
+            style: "padding: 10px",
+            editable: false
+        });
     }
 });
 

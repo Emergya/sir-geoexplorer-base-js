@@ -32,6 +32,8 @@
 //var TREE_SERVICE_URL = 'rest/persistenceGeo/treeService';
 
 var TREE_SERVICE_URL = '{0}/persistenceGeo/treeService';
+var TREE_IPT_URL = '{0}/persistenceGeo/getNodeTypes';
+
 
 Viewer.dialog.PlanificationToolsLayersWindow = Ext.extend(Ext.Window, {
 
@@ -118,6 +120,12 @@ Viewer.widgets.PlanificationToolsLayersTree = Ext.extend(Ext.tree.TreePanel, {
 
     // Planos intercomunales
     priNode: null,
+    // Array de planos
+    ipt: null,
+    
+    // Array de items
+    itemsArray: [],
+    
     // rest component
     restBaseUrl: "rest",
 
@@ -130,25 +138,7 @@ Viewer.widgets.PlanificationToolsLayersTree = Ext.extend(Ext.tree.TreePanel, {
             text: 'Root',
             expanded: true
         });
-
-        // Planos comunales
-        rootNode.appendChild(this.prcNode = new Ext.tree.TreeNode({
-            id: 'node-prc',
-            text: 'Planos Reguladores Comunales (PRC)',
-            leaf: false,
-            type: 'prc',
-            expanded: true
-        }));
-
-        // Planos intercomunales
-        rootNode.appendChild(this.priNode = new Ext.tree.TreeNode({
-            id: 'node-pri',
-            text: 'Planos Reguladores Intercomunales (PRI)',
-            leaf: false,
-            type: 'pri',
-            expanded: true
-        }));
-
+        
         Viewer.widgets.PlanificationToolsLayersTree.superclass.constructor.call(this, Ext.apply({
             border: false,
             autoScroll: true,
@@ -173,8 +163,8 @@ Viewer.widgets.PlanificationToolsLayersTree = Ext.extend(Ext.tree.TreePanel, {
             root: rootNode,
             rootVisible: false
         }, config));
-
-        this.on({
+    	
+    	this.on({
             beforeappend: this.onBeforeAppend,
             scope: this
         });
@@ -183,10 +173,48 @@ Viewer.widgets.PlanificationToolsLayersTree = Ext.extend(Ext.tree.TreePanel, {
             nodeLoaded: true
         });
     },
+    
+    /** private: method[initComponent]
+     * :arg target: ``Object`` The object initializing this plugin.
+     */
+    initComponent: function(target) {
+    	this.init_root();
+    	Viewer.widgets.PlanificationToolsLayersTree.superclass.initComponent.apply(this, arguments);
+    },
 
-    reload: function() {
-        this.loader.load(this.prcNode, function() {}, this);
-        this.loader.load(this.priNode, function() {}, this);
+    init_root: function() {
+    	Ext.Ajax.request({
+            url: String.format(TREE_IPT_URL, this.restBaseUrl),   
+            method: 'GET',
+            disableCaching: false,
+            success: function (response, request){
+            	var jsonObject = JSON.parse(response.responseText);
+            	ipt = [];
+            	for(el in jsonObject){
+            		if(!!jsonObject[el].id && !!jsonObject[el].type){
+            			var item = new Ext.tree.TreeNode({
+                            id: 'node-' + jsonObject[el].type,
+                            text: jsonObject[el].type,
+                            leaf: false,
+                            type: jsonObject[el].id.toString(),
+                            expanded: true
+                        });
+            			this.itemsArray.push(item);
+                		this.root.appendChild(item);
+            		}
+            	}
+            	this.reload();
+            },
+            scope: this 
+        });
+    },
+    
+    reload: function(){
+    	if(this.itemsArray.length > 0){
+    		for(var i=0; i<this.itemsArray.length; i++){
+        		this.loader.load(this.itemsArray[i], function() {}, this);
+        	}
+    	}
     },
 
     onBeforeAppend: function(tree, parent, node) {

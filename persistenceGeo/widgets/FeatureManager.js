@@ -67,6 +67,7 @@ PersistenceGeo.widgets.FeatureManager = Ext.extend(gxp.plugins.FeatureManager, {
         }else{
             var url = record.getLayer().url.replace("wms", "wfs").replace("WMS", "WFS");
             var typeName = record.getLayer().params.LAYERS;
+            //console.log(typeName);
             this.fetchSchema(url, typeName, function(schema){
                     this.prepareWFS(filter, autoLoad, record, source, schema);
             }, this);
@@ -247,8 +248,11 @@ PersistenceGeo.widgets.FeatureManager = Ext.extend(gxp.plugins.FeatureManager, {
         } else if(!!record.getLayer() 
             && !!record.getLayer().protocol
             && !!record.getLayer().protocol.CLASS_NAME
-            && !!record.getLayer().protocol.CLASS_NAME.match("OpenLayers.Format.WFS")
-            && record.getLayer().protocol.CLASS_NAME.match("OpenLayers.Format.WFS").length == 1){
+            && ((!!record.getLayer().protocol.CLASS_NAME.match("OpenLayers.Format.WFS")
+                    && record.getLayer().protocol.CLASS_NAME.match("OpenLayers.Format.WFS").length == 1)
+                || (record.getLayer().protocol.CLASS_NAME.match("OpenLayers.Protocol.WFS")
+                    && record.getLayer().protocol.CLASS_NAME.match("OpenLayers.Protocol.WFS").length == 1))
+            ){
             this.getSchemaFromWFS(filter, autoLoad, record, source);
         } else {
             this.clearFeatureStore();

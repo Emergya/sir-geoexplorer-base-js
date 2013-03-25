@@ -121,7 +121,7 @@ Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
                         {
                             xtype: 'label',
                             cls: 'toolDescription',
-                            text: this.descriptionText                            
+                            text: this.descriptionText
                         }, {
                             xtype: 'combo',
                             id: 'fileType',

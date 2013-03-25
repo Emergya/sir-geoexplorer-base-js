@@ -32,7 +32,7 @@ Viewer.widgets.ImportExportToolbar = Ext.extend(Ext.Toolbar, {
 
         this.tools = [];
 
-        this.plugins = [ {
+        this.plugins = [{
             ptype: "vw_exporttokml",
             actionTarget: ["importexporttbar"],
             exportToKMLText: "Exportar a KML",
@@ -41,7 +41,7 @@ Viewer.widgets.ImportExportToolbar = Ext.extend(Ext.Toolbar, {
             exportToKMLErrorTitle: "Error",
             exportToKMLErrorContent: "Error al exportar la capa",
             objectOwner: 'toolbar'
-        },{
+        }, {
             ptype: "vw_exporttoshp",
             actionTarget: ["importexporttbar"],
             exportToSHPText: "Exportar a SHP",

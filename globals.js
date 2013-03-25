@@ -78,10 +78,9 @@ Ext.ns(
      * Base URL for AJAX requests.
      */
     var base_url = (function() {
-        return '${protocol}//${host}${port}'
+        return '${protocol}//${host}'
             .replace('${protocol}', location.protocol)
-            .replace('${host}', location.host)
-            .replace('${port}', location.port == '' ? '' : ':' + location.port);
+            .replace('${host}', location.host);
     })();
 
     /**

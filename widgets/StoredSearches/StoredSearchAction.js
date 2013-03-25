@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012
+ * Copyright (C) 2013
  *
  * This file is part of the project ohiggins
  *
@@ -23,7 +23,7 @@
  * however invalidate any other reasons why the executable file might be covered
  * by the GNU General Public License.
  *
- * Author: Alejandro Díaz <adiaz@emergya.com>
+ * Author: Antonio Hernández <ahernandez@emergya.com>
  */
 
 
@@ -33,7 +33,7 @@
 
 /** api: (define)
  *  module = gxp.plugins
- *  class = ChannelToolsAction
+ *  class = StoredSearchAction
  */
 
 /** api: (extends)
@@ -42,84 +42,91 @@
 Ext.namespace("gxp.plugins");
 
 /** api: constructor
- *  .. class:: pointInformationAction(config)
+ *  .. class:: storedSearchAction(config)
  *
- *    Provides an action for showing channel selector dialog.
+ *    Provides an action for showing a stored search dialog.
  */
-gxp.plugins.ChannelToolsAction = Ext.extend(gxp.plugins.Tool, {
+gxp.plugins.StoredSearchAction = Ext.extend(gxp.plugins.Tool, {
     
-    /** api: ptype = gxp_extendedtoolbar */
-    ptype: "gxp_channeltools",
+    /** api: ptype = viewer_storedSearchAction */
+    ptype: "viewer_storedSearchAction",
     
     /** api: config[buttonText]
-     *  ``String`` Text to show button
+     *  ``String`` Text to show next to the zoom button
      */
-    buttonText: 'Thematic Channels',
+    buttonText: 'Búsqueda almacenada',
      
     /** api: config[menuText]
      *  ``String``
-     *  Text for show in menu item (i18n).
+     *  Text for zoom menu item (i18n).
      */
-    menuText: 'Thematic Channels',
+    menuText: 'Búsqueda almacenada',
 
     /** api: config[tooltip]
      *  ``String``
-     *  Text for channel tool tooltip (i18n).
+     *  Text for zoom action tooltip (i18n).
      */
-    tooltip: 'Thematic Channels',
+    tooltip: 'Búsqueda almacenada',
     
     /** private: property[iconCls]
      */
-    iconCls: 'vw-icon-channel-tools',
-     
-    /** api: config[track]
-     *  ``Boolean``
-     *  Send a call to stats module to track this component.
-     */
-    track: true,
+    iconCls: 'vw-icon-point-information',
+
+    source: null,
+    url: null,
     
     /** private: method[constructor]
      */
     constructor: function(config) {
-        gxp.plugins.ChannelToolsAction.superclass.constructor.apply(this, arguments);
+        gxp.plugins.StoredSearchAction.superclass.constructor.apply(this, arguments);
     },
 
     /** private: method[init]
      * :arg target: ``Object`` The object initializing this plugin.
      */
     init: function(target) {
-        gxp.plugins.ChannelToolsAction.superclass.init.apply(this, arguments);
+        gxp.plugins.StoredSearchAction.superclass.init.apply(this, arguments);
         this.target.on('beforerender', this.addActions, this);
+
+        // obtain default source: local
+        if(!this.source){
+            this.source = this.target.sources.local;
+        }
+        // obtain default url: source(local).url
+        if(!this.url 
+            && !!this.source){
+            this.url = this.source.url.replace('ows', 'wfs');
+        }
     },
 
     /** api: method[addActions]
      */
     addActions: function() {
-        return gxp.plugins.ChannelToolsAction.superclass.addActions.apply(this, [{
-            buttonText: this.showButtonText ? this.buttonText : '',
+        return gxp.plugins.DefaultSearchesAction.superclass.addActions.apply(this, [{
+            text: this.showButtonText ? this.buttonText : '',
             menuText: this.menuText,
             iconCls: this.iconCls,
             tooltip: this.tooltip,
             handler: function(action, evt) {
 
-                var ds = Viewer.getComponent('ChannelTools');
+                var ds = Viewer.getComponent(this.controller);
                 if (ds === undefined) {
                     var mapPanel = Viewer.getMapPanel();
-                    ds = new Viewer.dialog.ChannelTools({
+                    ds = new Viewer.dialog.StoredSearchWindow({
                         mapPanel: mapPanel,
-                        map: mapPanel.map, 
-                        persistenceGeoContext: this.target.persistenceGeoContext,
-                        showZones: this.showZones
+                        map: mapPanel.map,
+                        controller: this.controller,
+                        target:this.target,
+                        featureManager:this.featureManager,
+                        featureGrid:this.featureGrid,
+                        wfsServiceUrl: this.url
                     });
-                    Viewer.registerComponent('ChannelTools', ds);
+                    Viewer.registerComponent(this.controller, ds);
                 }
                 if (ds.isVisible()) {
                     ds.hide();
                 } else {
                     ds.show();
-                    if(this.track){
-                        Viewer.trackUrl('modules/Canales_Tematicos');
-                    }
                 }
 
             },
@@ -129,4 +136,4 @@ gxp.plugins.ChannelToolsAction = Ext.extend(gxp.plugins.Tool, {
         
 });
 
-Ext.preg(gxp.plugins.ChannelToolsAction.prototype.ptype, gxp.plugins.ChannelToolsAction);
+Ext.preg(gxp.plugins.StoredSearchAction.prototype.ptype, gxp.plugins.StoredSearchAction);

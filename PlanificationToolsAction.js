@@ -71,6 +71,12 @@ gxp.plugins.PlanificationToolsAction = Ext.extend(gxp.plugins.Tool, {
     /** private: property[iconCls]
      */
     iconCls: 'vw-icon-planification-tools',
+     
+    /** api: config[track]
+     *  ``Boolean``
+     *  Send a call to stats module to track this component.
+     */
+    track: true,
     
     /** private: method[constructor]
      */
@@ -101,7 +107,9 @@ gxp.plugins.PlanificationToolsAction = Ext.extend(gxp.plugins.Tool, {
                     ds.hide();
                 } else {
                     ds.show();
-                    Viewer.trackUrl('modules/Instrumentos_de_planificacion');
+                    if(this.track){
+                        Viewer.trackUrl('modules/Instrumentos_de_planificacion');
+                    }
                 }
 
             },
