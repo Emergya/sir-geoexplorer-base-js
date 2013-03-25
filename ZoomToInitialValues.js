@@ -128,7 +128,7 @@ gxp.plugins.ZoomToInitialValues = Ext.extend(gxp.plugins.Tool, {
 
     _onLoginStateChanged : function(sender, userInfo) {
 
-        if(!userInfo || !userInfo.id) {
+        if(!userInfo || !userInfo.id || userInfo.admin) {
             // The user is not logged, we clear the initial bbox so well load the default view.
             this._initialViewBBox =null;
             this.zoomToInitialValues();
