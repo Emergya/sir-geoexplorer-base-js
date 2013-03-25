@@ -56,6 +56,8 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
     exportToSHPMsg: "Generating ZIP File ...",
     exportToSHPErrorTitle: "Error",
     exportToSHPErrorContent: "Error to export the layer",
+    objectOwner: 'map',
+    selectedLayer: null,
 
     /** private: method[init]
      * :arg target: ``Object`` The object initializing this plugin.
@@ -67,7 +69,7 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
     
     /** api: method[addActions] */
     addActions: function() {
-        var selectedLayer = null;
+        
         var actions = PersistenceGeo.tree.MakeLayerPersistent.superclass.addActions.apply(this, [{
             menuText: this.exportToSHPText,
             iconCls: "gxp-icon-export-shp",
@@ -76,16 +78,16 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
             handler: function() {
                 var urlToExport = null;
                 var paramsToExport = null;
-                var urlLocalGeoServer = this.target.sources.local.url.replace("/ows", "");
-                if(selectedLayer.url){
-                    if(selectedLayer.url.indexOf(urlLocalGeoServer) != -1){
+                var urlLocalGeoServer = app.sources.local.url.replace("/ows", "");
+                if(this.selectedLayer.url){
+                    if(this.selectedLayer.url.indexOf(urlLocalGeoServer) != -1){
                         urlToExport = urlLocalGeoServer;
                     }
                 }
                 var contextLayer = null;
-                if(selectedLayer.params && selectedLayer.params.LAYERS){
-                    if(selectedLayer.params.LAYERS.indexOf(":") != -1){
-                        contextLayer = selectedLayer.params.LAYERS.split(":")[0];
+                if(this.selectedLayer.params && this.selectedLayer.params.LAYERS){
+                    if(this.selectedLayer.params.LAYERS.indexOf(":") != -1){
+                        contextLayer = this.selectedLayer.params.LAYERS.split(":")[0];
                     }
                 }
                 if(contextLayer != null){
@@ -94,10 +96,10 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
 
                 paramsToExport = {
                     'SERVICE': 'WFS',
-                    'VERSION': selectedLayer.params.VERSION,
+                    'VERSION': this.selectedLayer.params.VERSION,
                     'REQUEST': 'GetFeature',
-                    'TYPENAME': selectedLayer.params.LAYERS,
-                    'SRS': selectedLayer.params.SRS,
+                    'TYPENAME': this.selectedLayer.params.LAYERS,
+                    'SRS': this.selectedLayer.params.SRS,
                     'OUTPUTFORMAT': 'shape-zip'
                 };
 
@@ -110,7 +112,7 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
                     disableCaching: false,
                     success: function(o, r, n){
                         var elemIF = document.createElement("iframe");
-                        elemIF.src = this.target.proxy + encodeURIComponent(this.prepareUrlToDownload(r));
+                        elemIF.src = app.proxy + encodeURIComponent(this.prepareUrlToDownload(r));
                         elemIF.style.display = "none"; 
                         document.body.appendChild(elemIF);
                         Ext.MessageBox.updateProgress(1);
@@ -131,21 +133,32 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
             scope: this
         }]);
 
-        this.target.on("layerselectionchange", function(record) {
+        var owner = this.target;
+        if (this.objectOwner === 'toolbar') {
+            owner = app;
+        }
+        owner.on("layerselectionchange", function(record) {
             if(record && record.data){
-                selectedLayer = record.data.layer;
+                this.selectedLayer = record.data.layer;
+                
+                if(this.objectOwner === 'toolbar') {
+                    this.enableOrDisableAction();
+                }
             }
         }, this);
+        
+        this.enableOrDisableAction();
     },
 
     prepareUrlToDownload: function(data){
-        //"http://gofre.emergya.es:8080/geoserver/gore/wfs?SERVICE=WFS&VERSION=1.1.1&REQUEST=GetFeature&TYPENAME=gore%3Aagroclima&SRS=EPSG%3A900913&OUTPUTFORMAT=shape-zip"; 
+        //"http://gofre.emergya.es:8080/geoserver/gore/wfs?SERVICE=WFS&VERSION=1.1.1&REQUEST=GetFeature&TYPENAME=gore%3Aagroclima&SRS=EPSG%3A900913&OUTPUTFORMAT=shape-zip";
+        var urlToReturn = null;
         if(data != null){
-            var urlToReturn = data.url;
+            urlToReturn = data.url;
             var cont = 0;
             if(data.params!=null){
                 for(p in data.params){
-                    if(cont == 0){
+                    if(cont === 0){
                         urlToReturn += "?" + p + "=" + data.params[p];
                         cont ++;
                     }else{
@@ -155,6 +168,29 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
             }
         }
         return urlToReturn;
+    },
+    isLocalGeoserver: function(url) {
+        var urlLocalGeoServer = app.sources.local.url.replace("/ows", "");
+        if (url && url.indexOf(urlLocalGeoServer) != -1) {
+            return true;
+        } else {
+            return false;
+        }
+    },
+    enableOrDisableAction: function() {
+        if(!this.selectedLayer) {
+            this.selectedLayer = Viewer.getSelectedLayer();
+        }
+        if (this.selectedLayer && this.isLocalGeoserver(this.selectedLayer.url)) {
+            Ext.each(this.actions, function(item) {
+                item.enable();
+                    }, this);
+        } else {
+            Ext.each(this.actions, function(item) {
+               item.disable(); 
+            }, this);        
+        }
+        
     }
 });
 
