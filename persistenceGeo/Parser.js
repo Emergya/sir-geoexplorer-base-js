@@ -130,7 +130,10 @@ PersistenceGeo.Parser = Ext.extend(Ext.Component,{
 	SAVE_LAYER_GROUP_BASE_URL: function (){
 		return this.getRestBaseUrl() + "/persistenceGeo/saveLayerByGroup/";
 	},
-						
+
+	SAVE_LAYER_RESOURCE_GROUP_BASE_URL : function() {
+		return this.getRestBaseUrl() + "/persistenceGeo/saveLayerResourceByGroup/";
+	},						
 	SAVE_LAYER_BASE_URL: function (){
 		return this.getRestBaseUrl() + "/persistenceGeo/saveLayerByUser/";
 	},
@@ -823,6 +826,16 @@ PersistenceGeo.Parser = Ext.extend(Ext.Component,{
 		
 	},
 	
+	/**
+	 * Method: saveLayerResourceByGroup
+	 * 
+	 * Saves a temporal layer by its layerResource id for a group and call to callbacks functions
+	 */
+	saveLayerResourceByGroup : function(groupId, resourceId, params, onsuccess, onfailure)	 {
+		var url = this.SAVE_LAYER_RESOURCE_GROUP_BASE_URL() + groupId+"/"+resourceId;
+		this.sendFormPostData(url, params, this.REQUEST_METHOD_POST, onsuccess, onfailure);
+	},
+
 	/**
 	 * Method: deleteLayerByLayerId
 	 * 

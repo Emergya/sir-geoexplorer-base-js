@@ -110,7 +110,7 @@ GeoExt.Lang.add(
         saveLayerTitleText: "Capa a\u00F1adida",
         saveLayerText: "La capa '{0}' se ha a\u00F1adido de forma permanente.",
         saveLayerErrorTitleText: "Se ha producido un error",
-        saveLayerErrorText: "se ha producido un error al salvar la capa '{0}'. Por favor, contacte con su administrador",
+        saveLayerErrorText: "Se ha producido un error al salvar la capa «{0}». <br><br>Por favor, contacte con su administrador",
         labelLayerMaxFeatures: "M\u00e1ximas figuras",
         selectMaxFeature: "Introduzca el n\u00famero m\u00e1ximo de figuras a mostrar",
         cancelText: "Cancelar"

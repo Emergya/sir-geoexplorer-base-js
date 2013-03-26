@@ -46,7 +46,7 @@ PersistenceGeo.tree.MakeLayerPersistent = Ext.extend(gxp.plugins.Tool, {
             handler: function() {
                 var record = selectedLayer;
                 if(record) {
-                    if(this.target.isAuthorized() 
+                    if(app.persistenceGeoContext.userInfo
                         && !record.getLayer().layerID){
                         this.showSaveLayerWindow(record)
                     }

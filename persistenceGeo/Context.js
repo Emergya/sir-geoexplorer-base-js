@@ -427,6 +427,38 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
         this.saveLayerFromParams(params);
     },
 
+    saveLayerResource : function(resourceId, params)  {
+        // For tests purposes only, when resourceId is actually received this will be ignored.
+        var layerResourceId = 178; 
+        if(typeof(resourceId)!="undefined")  {
+            layerResourceId = resourceId;
+        }
+
+        var this_= this;
+        //Layer save
+        if (!!this.SAVE_MODES.GROUP == this.saveModeActive) {
+            this.parser.saveLayerResourceByGroup(this.authUser, layerResourceId, params,
+
+            function(form, action) {
+                /*
+                 * ON SUCCESS
+                 */
+                this_.parseLayer(form, action);
+            },
+
+            function(form, action) {
+                /*
+                 * ON FAILURE
+                 */
+                this_.parseLayer(form, action);
+            });
+        } else if ( !! this.SAVE_MODES.USER == this.saveModeActive) {
+            throw new Error("User persistence of layers not supported!");
+        } else {
+            throw new Error("Anonymous persistence of layers not supported!");
+        }
+    },
+
     getParser: function() {
         return this.parser;
     },

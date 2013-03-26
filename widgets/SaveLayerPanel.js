@@ -437,11 +437,13 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
         pgeoContext.onSaveLayerException = this.onSaveLayerException;
         pgeoContext.scope = this;
 
+
+
+
         if(!!this.layerRecord
             && !! this.layerRecord.getLayer()){
-            pgeoContext.addLayer(this.layerRecord.getLayer(), this.layerName, null, params);
-        }else{
-            pgeoContext.saveLayerFromParams(params);
+            pgeoContext.saveLayerResource(
+                this.layerRecord.getLayer().metadata.layerResourceId, params);
         }
     },
 
