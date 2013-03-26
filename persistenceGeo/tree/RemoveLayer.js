@@ -83,7 +83,7 @@ PersistenceGeo.tree.RemoveLayer = Ext.extend(gxp.plugins.RemoveLayer, {
         // We only delete from the server if the layer is persisted (has layerID), the user is logged
         // (userInfo exists) and the user can delete the layer (because is admin and layer is public or the layer's is
         // owned by the user's authority.)            
-        if ( !! layer.layerID && userInfo
+        if ( !! layer.layerID && userInfo && userInfo.username 
             && (userInfo.admin && layer.authId === null || userInfo.authorityId == layer.authId)) { 
 
 

@@ -61,6 +61,9 @@ Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
     crsEmptyText: "Coordinate Reference System ID",
     invalidCrsText: "CRS identifier should be an EPSG code (e.g. EPSG:4326)",
     fileTypeSelected: null,
+    layerTypeId: null,
+    layerResourceId: null,
+    
 
 
     /** api: config[validFileExtensions]
@@ -223,7 +226,7 @@ Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
             }
 
         }
-        return valid || this.invalidFileExtensionText + '<br/>' + this.validFileExtensions[vfeIndex].join(", ");
+        return valid || (this.invalidFileExtensionText + '<br/>' + this.validFileExtensions[vfeIndex].join(", "));
     },
 
     navHandler: function (){
@@ -240,16 +243,19 @@ Viewer.plugins.RasterUploadPanel = Ext.extend(Ext.Window, {
                         //Add layer to map and close window
                         var layerName = resp.data.layerName;
                         var layerTitle = resp.data.layerTitle;
-                        var geoserverUrl = resp.data.url || (app.sources.local.url + "/wms");
+                        var geoserverUrl = (resp.data.serverUrl) || (app.sources.local.url + "/wms");
                         var layer = new OpenLayers.Layer.WMS(layerTitle,
                             geoserverUrl,
                             {
                                 layers: layerName,
                                 transparent: true                         
                             },{
-                                opacity: 0.75,
+                                opacity: 1,
                                 visibility: true                                                
                             });
+                        layer.metadata.layerResourceId = resp.data.layerResourceId;
+                        layer.metadata.layerTypeId = resp.data.layerTypeId;
+                        layer.metadata.temporal = true;
                         Viewer.getMapPanel().map.addLayer(layer);
                         this.close();
                         Ext.Msg.alert('Capa creada', "La capa se ha creado de forma temporal");

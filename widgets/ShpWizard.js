@@ -78,6 +78,8 @@ Viewer.plugins.ShpWizard = Ext.extend(Ext.Window, {
     createLayerWaitMsgText: "Actualizando nombres de campos. Por favor espere.",
     createLayerWaitMsgTitleText: "Cambio de nombres",
     fieldNameEmptyText: 'Escriba un nombre para el campo (letras, números, . y _)',
+    layerTypeId: null,
+    layerResourceId: null,
     
     initComponent: function() {
     	var me = this;
@@ -234,16 +236,19 @@ Viewer.plugins.ShpWizard = Ext.extend(Ext.Window, {
 	                        	//Add layer to map and close window
 	                            var layerName = resp.data.layerName;
 	                            var layerTitle = resp.data.layerTitle;
-	                            var geoserverUrl = app.sources.local.url + "/wms";
+	                            var geoserverUrl = (resp.data.serverUrl) || (app.sources.local.url + "/wms");
 	                            var layer = new OpenLayers.Layer.WMS(layerTitle,
 	                            		geoserverUrl,
 	                            	{
 	                            		layers: layerName,
 	                            		transparent: true                         
 	                            	}, {
-	                            		opacity: 0.75,
+	                            		opacity: 1,
 	                            		visibility: true                            					
 	                            	});
+	                            layer.metadata.layerResourceId = this.layerResourceId;
+	                            layer.metadata.layerTypeId = this.layerTypeId;
+	                            layer.metadata.temporal = true;
 	                            Viewer.getMapPanel().map.addLayer(layer);
 	                            this.close();
 	                            Ext.Msg.alert('Capa creada', "La capa se ha creado de forma temporal");
@@ -299,6 +304,8 @@ Viewer.plugins.ShpWizard = Ext.extend(Ext.Window, {
                 	}
 
                 	// read response, populate Grid and show field name edit form.
+                	this.layerResourceId = resp.data.layerResourceId;
+                	this.layerTypeId = resp.data.layerTypeId;
                     this.initEditableGrid(o);
                     this.layout.setActiveItem(1);
                     this.doLayout();

@@ -203,8 +203,12 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
         if(Ext.isArray(filters)) {
             filters = filters.join(",");
         }
+        var normalizedIdChannel = idChannel;
+        if (idChannel > 10000000 ) {
+            normalizedIdChannel = normalizedIdChannel - 10000000;
+        }
 
-        this.parser.loadFolderById(idChannel, filters,
+        this.parser.loadFolderById(normalizedIdChannel, filters,
 
         function (form, action) {
             /*
@@ -236,7 +240,11 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
      * Load all folders of a channel or channel layers not marked as channel.
      */
     getChannelData: function (idChannel, onLoadLayers, onFailure) {
-        this.parser.loadFolderById(idChannel, false,
+        var normalizedIdChannel = idChannel;
+        if (idChannel > 10000000 ) {
+            normalizedIdChannel = normalizedIdChannel - 10000000;
+        }
+        this.parser.loadFolderById(normalizedIdChannel, false,
 
         function (form, action) {
             /*
