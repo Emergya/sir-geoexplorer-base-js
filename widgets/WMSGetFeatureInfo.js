@@ -34,6 +34,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
         'OpenLayers.Layer.WFS'
     ],
 
+    layersWithInfo: null,
     visibleLayers: null,
 
     accordion: null,
@@ -45,6 +46,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
 
     constructor: function(config) {
 
+        this.layersWithInfo = {};
         this.visibleLayers = {};
 
         Viewer.dialog.WMSGetFeatureInfo.superclass.constructor.call(this, Ext.apply({
@@ -60,12 +62,29 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
 			map: this.map,
 			initDir: GeoExt.data.LayerStore.MAP_TO_STORE,
             listeners: {
+                remove: function(store, record, index) {
+                    var layer = record.get('layer');
+                    delete this.visibleLayers[layer.name];
+                    delete this.layersWithInfo[layer.name];
+                    if (this.cmbLayers && this.cmbLayers.getValue() === layer.name) {
+                        if (store.getCount() === 0) {
+                            this.cmbLayers.setValue("");                            
+                        } else if (index === 0) {
+                            this.cmbLayers.setValue(store.getAt(0).get('layer').name);
+                        } else if (index === store.getCount()) {
+                            this.cmbLayers.setValue(store.getAt(store.getCount()-1).get('layer').name);
+                        }
+                        
+                        this.addFeatureInfo(this.layersWithInfo[this.cmbLayers.getValue()]);
+                    }                     
+                    
+                },
                 load: function(store, records, options) {
                     this.filterLayers(store);
                 },
                 datachanged: function(store) {
 
-                    if (this.visibleLayers[this.cmbLayers.getValue] === undefined) {
+                    if (this.visibleLayers[this.cmbLayers.getValue()] === undefined) {
                         var layer = null;
                         var record = this.layersStore.getAt(0);
                         if (record !== undefined) {
@@ -74,7 +93,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
                             layer = { name: '' };
                         }
                         this.cmbLayers.setValue(layer.name);
-                        this.addFeatureInfo(this.visibleLayers[layer.name]);
+                        this.addFeatureInfo(this.layersWithInfo[layer.name]);
                     }
                 },
                 scope: this
@@ -108,7 +127,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
         }
 
         this.cmbLayers.setValue(selectedLayer.name);
-        this.addFeatureInfo(this.visibleLayers[selectedLayer.name]);
+        this.addFeatureInfo(this.layersWithInfo[selectedLayer.name]);
     },
 
     onHide: function() {
@@ -128,7 +147,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
 
 	onCmbLayersSelected: function(widget, record, index) {
         var layer = record.getLayer();
-        this.addFeatureInfo(this.visibleLayers[layer.name]);
+        this.addFeatureInfo(this.layersWithInfo[layer.name]);
 	},
 
     filterLayers: function(store) {
@@ -140,7 +159,10 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
                 var include = this.ALLOWED_LAYERS.indexOf(layer.CLASS_NAME) > -1 && layer.visibility;
 
                 if (!include) {
+                    delete this.layersWithInfo[layer.name];
                     delete this.visibleLayers[layer.name];
+                } else {
+                    this.visibleLayers[layer.name] = layer.name;
                 }
 
                 return include;
@@ -156,7 +178,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
         if (!this.isVisible()) {
             this.show();
         } else {
-            this.addFeatureInfo(this.visibleLayers[this.cmbLayers.getValue()]);
+            this.addFeatureInfo(this.layersWithInfo[this.cmbLayers.getValue()]);
         }
     },
 
@@ -225,11 +247,11 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
 
         if (queriedPoint != this.lastQueriedPoint) {
             this.lastQueriedPoint = queriedPoint;
-            this.visibleLayers = {};
+            this.layersWithInfo = {};
             this.filterLayers(this.layersStore);
         }
 
-        this.visibleLayers[layer.name] = info;
+        this.layersWithInfo[layer.name] = info;
     },
 
 	// TODO: Implement the group of attributes in an accordion
