@@ -91,6 +91,7 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
             // When added, the layers should be visible by default
             layer.setVisibility(true);
             this.map.addLayer(layer);
+            return layer;
         }
     },
 
@@ -427,11 +428,16 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
         this.saveLayerFromParams(params);
     },
 
-    saveLayerResource : function(resourceId, params)  {
+    saveLayerResource : function(resourceId, params, onSuccess, onFailure, scope)  {
         // For tests purposes only, when resourceId is actually received this will be ignored.
         var layerResourceId = 178; 
         if(typeof(resourceId)!="undefined")  {
             layerResourceId = resourceId;
+        }
+
+        var eScope = window;
+        if(typeof(scope)!="undefined") {
+            eScope = scope;
         }
 
         var this_= this;
@@ -443,14 +449,16 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
                 /*
                  * ON SUCCESS
                  */
-                this_.parseLayer(form, action);
+                var layer = this_.parseLayer(form, action);                
+                if(onSuccess) {
+                    Ext.defer(onSuccess, 0, eScope, [layer]);
+                }
             },
 
             function(form, action) {
-                /*
-                 * ON FAILURE
-                 */
-                this_.parseLayer(form, action);
+                if(onFailure) {
+                    Ext.defer(onFailure, 0, eScope);
+                }
             });
         } else if ( !! this.SAVE_MODES.USER == this.saveModeActive) {
             throw new Error("User persistence of layers not supported!");
@@ -557,7 +565,10 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
         try {
             var json = Ext.util.JSON.decode(action.response.responseText);
             var layer = this.getLayerFromData(json);
-            this.addToMap(layer);
+            // We persist the layer in the last created group for the user.
+            layer.groupID=this._groupIndexes-1;
+            return this.addToMap(layer);
+
         } catch (e) {
             this.onSaveLayerException(e);
         }

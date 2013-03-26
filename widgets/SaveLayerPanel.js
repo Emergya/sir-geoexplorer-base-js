@@ -430,20 +430,10 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
         // Get the layer params to save them
         var params = this.getParamsToSubmit();
         
-        // init context and save layer
-        var pgeoContext = this.target.persistenceGeoContext;
-
-        pgeoContext.onLayerSave = this.onLayerSave;
-        pgeoContext.onSaveLayerException = this.onSaveLayerException;
-        pgeoContext.scope = this;
-
-
-
-
         if(!!this.layerRecord
             && !! this.layerRecord.getLayer()){
-            pgeoContext.saveLayerResource(
-                this.layerRecord.getLayer().metadata.layerResourceId, params);
+            app.persistenceGeoContext.saveLayerResource(
+                this.layerRecord.getLayer().metadata.layerResourceId, params, this.onLayerSave, this.onSaveLayerException,this);
         }
     },
 
@@ -468,30 +458,30 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
     },
 
     onLayerSave: function (layer){
-        if(!!this.scope.layerRecord
-            && !!this.scope.layerRecord.getLayer()){
-            this.scope.layerRecord.getLayer().name = layer.name;
+        if(!!this.layerRecord
+            && !!this.layerRecord.getLayer()){
+            this.layerRecord.getLayer().name = layer.name;
         }
 
-        if(this.scope.authorized){
-            this.scope.updateLayer(layer);
-            Ext.Msg.alert(this.scope.saveLayerTitleText, String.format(this.scope.saveLayerText, layer.name));
+        if(this.authorized){
+            this.updateLayer(layer);
+            Ext.Msg.alert(this.saveLayerTitleText, String.format(this.saveLayerText, layer.name));
         }
 
-        if(this.scope.layerType
-            == this.scope.KNOWN_TYPES.KML){
-            this.scope.layer = layer;
-            this.scope.target.mapPanel.map.addLayer(layer);
+        if(this.layerType
+            == this.KNOWN_TYPES.KML){
+            this.layer = layer;
+            this.target.mapPanel.map.addLayer(layer);
 
             // restore savemode
-            if(this.scope.authorized){
-                this.scope.target.persistenceGeoContext.saveModeActive = this.scope.target.persistenceGeoContext.SAVE_MODES.GROUP;
+            if(this.authorized){
+                this.target.persistenceGeoContext.saveModeActive = this.target.persistenceGeoContext.SAVE_MODES.GROUP;
             }
         
-            layer.events.register("loadend", this.scope, this.scope.onLoadEnd);
+            layer.events.register("loadend", this, this.onLoadEnd);
         }
 
-        this.scope.hide();
+        this.hide();
     },
 
     onSaveLayerException: function (e){

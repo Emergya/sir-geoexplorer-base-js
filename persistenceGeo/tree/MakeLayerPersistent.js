@@ -54,7 +54,7 @@ PersistenceGeo.tree.MakeLayerPersistent = Ext.extend(gxp.plugins.Tool, {
             },
             scope: this
         }]);
-        var removeLayerAction = actions[0];
+        var makePersistentAction = actions[0];
 
         this.target.on("layerselectionchange", function(record) {
             selectedLayer = record;
@@ -66,10 +66,10 @@ PersistenceGeo.tree.MakeLayerPersistent = Ext.extend(gxp.plugins.Tool, {
             
             var userInfo = app.persistenceGeoContext.userInfo;
             // We cant persist already persisted layers.
-            removeLayerAction.setDisabled(!userInfo || !persistibleLayer);
+            makePersistentAction.setDisabled(!userInfo || userInfo.admin || !persistibleLayer);
         }, this);
         var enforceOne = function(store) {
-            removeLayerAction.setDisabled(
+            makePersistentAction.setDisabled(
                 !selectedLayer || store.getCount() <= 1
             );
         };
