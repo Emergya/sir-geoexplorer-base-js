@@ -51,10 +51,10 @@ PersistenceGeo.tree.RemoveLayer = Ext.extend(gxp.plugins.RemoveLayer, {
                 var layer = record.getLayer();
 
                 // We cannot remove the layers marked as not removable.
-                var removable = layer.metadata && !layer.metadata.removable;;
+                var removable = layer.metadata && !!layer.metadata.removable;
                 // Nor initial layers.
-                var initialLayer = typeof(layer.authId) == "undefined" && typeof(layer.layerID) !== "undefined";
-                cannotDelete = removable || initialLayer;
+                var initialLayer = typeof(layer.authId) == "undefined" && typeof(layer.layerID) == "undefined";
+                cannotDelete = !removable && initialLayer;
             }
             removeLayerAction.setDisabled(cannotDelete);
         }, this);

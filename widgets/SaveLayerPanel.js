@@ -136,7 +136,7 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
             // labelWidth : 100,
             // width : 500,
             frame : true,
-            autoHeight : true,
+            height: 115,
             bodyStyle : 'padding: 10px 10px 0 10px;',
             defaultType : 'textfield',
             defaults : {
@@ -424,6 +424,10 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
      */
     submitForm : function() {
 
+        if(!this.items.items[0].form.isValid()){
+            return;
+        }
+
         // Mark as saved
         this.markIsSaved = true;
         
@@ -432,8 +436,19 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
         
         if(!!this.layerRecord
             && !! this.layerRecord.getLayer()){
-            app.persistenceGeoContext.saveLayerResource(
-                this.layerRecord.getLayer().metadata.layerResourceId, params, this.onLayerSave, this.onSaveLayerException,this);
+
+            var layer = this.layerRecord.getLayer();
+
+            if(layer.metadata && layer.metadata.layerResourceId) {
+                // Temporal layers saved in the server.
+                 app.persistenceGeoContext.saveLayerResource(
+                   layer.metadata.layerResourceId, params, this.onLayerSave, this.onSaveLayerException,this);   
+            } else if(params.type=="WFS" || params.type=="WMS") {
+                // Remote temporal layers.
+                app.persistenceGeoContext.saveLayerFromParams(params, this.onLayerSave, this.onSaveLayerException,this);
+            } else {
+                throw new Error("Unsupported temporal layer for persistence.!")
+            }
         }
     },
 
@@ -443,30 +458,16 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
      **/
     updateLayer: function (layer){
         var layerToRemove = this.layerRecord.getLayer();
-        if(this.target.mapPanel.map.getLayersByName(layerToRemove.name).length ==  1){
-          layerToRemove = this.target.mapPanel.map.getLayersByName(layerToRemove.name)[0];
-          this.target.mapPanel.map.removeLayer(layerToRemove);
-        }else{
-            var layersCanBeRemoved = this.target.mapPanel.map.getLayersByName(layerToRemove.name);
-            for (var i = 0; i< layersCanBeRemoved.length; i++){
-                if(!!layersCanBeRemoved[i].temporal){
-                    this.target.mapPanel.map.removeLayer(layersCanBeRemoved[i]);
-                }
-            }
-        }
+        this.target.mapPanel.map.removeLayer(layerToRemove);
         this.target.mapPanel.map.addLayer(layer);
     },
 
     onLayerSave: function (layer){
-        if(!!this.layerRecord
-            && !!this.layerRecord.getLayer()){
-            this.layerRecord.getLayer().name = layer.name;
-        }
-
-        if(this.authorized){
-            this.updateLayer(layer);
-            Ext.Msg.alert(this.saveLayerTitleText, String.format(this.saveLayerText, layer.name));
-        }
+        
+        
+        this.updateLayer(layer);
+        Ext.Msg.alert(this.saveLayerTitleText, String.format(this.saveLayerText, layer.name));
+        
 
         if(this.layerType
             == this.KNOWN_TYPES.KML){

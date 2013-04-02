@@ -146,7 +146,14 @@ gxp.plugins.ZoomToInitialValues = Ext.extend(gxp.plugins.Tool, {
                 var result = Ext.decode(response.responseText);
 
                 var wktFmtr = new OpenLayers.Format.WKT();
-                this._initialViewBBox = wktFmtr.read(result.data).geometry.getBounds();
+                var data = wktFmtr.read(result.data);
+
+                if(data) {
+                    var geometry = data.geometry;
+                    if(geometry) {
+                        this._initialViewBBox = geometry.getBounds();    
+                    }         
+                }       
 
                 this.zoomToInitialValues();
 

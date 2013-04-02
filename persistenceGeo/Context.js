@@ -431,9 +431,11 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
     saveLayerResource : function(resourceId, params, onSuccess, onFailure, scope)  {
         // For tests purposes only, when resourceId is actually received this will be ignored.
         var layerResourceId = 178; 
-        if(typeof(resourceId)!="undefined")  {
-            layerResourceId = resourceId;
+        if(typeof(resourceId)=="undefined" || !resourceId)  {
+            throw new Error("Undefined resourceId");
         }
+
+        layerResourceId = resourceId;
 
         var eScope = window;
         if(typeof(scope)!="undefined") {
@@ -471,25 +473,32 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
         return this.parser;
     },
 
-    saveLayerFromParams: function(params) {
+    saveLayerFromParams: function(params, onSuccess, onFailure, scope) {
         var this_ = this;
+
+        var eScope = window;
+        if(typeof(scope)!="undefined") {
+            eScope = scope;
+        }
 
         //Layer save
         if (!!this.SAVE_MODES.GROUP == this.saveModeActive) {
             this.parser.saveLayerByGroup(this.authUser, params,
 
-            function(form, action) {
+           function(form, action) {
                 /*
                  * ON SUCCESS
                  */
-                this_.parseLayer(form, action);
+                var layer = this_.parseLayer(form, action);                
+                if(onSuccess) {
+                    Ext.defer(onSuccess, 0, eScope, [layer]);
+                }
             },
 
             function(form, action) {
-                /*
-                 * ON FAILURE
-                 */
-                this_.parseLayer(form, action);
+                if(onFailure) {
+                    Ext.defer(onFailure, 0, eScope);
+                }
             });
         } else if ( !! this.SAVE_MODES.USER == this.saveModeActive) {
             this.parser.saveLayerByUser(this.userLogin, params,
