@@ -118,9 +118,9 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
             //this.setPosition(this.x, panel.getHeight() - this.height - this.height/3);
             if (this.minimized) {
                 
-                this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -30]);
+                this.anchorTo(Viewer.getMapPanel().body, 'bl', [15, -30]);
             } else {
-                this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -this.height]);
+                this.anchorTo(Viewer.getMapPanel().body, 'bl', [15, -this.height]);
             }
             
             },
@@ -294,12 +294,12 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
         this.toggleCollapse(false);
         if (!this.minimized) {
             this.minimized = true;
-            this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -30]);
+            this.anchorTo(Viewer.getMapPanel().body, 'bl', [15, -30]);
             this.setTitle("Coordenadas y Escala");
         } else {
             this.setTitle(null);
             this.minimized = false;
-            this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -this.height]);
+            this.anchorTo(Viewer.getMapPanel().body, 'bl', [15, -this.height]);
         }
     }
 
