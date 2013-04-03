@@ -121,12 +121,14 @@ Viewer.dialog.LocalCertificatesWindow = Ext.extend(Ext.Window, {
 								['PROPIETARI', 'Propietario'],
 								['DIRECCION', "Dirección"]
 							]
-						}),
-						mode: "local",
+						}),			
+						mode:"local",			
 						fieldLabel: "Criterio",
 						valueField: 'criteria',
-						displayField: 'label',
-						forceSelection: true,
+						displayField: 'label',		
+						triggerAction: 'all',				
+						editable: false,
+						typeAhead:false,
 						flex: 1,
 						listeners: {
 							change: this.onCriteriaChanged,
