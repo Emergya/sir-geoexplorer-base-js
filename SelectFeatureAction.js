@@ -71,6 +71,14 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
     /** private: property[iconCls]
      */
     iconCls: 'vw-icon-select-item',
+
+    /** private: property[toolAction]
+     */
+    toolAction : null,
+
+    /** private: property[selectedLayer]
+     */
+    selectedLayer: null,
     
     /** private: method[constructor]
      */
@@ -89,21 +97,59 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
     /** api: method[addActions]
      */
     addActions: function() {
-        return gxp.plugins.SelectFeatureAction.superclass.addActions.apply(this, [{
+        var featureManager = this._getFeatureManager();
+        featureManager.on("layerchange", this._onLayerChange, this);
+
+        var actions = gxp.plugins.SelectFeatureAction.superclass.addActions.apply(this, [{
             text: this.showButtonText ? this.buttonText : '',
             menuText: this.menuText,
             iconCls: this.iconCls,
             tooltip: this.tooltip,
             enableToggle: true,
+            disabled: true,
             pressed: false,
             toggleHandler: function(action, state) {
 
+                // We change the cursor over the map to indicate selection.
+                Ext.select(".olMap").setStyle("cursor", state?"crosshair":"default");
                 Viewer.getController('Map').toggleSelectFeature(state);
 
             },
             scope: this
         }]);
-    }
+
+        this.toolAction = actions[0];
+        return actions;
+    },
+
+     /** private: method[_onLayerChange]
+     *  :arg mgr: :class:`gxp.plugins.FeatureManager`
+     *  :arg layerRecord: ``GeoExt.data.LayerRecord``
+     *  :arg schema: ``GeoExt.data.AttributeStore``
+     */
+    _onLayerChange : function(mgr, layerRecord, schema) {
+        this.toolAction.setDisabled(!layerRecord);
+
+        if(layerRecord) {
+            this.selectedLayer = layerRecord.getLayer();    
+        } else {
+            this.selectedLayer = null;
+        }
+        
+    },
+
+     /** private: method[_getFeatureManager]
+     *  :arg mgr: :class:`gxp.plugins.FeatureManager`
+     *  :arg layer: ``GeoExt.data.LayerRecord``
+     *  :arg schema: ``GeoExt.data.AttributeStore``
+     */
+    _getFeatureManager: function() {
+        var  manager = window.app.tools["featuremanager"];
+        if(!manager){
+            throw new Error("Unable to access feature manager by id: " + this.featureManager);
+        }
+        return manager;
+    },
         
 });
 

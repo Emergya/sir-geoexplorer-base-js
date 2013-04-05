@@ -127,6 +127,9 @@ Viewer.dialog.LocalCertificatesWindow = Ext.extend(Ext.Window, {
 						valueField: 'criteria',
 						displayField: 'label',
 						forceSelection: true,
+						editable: false,
+						typeAhead: false,
+						triggerAction: "all",
 						flex: 1,
 						listeners: {
 							change: this.onCriteriaChanged,

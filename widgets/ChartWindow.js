@@ -155,7 +155,8 @@ Viewer.dialog.ChartWindow = Ext
                         }
                     },
                     _onShow : function () {
-                        this._bigChart = "pie";
+                        this._bigChart = "bars";
+                        this._doChartsCreation(true);
                     },
 
                     onHide : function () {

@@ -49,6 +49,22 @@ PersistenceGeo.tree.LayerManager = Ext.extend(gxp.plugins.LayerManager, {
     /** api: ptype = pgeo_layermanager */
     ptype: "pgeo_layermanager",
 
+    constructor : function(config) {
+
+        if(!this.groups) {
+            this.groups = {
+                "background": {
+                    title: this.baseNodeText,
+                    exclusive: true
+                },
+                "default": this.overlayNodeText            
+            };
+        }
+
+        gxp.plugins.LayerManager.superclass.constructor.apply(this, arguments);
+        
+    },
+
     addGroup: function(groupProperties){
         var group = groupProperties.group, 
             groupIndex = groupProperties.groupIndex, 

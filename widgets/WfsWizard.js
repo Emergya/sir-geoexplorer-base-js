@@ -84,10 +84,11 @@ Viewer.dialog.WfsWizard = Ext.extend(Ext.Window, {
                    items: [
                        {
                           xtype: 'label',
-                           text: 'La presente ventana le permite añadir una nueva capa de tipo WFS al visor. '
+                          text: 'La presente ventana le permite añadir una nueva capa de tipo WFS al visor. '
                                + 'Introduza a continuación la URL del documento Capabilities del servicio que desee añadir. '
                                + 'En el paso siguiente podrá seleccionar que tipo de elemento de los ofrecidos por el servicio '
-                               + 'desea añadir al visor.'
+                               + 'desea añadir al visor.',
+                          style: "display:block; padding-bottom: 10px"
                        },
                        {
                            xtype: 'textfield',
@@ -154,13 +155,19 @@ Viewer.dialog.WfsWizard = Ext.extend(Ext.Window, {
     },
     nextClicked: function(button, e, options) {
         var form = this.items.get('step-1').getForm();
-        var url = form.findField('urlTextField');
+        var url = form.findField('urlTextField').getValue();
+
+        var versionIdx = url.indexOf("version=");
+        if(versionIdx===-1) {
+          url+="&version=1.1.0";
+        }
+
         if (form.isValid()) {
     	   this.progressBar = this.items.get('step-2').getComponent('progressBar');
             this.layout.setActiveItem('step-2');
             this.progressBar.wait();
             OpenLayers.Request.GET({
-                url: url.getValue(),
+                url: url,
                 callback: this.remoteCapabilitiesLoaded,
                 scope: this
             });
@@ -204,10 +211,10 @@ Viewer.dialog.WfsWizard = Ext.extend(Ext.Window, {
                     header: "Nombre", dataIndex: "name", sortable: true
                 },
                 {
-                    header: "Espacio de nombre", dataIndex: "namespace", sortable: true, width: 150
+                    header: "Espacio de nombre", dataIndex: "namespace", sortable: true, width: 175
                 },
                 {
-                    id: "description", header: "Descripcion", dataIndex: "abstract"
+                    id: "description", header: "Descripción", dataIndex: "abstract"
                 },
                 {
                     header: 'Añadir',

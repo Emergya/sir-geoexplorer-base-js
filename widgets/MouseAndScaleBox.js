@@ -14,7 +14,7 @@
  * details.
  *
  * You should have received a copy of the GNU General Public License along with
- * this library; if not, write to the Free Software Foundation, Inc., 51
+ * this library; if not, write to the Free Software Foundation, Inc., this.leftPadding1
  * Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  *
  * As a special exception, if you link this library with other files to produce
@@ -54,6 +54,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
     width: 250,
     height: 190,
     x: 5,
+    leftPadding: 15, // Why 15? I don't know but it positions it ok.
  //   floating:true,
     frame: true,
     resizable: false,
@@ -118,9 +119,9 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
             //this.setPosition(this.x, panel.getHeight() - this.height - this.height/3);
             if (this.minimized) {
                 
-                this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -30]);
+                this.anchorTo(Viewer.getMapPanel().body, 'bl', [this.leftPadding, -30]);
             } else {
-                this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -this.height]);
+                this.anchorTo(Viewer.getMapPanel().body, 'bl', [this.leftPadding, -this.height]);
             }
             
             },
@@ -294,12 +295,12 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
         this.toggleCollapse(false);
         if (!this.minimized) {
             this.minimized = true;
-            this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -30]);
+            this.anchorTo(Viewer.getMapPanel().body, 'bl', [this.leftPadding, -30]);
             this.setTitle("Coordenadas y Escala");
         } else {
             this.setTitle(null);
             this.minimized = false;
-            this.anchorTo(Viewer.getMapPanel().body, 'bl', [5, -this.height]);
+            this.anchorTo(Viewer.getMapPanel().body, 'bl', [this.leftPadding, -this.height]);
         }
     }
 
