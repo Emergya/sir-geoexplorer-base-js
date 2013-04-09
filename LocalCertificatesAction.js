@@ -471,7 +471,8 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                 Ext.MessageBox.updateProgress(1);
                 Ext.MessageBox.hide();
                 Ext.MessageBox.alert("", this.errorText)
-            }
+            },
+            scope: this
         })
 
 

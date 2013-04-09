@@ -335,8 +335,8 @@ Viewer.plugins.ShpWizard = Ext.extend(Ext.Window, {
             this.items.get(1).add(tableNameField);
             
             var layerNameField = new Ext.form.Hidden({
-                name: 'layerName',
-                value: resp.data.layerName
+                name: 'layerTitle',
+                value: resp.data.layerTitle
             });
         this.items.get(1).add(layerNameField);
 

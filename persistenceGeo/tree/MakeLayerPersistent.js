@@ -66,7 +66,7 @@ PersistenceGeo.tree.MakeLayerPersistent = Ext.extend(gxp.plugins.Tool, {
             
             var userInfo = app.persistenceGeoContext.userInfo;
             // We cant persist already persisted layers.
-            makePersistentAction.setDisabled(!userInfo || userInfo.admin || !persistibleLayer);
+            makePersistentAction.setDisabled(!userInfo || !userInfo.username || userInfo.admin || !persistibleLayer);
         }, this);
         var enforceOne = function(store) {
             makePersistentAction.setDisabled(
@@ -96,7 +96,7 @@ PersistenceGeo.tree.MakeLayerPersistent = Ext.extend(gxp.plugins.Tool, {
         });
         var savePanel = new Viewer.widgets.SaveLayerPanel({
             layerRecord: layerRecord,
-            authorized: this.target.isAuthorized(),
+            authorized: app.persistenceGeoContext.userInfo && app.persistenceGeoContext.userInfo.username,
             target: this.target,
             saveWindow: saveWindow,
             outputTarget: false

@@ -448,7 +448,7 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
                 app.persistenceGeoContext.saveLayerFromParams(params, this.onLayerSave, this.onSaveLayerException,this);
             } else {
                 throw new Error("Unsupported temporal layer for persistence.!")
-ç            }
+            }
         }
     },
 
@@ -462,8 +462,8 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
         this.target.mapPanel.map.addLayer(layer);
     },
 
-    onLayerSave: function (layer){     
-        
+    onLayerSave: function (layer){    
+
         this.updateLayer(layer);
         Ext.Msg.alert(this.saveLayerTitleText, String.format(this.saveLayerText, layer.name));
  
@@ -483,10 +483,24 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
         this.hide();
     },
 
-    onSaveLayerException: function (e){
-        Ext.Msg.alert(this.scope.saveLayerErrorTitleText, String.format(this.scope.saveLayerErrorText, this.scope.layerName));
+    onSaveLayerException: function (responseText){
 
-        this.scope.hide();
+        var errorResponse = null;
+
+        try {
+            errorResponse = Ext.decode(responseText);    
+        } catch(e) {
+
+        }
+        
+
+        if(errorResponse && errorResponse.data && errorResponse.data.error) {
+            Ext.Msg.alert(this.saveLayerErrorTitleText, errorResponse.data.error);
+        } else{
+            Ext.Msg.alert(this.saveLayerErrorTitleText, String.format(this.saveLayerErrorText, this.layerName));
+        }
+
+        this.hide();
 
         //TODO: handle exception
         if(!!e
