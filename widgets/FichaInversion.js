@@ -30,7 +30,8 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
 			codBip: this.feature.attributes.codBip,
 			etapa: this.feature.attributes.etapa,
 			serRes: this.feature.attributes.serRes,
-			anyo: this.feature.attributes.anyo
+			anyo: this.feature.attributes.anyo,
+			tipoProyecto: this.feature.attributes.tipoProyecto
 		});
 		url = Ext.urlAppend(url, params);
 		window.open(url, "Ficha del proyecto " + this.feature.attributes.codBip);
@@ -106,6 +107,7 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
     	var etapa = this.feature.attributes.etapa;
     	var serRes = this.feature.attributes.serRes;
     	var anyo = this.feature.attributes.anyo;
+    	var tipoProyecto = this.feature.attributes.tipoProyecto;
     	
     	Ext.Ajax.request({
 	 	    url: this.baseUrl + "/fichaInversion/fichaPopup",
@@ -113,7 +115,8 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
 	 	    	codBip: codBip,
 	 	    	etapa: etapa,
 	 	    	serRes: serRes,
-	 	        anyo: anyo
+	 	        anyo: anyo,
+	 	        tipoProyecto: tipoProyecto
 	 	    },
 	 	    scope: this,
 	 	    success: function(response){
