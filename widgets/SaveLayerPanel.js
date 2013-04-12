@@ -490,7 +490,13 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
         try {
             errorResponse = Ext.decode(responseText);    
         } catch(e) {
-
+             //TODO: handle exception
+            if(!!e
+                && !!e.stack 
+                && !!console
+                && !!console.log){
+                console.log(e.stack);
+            }
         }
         
 
@@ -502,13 +508,7 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
 
         this.hide();
 
-        //TODO: handle exception
-        if(!!e
-            && !!e.stack 
-            && !!console
-            && !!console.log){
-            console.log(e.stack);
-        }
+       
     },
 
     /** api: method[onLoadEnd]

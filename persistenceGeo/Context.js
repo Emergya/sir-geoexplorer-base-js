@@ -145,14 +145,14 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
         if (!!this.SAVE_MODES.GROUP == this.saveModeActive) {
             if (this.authUser && this.userInfo.admin) {
                 // The user admin views public and pending layers.
-            	this.parser.loadPendingLayerRequests(this.authUser,function(layers, layerTree){
+            	this.parser.loadPendingLayerRequests(this.userInfo.id,function(layers, layerTree){
 	        		this_.onLoadLayers(layers, layerTree, {
                         groupName: this_.publishRequestsGroupText,
                         removable: false
                     });
 	        	});
 	            	
-            	this.parser.loadPublicLayers(this.authUser, function(layers, layerTree){
+            	this.parser.loadPublicLayers(this.userInfo.id, function(layers, layerTree){
             		this_.onLoadLayers(layers, layerTree, {
                         groupName: this_.publicLayersGroupText, 
                         visible: false

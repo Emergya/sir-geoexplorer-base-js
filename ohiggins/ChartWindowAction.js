@@ -111,7 +111,7 @@ Viewer.plugins.ChartWindowAction = Ext.extend(gxp.plugins.Tool, {
                     } else {
                         Viewer.trackUrl('modules/Iniciativas_de_inversion');
                         ds.show();
-                        ds.alignTo(app.mapPanelContainer.ownerCt.el,"bl-bl");
+                        //ds.alignTo(app.mapPanelContainer.ownerCt.el,"bl-bl");
                     }
 
 

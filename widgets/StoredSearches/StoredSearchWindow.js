@@ -238,20 +238,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                     text: 'Imprimir',
                     disabled: true,
                     listeners: {
-                        click: function(){
-                            var header = Ext.getCmp('viewer-header');
-                            var footer = Ext.getCmp('viewer-footer');
-                            var headerHTML = '<div id ="viewer-header">' + header.getEl().dom.innerHTML + '</div>';
-                            var footerHTML = '<div id ="viewer-footer">' + footer.getEl().dom.innerHTML + '</div>';
-                            headerHTML = this.replaceAll(headerHTML, '../theme', document.URL + 'tmpReplace');
-                            headerHTML = this.replaceAll(headerHTML, document.URL + 'tmpReplace', document.URL + '../theme');
-                            footerHTML = this.replaceAll(footerHTML, '../theme', document.URL + 'tmpReplace');
-                            footerHTML = this.replaceAll(footerHTML, document.URL + 'tmpReplace', document.URL + '../theme');
-                            // Ext.ux.GridPrinter.stylesheetPath = document.URL + '../theme/ux/ohiggins.css';
-                            Ext.ux.GridPrinter.stylesheetPath = document.URL + '../theme/ux/ext.ux/print.css';
-                            Ext.ux.GridPrinter.rootPath = document.URL + '..';
-                            Ext.ux.GridPrinter.print(this.grid, this.title, headerHTML, footerHTML);
-                        },
+                        click: this._printResults,
                         scope: this
                     }   
                 }),
@@ -314,6 +301,228 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
         }     
 
         this.add(formContainer);
+    },
+
+    _printResults : function() {
+        var pageWidth = 215.9;
+        var margin = 30;
+        var avalaibleWidth = pageWidth - 2 * margin;
+
+        var items = this.createPDFDocument(margin, pageWidth, avalaibleWidth);
+        if(!items) {
+            return;
+        }
+
+        var params = {
+            size: "letter",
+            margin: {
+                top: 45,
+                bottom: 30,
+                left: 30,
+                right: 30
+            }, // mm
+            title: this.controller.title,
+            items: items,
+            outputFile: this.controller.title.toLowerCase().replace(/ /g,"_"),
+            keepFile: true,
+            header: {
+                margin: 10,
+                items: [
+                    {
+                        type: "image",
+                        url: "http://localhost:9080/theme/app/img/logo_ministerio.png",
+                        height: 25
+                    },
+                    {
+                        type: "par",
+                        text: this.controller.title,
+                        x: 65,
+                        y: 15,                       
+                        newFont : {
+                            size: 14
+                        }
+                    }
+                ]
+            },
+            footer: {
+                margin: 15,
+                items : [{
+                    text: "http://sig.minenergia.cl/sig-minen",
+                    keepPosition:true
+                },{
+                    text: "Página %PAGE_NUMBER% / %PAGE_COUNT%",
+                    align: "L",
+                    x: pageWidth-margin -26
+                }]
+            }
+        };
+
+        Ext.MessageBox.wait("Por favor espere...");
+
+        var url = app.proxy + "http://localhost/phpPDF/phpPDF.php";
+
+        Ext.Ajax.request({
+            url: url,
+            params: {
+                params: Ext.encode(params)
+            },
+            isUpload: true,
+            success: function(response) {
+                Ext.MessageBox.updateProgress(1);
+                Ext.MessageBox.hide();
+                // We should have get a json text here
+
+                var result = Ext.decode(response.responseText);
+
+                // We can use localhost this way because of the proxy
+                app.downloadFile(url, {
+                    params: Ext.encode({
+                        downloadFile: result.downloadableFile,
+                        outputFormat: "PDF"
+                    })
+                });
+            },
+            failure: function(response) {
+                Ext.MessageBox.updateProgress(1);
+                Ext.MessageBox.hide();
+                Ext.MessageBox.alert("", this.errorText)
+            },
+            scope: this
+        })
+    },
+
+    createPDFDocument: function(margin, pageWidth, avalaibleWidth) {
+        //We generate an XTemplate here by using 2 intermediary XTemplates - one to create the header,
+        //the other to create the body (see the escaped {} below)
+        var columns = this.grid.getColumnModel().config;
+
+        if(!columns || !columns.length ) {
+            Ext.Msg.alert("","Por favor, realice una búsqueda primero.");
+            return false;
+        }
+
+        
+        //build a useable array of store data for the XTemplate
+        var data = [];
+        this.grid.store.data.each(function(item) {
+          var convertedData = [];
+
+          //apply renderers from column model
+          for (var key in item.data) {
+            var value = item.data[key];
+            
+            Ext.each(columns, function(column) {
+              if (column.dataIndex == key) {
+                convertedData[key] = column.renderer ? column.renderer(value) : value;
+              }
+            }, this);
+          }
+          
+          data.push(convertedData);
+        });
+
+
+        // We remove the colums that have no data because its not applicable.
+         columns = columns.filter(function(column, index){
+            for(var i = 0; i < data.length; i++) {
+                if(data[i][column.dataIndex] !== "No Aplica") {
+                    return true;
+                }
+            }
+
+            return false;
+        },this);
+
+         // We convert the columns in a multi row structure.
+         var maxColumns = 3;
+
+         var rows = [];
+
+         var row = [columns[0]]; // We add the name column first.
+         // We set the rowspan for the name column. We add -1 to not apply to the name column itself!
+         columns[0].rowspan = Math.ceil((columns.length -1)/ maxColumns); 
+         columns[0].colspan = 1;
+         for(var cIdx = 1; cIdx < columns.length; cIdx ++) {
+            // Other columns rowspan is always 1
+            columns[cIdx].rowspan = 1;
+            columns[cIdx].colspan = 1;
+
+
+            if(cIdx == columns.length-1 && cIdx % maxColumns != 0) {
+                // The last column isn't in the last position, so we need
+                // colspan!
+                columns[cIdx].colspan = maxColumns - (cIdx % maxColumns) + 1;
+            }
+
+            row.push(columns[cIdx]);
+
+
+            if(cIdx % maxColumns ==0 || cIdx == columns.length-1) {
+                // The row is finished!
+                rows.push(row);
+                // A new row is started.
+                row = [];
+            }
+         }
+
+
+        var headerTemplate = new Ext.XTemplate(
+            '<tpl for=".">',
+                '<tr nobr="true" style="background-color: gray" border="0.1mm">',
+                  '<tpl for=".">',
+                    '<th rowspan="{rowspan}" colspan="{colspan}">{header}</th>',
+                  '</tpl>',
+                '</tr>',
+            '</tpl>'
+          );
+        var bodyTemplate = new Ext.XTemplate(       
+           
+                '<tpl for="rows">',
+                    '<tr style="background-color:{[parent.odd? "lightgray":"white"]}">',
+                      '<tpl for=".">',
+                        '<td rowspan="{rowspan}" colspan="{colspan}">\{{dataIndex}\}</td>',
+                      '</tpl>',
+                    '</tr>',
+                '</tpl>');
+        
+        //use the headerTpl and bodyTpl XTemplates to create the main XTemplate below
+        var headings = headerTemplate.apply(rows);
+        var bodyOddTemplate    = bodyTemplate.apply({
+            rows: rows,
+            odd:true
+        });
+        var bodyEvenTemplate = bodyTemplate.apply({
+            rows: rows,
+            odd: false
+        });
+        
+        var html = new Ext.XTemplate(          
+              '<table border="0.1mm" cellpadding="0.5mm">',
+                '<thead>',
+                headings,
+                '</thead>',
+                '<tbody>',
+                    '<tpl for=".">',    
+                        '<tpl if="xindex % 2 == 0">',                    
+                            bodyOddTemplate,
+                        '</tpl>',
+                        '<tpl if="xindex % 2 != 0">',
+                            bodyEvenTemplate,
+                        '</tpl>',
+                    '</tpl>',
+                '</tbody>',
+              '</table>'
+        ).apply(data);
+        
+
+        var items = [{
+            type: "html",
+            content: html,
+            newFont : {
+                size: 8
+            }
+        }];
+        return items;
     },
 
     _getFieldHandler: function(handler1, handler2) {

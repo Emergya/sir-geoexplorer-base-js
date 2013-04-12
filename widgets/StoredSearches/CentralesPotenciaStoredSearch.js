@@ -30,7 +30,7 @@ Viewer.controller.CentralesPotenciaStoredSearch = Ext.extend(Viewer.controller.S
 
     featureType: 'CENTRALES',
     
-    title: 'Potencia de Centrales Generadoras.',
+    title: 'Potencia de Centrales Generadoras',
 
     constructor: function(config) {
 

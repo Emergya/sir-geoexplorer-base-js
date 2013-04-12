@@ -30,7 +30,7 @@ Viewer.controller.CentralesCombustibleStoredSearch = Ext.extend(Viewer.controlle
 
     featureType: 'CENTRALES',
     
-    title: 'Centrales Generadoras por tipo de combustible.',
+    title: 'Centrales Generadoras por tipo de combustible',
 
     constructor: function(config) {
 

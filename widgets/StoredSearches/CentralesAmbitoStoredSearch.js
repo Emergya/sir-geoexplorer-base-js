@@ -30,7 +30,7 @@ Viewer.controller.CentralesAmbitoStoredSearch = Ext.extend(Viewer.controller.Sto
 
     featureType: 'CENTRALES',
     
-    title: 'Centrales Generadoras por ámbito territorial.',
+    title: 'Centrales Generadoras por ámbito territorial',
 
     constructor: function(config) {
 
