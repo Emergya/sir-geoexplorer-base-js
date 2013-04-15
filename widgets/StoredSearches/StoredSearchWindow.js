@@ -35,6 +35,26 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
     controller: null,
 
     formFields: null,
+
+    columns : {
+        "CENTRALES" : ["TIPO","NOMBRE","PROPIETARIO","POT_BR_MW", "N_UNIDADES", "TIPO", "RCA", "SISTE_ELEC", "REGION", "PROVINCIA", "COMUNA", "COMBUSTIBL", "EMI_RCA", "CUENCA"],
+        "Proyectos_SEA" : ["NOMBRE","PROPIETARI","POT_BR_MW", "EMI_RCA", "CAUDAL_ECO", "REGION", "PROVINCIA", "COMUNA"]
+    },
+
+    // We define the translations of the column names into human readable names. If not present here, 
+    // we will just take the column's name and lowercase it (except the first letter).
+    columnLabels : {
+        "POT_BR_MW" : "Potencia Bruta (MW)" ,
+        "N_UNIDADES" : "Nº Unidades",
+        "RCA": "Resolución de Calificación Ambiental",
+        "SISTE_ELEC": "Sistema Eléctrico",
+        "COMBUSTIBL": "Combustible",
+        "EMI_RCA": "Emisiones según R.C.A.",
+        "PROPIETARI" : "Propietario",
+        "CAUDAL_ECO": "Caudal Ecológico",
+        "REGION": "Región"        
+    },
+
     
     /** api: config[closest]
      *  ``Boolean`` Find the zoom level that most closely fits the specified
@@ -322,6 +342,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                 right: 30
             }, // mm
             title: this.controller.title,
+            columns: 2,
             items: items,
             outputFile: this.controller.title.toLowerCase().replace(/ /g,"_"),
             keepFile: true,
@@ -347,12 +368,13 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
             footer: {
                 margin: 15,
                 items : [{
-                    text: "http://sig.minenergia.cl/sig-minen",
+                    type: "html",
+                    content: '<a href="http://sig.minenergia.cl/sig-minen">http://sig.minenergia.cl/sig-minen</a>',
                     keepPosition:true
                 },{
-                    text: "Página %PAGE_NUMBER% / %PAGE_COUNT%",
+                    text: "Página %PAGE_NUMBER%",
                     align: "L",
-                    x: pageWidth-margin -26
+                    x: pageWidth-margin -17
                 }]
             }
         };
@@ -421,9 +443,24 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
           data.push(convertedData);
         });
 
+        var featureColumns = this.columns[this.controller.featureType];
 
         // We remove the colums that have no data because its not applicable.
          columns = columns.filter(function(column, index){
+
+            if(featureColumns.indexOf(column.dataIndex)<0) {
+                // The column shouldn't be added per customer request.
+                return false;
+            }
+
+            var headerLabel = this.columnLabels[column.dataIndex];
+            if(!headerLabel) {
+                headerLabel = column.header.charAt(0).toUpperCase() + column.header.slice(1).toLowerCase();
+            }
+
+            column.headerLabel = headerLabel;
+
+
             for(var i = 0; i < data.length; i++) {
                 if(data[i][column.dataIndex] !== "No Aplica") {
                     return true;
@@ -433,7 +470,48 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
             return false;
         },this);
 
-         // We convert the columns in a multi row structure.
+         
+        //var content  = this._cratePDFTable(columns, data);
+        var content = this._createList(columns, data);
+        
+
+        var items = [{
+            type: "html",
+            content: content,
+            newFont : {
+                size: 8
+            }
+        }];
+        return items;
+    },
+
+    _createList : function(columns, data) {
+
+        var bodyTemplate = new Ext.XTemplate(      
+            '<li><dt><b>\{{values.firstCol.dataIndex}\}</b></dt>',
+            '<dd>',
+                '<ul>',
+                    '<tpl for="otherColumns">',
+                        '<li><i>{headerLabel}</i>: \{{dataIndex}\}</li>',                                                   
+                    '</tpl>',
+                '</ul>',
+            '</dd></li>');
+
+        bodyTemplate = bodyTemplate.apply({firstCol :  columns[0], otherColumns: columns.slice(1)});
+        
+        var html = new Ext.XTemplate(          
+              '<ul style="margin-left:0">',     
+                '<tpl for=".">',                              
+                    bodyTemplate,
+                '</tpl>',               
+              '</ul>'
+        ).apply(data);
+
+        return html;
+    },    
+
+    _createPDFTable : function (columns, data) {
+        // We convert the columns in a multi row structure.
          var maxColumns = 3;
 
          var rows = [];
@@ -470,7 +548,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
             '<tpl for=".">',
                 '<tr nobr="true" style="background-color: gray" border="0.1mm">',
                   '<tpl for=".">',
-                    '<th rowspan="{rowspan}" colspan="{colspan}">{header}</th>',
+                    '<th rowspan="{rowspan}" colspan="{colspan}">{headerLabel}</th>',
                   '</tpl>',
                 '</tr>',
             '</tpl>'
@@ -513,16 +591,8 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                 '</tbody>',
               '</table>'
         ).apply(data);
-        
 
-        var items = [{
-            type: "html",
-            content: html,
-            newFont : {
-                size: 8
-            }
-        }];
-        return items;
+        return html;
     },
 
     _getFieldHandler: function(handler1, handler2) {

@@ -181,7 +181,11 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
         if(!this.selectedLayer) {
             this.selectedLayer = Viewer.getSelectedLayer();
         }
-        if (this.selectedLayer && this.isLocalGeoserver(this.selectedLayer.url)) {
+
+        var isRaster = this.selectedLayer  && !this.selectedLayer.params;
+        var userLogged = !!app.persistenceGeoContext.userLogin;
+
+        if (!isRaster && userLogged && this.selectedLayer && this.isLocalGeoserver(this.selectedLayer.url)) {
             Ext.each(this.actions, function(item) {
                 item.enable();
                     }, this);
