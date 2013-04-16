@@ -90,6 +90,10 @@ PersistenceGeo.loaders.AbstractLoader, {
 
         });
 
+        layer.metadata = {
+            layerTypeId: layerData.typeId
+        };
+
         // TODO: Wrap
         this.postFunctionsWrapper(layerData, layer, layerTree);
 

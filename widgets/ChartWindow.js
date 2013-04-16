@@ -287,7 +287,7 @@ Viewer.dialog.ChartWindow = Ext
                             },
                             visualizationPkg : 'corechart',
                             visualizationCfg : {
-                                title : "Invertido en sectores",
+                                title : "Solicitado en sectores",
                                 pieSliceText : 'label',
                                 pieResidueSliceLabel : this.porcionOtrosText,
                                 chartArea : {
@@ -393,7 +393,7 @@ Viewer.dialog.ChartWindow = Ext
                             visualizationCfg : {
                                 title : projectTypeText + " - Año: " +
                                         formValues.anyo +
-                                        " - Invertido en sectores",
+                                        " - Solicitado en sectores",
                                 pieSliceText : 'label',
                                 pieResidueSliceLabel : this.porcionOtrosText,
                                 chartArea : {

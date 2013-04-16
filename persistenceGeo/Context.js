@@ -363,7 +363,7 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
                     //Layers must be visible by default
                     layer.setVisibility(visible);
                     this.map.addLayer(layer);
-                    layer.metadata.removable = removable;
+                    layer.metadata.removable = removable;                    
                     this.loadedLayers[this._groupIndexes].push(layer);
                 } catch (e) {
                     // TODO: handle
@@ -601,7 +601,7 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
             return null;
         }
 
-        layer = loaderClass.load(json);
+        layer = loaderClass.load(json);        
 
         var groupLayers;
         if ( !! this.SAVE_MODES.GROUP == this.saveModeActive) {
@@ -610,6 +610,12 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
             groupLayers = String.format(this.defaultUsersGroup, this.userLogin);
         }
         layer.groupLayers = groupLayers;
+
+        layer.metadata = {
+            layerTypeId: json.typeId
+        };
+
+
         return layer;
     }
 

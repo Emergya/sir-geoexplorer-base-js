@@ -53,7 +53,8 @@ Viewer.widgets.ImportExportToolbar = Ext.extend(Ext.Toolbar, {
             exportToSHPMsg: "Generando el fichero ZIP ...",
             exportToSHPErrorTitle: "Error",
             exportToSHPErrorContent: "Error al exportar la capa",
-            objectOwner: 'toolbar'
+            objectOwner: 'toolbar',
+            requireLogin: true
         }];
 
         Viewer.widgets.ImportExportToolbar.superclass.constructor.call(this, Ext.apply({

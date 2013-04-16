@@ -174,7 +174,7 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
             if(alreadyAddedCount>0) {
                 if(addedLayersCount==0) {
                     msg="No se añadió ninguna capa, ya que todas las seleccionadas ya estaban presentes."
-                } else if(addLayersCount == 1) {
+                } else if(addedLayersCount == 1) {
                     msg="Se añadió sólo una capa, el resto de las seleccionadas ya estaban presentes."
                 } else {
                     msg="Se añadieron "+addedLayersCount+" capas, el resto de las seleccionadas ya estaban presentes."

@@ -575,7 +575,7 @@ PersistenceGeo.Parser = Ext.extend(Ext.Component,{
                       'user','folderList','styles',
                       'createDate','server_resource',
                       'publicized','enabled','updateDate', 
-                      'folderId', 'authId', 'userId',"layerTitle"],
+                      'folderId', 'authId', 'userId',"layerTitle","typeId"],
              listeners: {
                  load: function(store, records, options) {
                 	 if(!!onload){

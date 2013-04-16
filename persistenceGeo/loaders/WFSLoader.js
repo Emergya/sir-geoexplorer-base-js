@@ -79,6 +79,12 @@ PersistenceGeo.loaders.WFSLoader
 	            schema: layerData['properties']['schema']
 			};
 
+
+	        layer.metadata = {
+	            layerTypeId: layerData.typeId
+	        };
+
+
 			this.copyAllPosibleProperties(layerData['properties'], options);
 
 			var authId = layerData.authId;

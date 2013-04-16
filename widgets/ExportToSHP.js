@@ -59,6 +59,9 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
     objectOwner: 'map',
     selectedLayer: null,
 
+    requireLogin : true,
+    rasterTypeIDs: [1,2,3,8,9,10],
+
     /** private: method[init]
      * :arg target: ``Object`` The object initializing this plugin.
      */
@@ -182,10 +185,13 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
             this.selectedLayer = Viewer.getSelectedLayer();
         }
 
-        var isRaster = this.selectedLayer  && !this.selectedLayer.params;
-        var userLogged = !!app.persistenceGeoContext.userLogin;
+        var layerSelected = !!this.selectedLayer;
 
-        if (!isRaster && userLogged && this.selectedLayer && this.isLocalGeoserver(this.selectedLayer.url)) {
+        var hasLayerTypeId= this.selectedLayer.metadata && this.selectedLayer.metadata.layerTypeId;
+        var isVectorial = layerSelected  && hasLayerTypeId && this.rasterTypeIDs.indexOf(this.selectedLayer.metadata.layerTypeId)<0;
+        var userLogged = !this.requireLogin || !!app.persistenceGeoContext.userLogin;
+
+        if (isVectorial && userLogged  && this.isLocalGeoserver(this.selectedLayer.url)) {
             Ext.each(this.actions, function(item) {
                 item.enable();
                     }, this);
