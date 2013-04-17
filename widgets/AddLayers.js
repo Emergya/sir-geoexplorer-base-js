@@ -163,12 +163,12 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 handler: this.uploadRasterHandler,
                 scope: this
             }));
-//            items.push(new Ext.menu.Item({
-//                iconCls: 'vw-icon-add-layer-wms',
-//                text: this.uploadKmlImportText,
-//                handler: this.uploadKmlHandler,
-//                scope: this
-//            }));
+            items.push(new Ext.menu.Item({
+                iconCls: 'vw-icon-add-layer-wms',
+                text: this.uploadKmlImportText,
+                handler: this.uploadKmlHandler,
+                scope: this
+            }));
             if (this.uploadSource) {
                 //TODO: Activate upload buttons
                 // uploadButton = this.createUploadButton(Ext.menu.Item);
@@ -265,22 +265,22 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
     /**
      * api: method[uploadKmlHandler]
      */
-//    uploadKmlHandler: function() {
-//        if (!this.uploadKmlImporterWindow) {
-//            this.uploadKmlImporterWindow = new Viewer.plugins.KMLWizard();
-//            this.uploadKmlImporterWindow.on({
-//                'close': {
-//                    fn: function() {
-//                        this.uploadKmlImporterWindow = null;                        
-//                    },
-//                    scope: this
-//                }
-//            });
-//
-//        }
-//        this.uploadKmlImporterWindow.show();
-//        
-//    },
+    uploadKmlHandler: function() {
+        if (!this.uploadKmlImporterWindow) {
+            this.uploadKmlImporterWindow = new Viewer.plugins.KMLWizard();
+            this.uploadKmlImporterWindow.on({
+                'close': {
+                    fn: function() {
+                        this.uploadKmlImporterWindow = null;                        
+                    },
+                    scope: this
+                }
+            });
+
+        }
+        this.uploadKmlImporterWindow.show();
+        
+    },
 
     /**
      * api: method[uploadShapeHandler]
