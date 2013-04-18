@@ -76,8 +76,8 @@ Viewer.plugins.XLSWizard = Ext.extend(Ext.Window, {
     chooseFileText: "Examinar...",
     uploadWaitMsgText: "Enviando archivo. Por favor espere.",
     waitTitleMsgText: "Subida de archivo",
-    createLayerWaitMsgText: "Actualizando nombres de campos. Por favor espere.",
-    createLayerWaitMsgTitleText: "Cambio de nombres",
+    createLayerWaitMsgText: "Procesando archivo XLS. Por favor espere.",
+    createLayerWaitMsgTitleText: "Procesando XLS",
     fieldNameEmptyText: 'Escriba un nombre para el campo (letras, números, . y _)',
     projectionLabel: 'CRS: ',
     coordinateXLabel: 'Coordenada X: ',
@@ -97,39 +97,6 @@ Viewer.plugins.XLSWizard = Ext.extend(Ext.Window, {
     initComponent: function() {
     	var me = this;
     	this.self = me;
-        this.store = new Ext.data.JsonStore({
-            // store configs
-            autoDestroy: true,
-            autoLoad: false,
-            storeId: 'oldColumnsStore',
-            // reader configs
-            root: 'columnsMetadata',
-            idProperty: 'name',
-            fields: [
-               'name', 
-                {name:'columnSize', type: 'integer'},
-                {name:'lastmod', type:'date'},
-                'typeName'
-            ],
-            sortInfo: {field: 'name', direction:'ASC'}
-        });
-
-        var cm = new Ext.grid.ColumnModel({
-            defaults: {
-                sortable: false
-            },
-            columns:[
-                {
-                    id: 'oldName',
-                    header: 'Nombre de campo',
-                    dataIndex: 'name',
-                    width: 220,
-                    editor: new Ext.form.TextField({
-                        allowBlank: false
-                    })
-                }
-            ]
-        });
 
     	var defaultOptions = {
     		title: this.windowTitleText,
