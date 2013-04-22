@@ -187,7 +187,7 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
 
         var layerSelected = !!this.selectedLayer;
 
-        var hasLayerTypeId= this.selectedLayer.metadata && this.selectedLayer.metadata.layerTypeId;
+        var hasLayerTypeId= layerSelected && this.selectedLayer.metadata && this.selectedLayer.metadata.layerTypeId;
         var isVectorial = layerSelected  && hasLayerTypeId && this.rasterTypeIDs.indexOf(this.selectedLayer.metadata.layerTypeId)<0;
         var userLogged = !this.requireLogin || !!app.persistenceGeoContext.userLogin;
 
