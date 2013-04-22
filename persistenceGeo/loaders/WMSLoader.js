@@ -76,6 +76,7 @@ PersistenceGeo.loaders.AbstractLoader, {
             layers = layerData.properties.layers || layers;
         }
 
+
         var layer = new OpenLayers.Layer.WMS(layerTitle,
         layerData.server_resource, {
             layers: layers,
@@ -93,6 +94,7 @@ PersistenceGeo.loaders.AbstractLoader, {
         layer.metadata = {
             layerTypeId: layerData.typeId
         };
+
 
         // TODO: Wrap
         this.postFunctionsWrapper(layerData, layer, layerTree);
