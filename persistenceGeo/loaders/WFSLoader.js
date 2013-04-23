@@ -80,11 +80,7 @@ PersistenceGeo.loaders.WFSLoader
 			};
 
 
-	        layer.metadata = {
-	            layerTypeId: layerData.typeId
-	        };
-
-
+	       
 			this.copyAllPosibleProperties(layerData['properties'], options);
 
 			var authId = layerData.authId;
@@ -97,6 +93,11 @@ PersistenceGeo.loaders.WFSLoader
 						'protocol' : new OpenLayers.Protocol.WFS(options),
 						'authId': authId
 					});
+
+			layer.metadata = {
+	            layerTypeId: layerData.typeId
+	        };
+
 			
 			this.postFunctionsWrapper(layerData, layer, layerTree);
 			
