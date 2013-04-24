@@ -1,5 +1,5 @@
 /**
- * Copyright (C) 2012
+ * Copyright (C) 2013
  *
  * This file is part of the project ohiggins
  *
@@ -23,15 +23,15 @@
  * however invalidate any other reasons why the executable file might be covered
  * by the GNU General Public License.
  *
- * Author: Moisés Arcos Santiago <marcos@emergya.com>
+ * Author: Luis Román Gutiérrez <lroman@emergya.com>
  */
  /**
  * @requires plugins/Tool.js
  */
 
 /** api: (define)
- *  module = Viewer.plugins
- *  class = addLineToMap
+ *  module = gxp.plugins
+ *  class = AddFeatureToMap
  */
 
 /** api: (extends)
@@ -40,26 +40,46 @@
 Ext.namespace("gxp.plugins");
 
 /** api: constructor
- *  .. class:: addLineToMap(config)
+ *  .. class:: addFeatureToMap(config)
  *
- *    Plugin for adding a line in a layer on the map.
+ *    Plugin for adding a feature to the map. Cannot be instantiated directly, must be
+ *    extended to define which kind of geometry will be added.
  */
-gxp.plugins.AddLineToMap = Ext.extend(gxp.plugins.Tool, {
-	/** api: ptype = gxp_addlinetomap */
-	ptype: "gxp_addlinetomap",
-	/** private: property[iconCls]*/
+gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
+
+     /** api: ptype = gxp_addfeaturetomap */
+    ptype: "gxp_addfeaturetomap",
+
+    /** public: property[iconCls]*/
     iconCls: 'vw-icon-add-line',
-    /** private: property[featuremanager]*/
+
+	/** private: property[featuremanager]*/
     featureManager: "featuremanager",
+
+    /** public: property[geometryHandler]
+     * The OpenLayers.Handler sublclass that will handle feature creation.
+     * Default value is OpenLayers.Handler.Point.
+     */
+    geometryHandler : OpenLayers.Handler.Point,
+
+    /** public: property[geometryTypes]
+     * The  geometry types that tool will be enabled for.
+     * Dafault value is ["Point"]
+     */    
+    geometryTypes: ["Point"],
+
     /** private: method[constructor]*/
     constructor: function(config) {
-        gxp.plugins.AddLineToMap.superclass.constructor.apply(this, arguments);
+          gxp.plugins.AddFeatureToMap.superclass.constructor
+                .call(this, Ext.apply({                   
+                }, config));
+
     },
     /** private: method[init]
      * :arg target: ``Object`` The object initializing this plugin.
      */
     init: function(target) {
-        gxp.plugins.AddLineToMap.superclass.init.apply(this, arguments);
+        gxp.plugins.AddFeatureToMap.superclass.init.apply(this, arguments);   
         this.target.on('beforerender', this.addActions, this);
     },
     /** api: method[addActions] */
@@ -70,9 +90,8 @@ gxp.plugins.AddLineToMap = Ext.extend(gxp.plugins.Tool, {
 		featureManager = this.updateFeatureManager(featureManager);
 		var control = new OpenLayers.Control.DrawFeature(
 	            featureLayer,
-	            OpenLayers.Handler.Path, 
+	            this.geometryHandler, 
 	            {
-	            	multi: true,
 	                eventListeners: {
 	                    featureadded: function(evt) {
 	                        if (this.autoLoadFeature === true) {
@@ -95,10 +114,16 @@ gxp.plugins.AddLineToMap = Ext.extend(gxp.plugins.Tool, {
             deactivateOnDisable: true,
             map: this.target.mapPanel.map
 		}));
-		actions = gxp.plugins.AddLineToMap.superclass.addActions.apply(this, actions);
-		featureManager.on("layerchange", this.onLayerChange, this);
+
+		actions = gxp.plugins.AddFeatureToMap.superclass.addActions.apply(this, actions);
+		featureManager.on("layerchange", this._enableOrDisable, this);
+        app.on("loginstatechange", this._enableOrDisable,this);
+
+        this._enableOrDisable();
+
 		return actions;
 	},
+
 	/** private: method[getFeatureManager]
      *  :returns: :class:`gxp.plugins.FeatureManager`
      */
@@ -112,52 +137,72 @@ gxp.plugins.AddLineToMap = Ext.extend(gxp.plugins.Tool, {
         }
         return manager;
     },
-    /** private: method[onLayerChange]
-     *  :arg mgr: :class:`gxp.plugins.FeatureManager`
-     *  :arg layer: ``GeoExt.data.LayerRecord``
-     *  :arg schema: ``GeoExt.data.AttributeStore``
-     */
-    onLayerChange: function(mgr, layer, schema) {
-    	var geometryType = null;
-    	var authIdLayer = null;
-    	var authIdUser = null;
-    	// Institución de la capa
-    	if(!!layer && !!layer.data && !!layer.data.layer && layer.data.layer.authId){
-    		authIdLayer = layer.data.layer.authId;
-    	}
-    	// Institución del usuario
-    	if(!!app && !!app.persistenceGeoContext 
-    			&& !!app.persistenceGeoContext.userInfo 
-    			&& !!app.persistenceGeoContext.userInfo.authorityId){
-    		authIdUser = app.persistenceGeoContext.userInfo.authorityId;
-    	}
-    	// Comprobamos si el usuario tiene permisos en la capa
-    	if(!!authIdLayer && !!authIdUser && authIdLayer == authIdUser){
-    		// There's a schema
-        	if(!schema){
-        		// Disable the edit options
-        		this.actions[0].disable();
-        	}else{
-        		// Feature Types
-        		if(!!mgr.geometryType){
-        			if(mgr.geometryType.indexOf("Multi") != -1){
-        				geometryType = mgr.geometryType.replace("Multi", "");
-        			}else{
-        				geometryType = mgr.geometryType;
-        			}
-        			if(!!geometryType && (geometryType == "Curve" || geometryType == "Line")){
-        				this.setActionControlLayer(mgr.featureLayer);
-        				this.actions[0].enable();
-        			}else{
-        				this.actions[0].disable();
-        			}
-        		}
-        	}
-    	}else{
-    		// Disable the edit options
-    		this.actions[0].disable();
-    	}
+
+     /** private: method[_enableOrDisable]
+      */
+    _enableOrDisable : function() {
+        var mgr = this.getFeatureManager();
+        var layerRecord = mgr.layerRecord;
+        var schema = mgr.schema;
+
+
+        var geometryType = null;
+        var authIdLayer = null;
+        var authIdUser = null;
+        var isAdmin = null;
+        var layerId = null;
+        var isTemporal = null;
+        var layer = null;
+        // Institución de la capa
+        if(!!layerRecord && !!layerRecord.data && !!layerRecord.data.layer){
+            layer = layerRecord.data.layer;
+            if(layer.authId){
+                authIdLayer = layer.authId;
+            }
+
+            if(layer.layerID) {
+                layerId = layer.layerID;
+            }
+
+            if(layer.metadata && layer.metadata.temporal) {
+                isTemporal = true;
+            }
+        } 
+        // Institución del usuario
+        if(!!app && !!app.persistenceGeoContext 
+                && !!app.persistenceGeoContext.userInfo 
+                && !!app.persistenceGeoContext.userInfo.authorityId){
+            authIdUser = app.persistenceGeoContext.userInfo.authorityId;
+            isAdmin = app.persistenceGeoContext.userInfo.admin
+        }
+        // Comprobamos si el usuario tiene permisos en la capa
+        if(layer && (isTemporal || layerId && (isAdmin || !!authIdUser && authIdLayer == authIdUser))){
+            // There's a schema
+            if(!schema){
+                // Disable the edit options
+                this.actions[0].disable();
+            }else{
+                // Feature Types
+                if(!!mgr.geometryType){
+                    if(mgr.geometryType.indexOf("Multi") != -1){
+                        geometryType = mgr.geometryType.replace("Multi", "");
+                    }else{
+                        geometryType = mgr.geometryType;
+                    }
+                    if(!!geometryType && this.geometryTypes.indexOf(geometryType)>=0){
+                        this.setActionControlLayer(mgr.featureLayer);
+                        this.actions[0].enable();
+                    }else{
+                        this.actions[0].disable();
+                    }
+                }
+            }
+        }else{
+            // Disable the edit options
+            this.actions[0].disable();
+        }
     },
+
     /** private: method[setActionControlLayer]
      *  :arg layer: OpenLayers.Layer
      */
@@ -179,14 +224,15 @@ gxp.plugins.AddLineToMap = Ext.extend(gxp.plugins.Tool, {
     	featureManager.prepareWFS = queryManager.prepareWFS;
     	return featureManager;
     },
-    /** private: method[setHandler]
-     *  :arg multi: boolean
-     */
+
     setHandler: function(multi){
-    	this.actions[0].control.handler.destroy();
-    	this.actions[0].control.handler = new OpenLayers.Handler.Path(this.actions[0].control, this.actions[0].control.callbacks,
+        this.actions[0].control.handler.destroy();
+
+        var handler = this.geometryHandler;
+
+        this.actions[0].control.handler = new handler(this.actions[0].control, this.actions[0].control.callbacks,
                 Ext.apply(this.actions[0].control.handlerOptions, {multi: multi}));
     }
 });
 
-Ext.preg(gxp.plugins.AddLineToMap.prototype.ptype, gxp.plugins.AddLineToMap);
+Ext.preg(gxp.plugins.AddFeatureToMap.prototype.ptype, gxp.plugins.AddFeatureToMap);

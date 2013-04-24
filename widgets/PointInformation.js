@@ -99,7 +99,7 @@ Viewer.dialog.PointInformation = Ext.extend(Ext.Window, {
             cls: 'vw_point_information_window',
             title: 'Consulta de coordenadas',
             width: 290,
-            height: 285,
+            height: 315,
             closeAction: 'hide',
             layout: 'fit',
             geoProjection: null,
@@ -162,6 +162,10 @@ Viewer.dialog.PointInformation = Ext.extend(Ext.Window, {
 
     _onShow: function() {
         this.reset();
+
+          // We change the cursor over the map to indicate selection.
+        Ext.select(".olMap").setStyle("cursor", "crosshair");
+
         this.map.events.on({
             click: this.onMapClicked,
             scope: this
@@ -170,6 +174,10 @@ Viewer.dialog.PointInformation = Ext.extend(Ext.Window, {
 
     onHide: function() {
         this.map.events.unregister('click', this, this.onMapClicked);
+
+        // We change the cursor back to default
+        Ext.select(".olMap").setStyle("cursor", "default");
+
         this._clearMarkerLayer();
     },
 
@@ -178,7 +186,7 @@ Viewer.dialog.PointInformation = Ext.extend(Ext.Window, {
         var c = {
             xtype: 'form',
             layout: 'form',
-            padding: '20px 10px',
+            padding: '20px 10px',           
             items: [{
                 xtype: 'label',
                 text: this.descriptionText,
@@ -218,30 +226,14 @@ Viewer.dialog.PointInformation = Ext.extend(Ext.Window, {
                 anchor: '95%',
                 readOnly: true,
                 decimalPrecision: Viewer.UTM_PRECISION
-            })],
-            bbar: {
-                layout: 'auto',
-                items: {
-                    xtype: 'container',
-
-                    defaultType: 'button',
-                    minButtonWidth: 140,
-                    items: [
-                    this.button = new Ext.Button({
-                        text: "Mostrar en decimal",
-                        minWidth: 140,
-                        listeners: {
-                            "click": {
-                                fn: this.toggleCoordinatesFormat,
-                                scope: this
-                            }
-                        }
-                    })]
-                }
-            }
+            })]          
         };
 
         this.add(c);
+        this.button = this.addButton({
+            text: "Mostrar en decimal",
+            minWidth: 140
+        },this.toggleCoordinatesFormat, this);
     },
     getUtmProjection: function(mapCoordinates, utmZone) {
         var coord = mapCoordinates.clone();

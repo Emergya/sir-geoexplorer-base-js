@@ -465,6 +465,21 @@ GeoExt.Lang.add(
     "Viewer.dialog.DefaultSearches.prototype": {
         titleTool: "Búsquedas Predeterminadas"
         
-    } 
+    },
+
+    "gxp.FeatureEditPopup.prototype" : {
+        title: "Establecer campos",
+        cls: "featureEditorPopup"
+    },
+
+    "Ext.grid.PropertyColumnModel.prototype" : {
+        nameText : "Campo",
+        valueText: "Valor",
+        dateFormat: "dd/MM/yy"
+    },
+
+    "gxp.plugins.FeatureEditor.propertyEditor.prototype": {
+        exceptionTitle: "Fallo al guardar"
+    }
 
 });

@@ -57,20 +57,29 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
             titlePrompt: "Añadir etiqueta",
             promptText: "Inserte el texto de la etiqueta"
         },{
-        	ptype: 'gxp_addpointtomap',
+        	ptype: 'gxp_addfeaturetomap',
         	id: 'addpointtomap',
         	actionTarget: 'editiontbar',
-        	tooltip: this.tooltipAddPoint
+        	tooltip: this.tooltipAddPoint,
+            iconCls: 'vw-icon-add-point',
+            geometryTypes : ["Point"],
+            geometryHandler: OpenLayers.Handler.Point
         },{
-        	ptype: 'gxp_addlinetomap',
+        	ptype: 'gxp_addfeaturetomap',
         	id: 'addlinetomap',
         	actionTarget: 'editiontbar',
-        	tooltip: this.tooltipAddLine
+        	tooltip: this.tooltipAddLine,
+            iconCls: 'vw-icon-add-line',            
+            geometryTypes : ["Line", "Curve"],
+            geometryHandler: OpenLayers.Handler.Path
         },{
-        	ptype: 'gxp_addpolygontomap',
+        	ptype: 'gxp_addfeaturetomap',
         	id: 'addpolygontomap',
         	actionTarget: 'editiontbar',
-        	tooltip: this.tooltipAddPolygon
+        	tooltip: this.tooltipAddPolygon,
+            iconCls: 'vw-icon-add-polygon',             
+            geometryTypes : ["Polygon", "Surface"],
+            geometryHandler: OpenLayers.Handler.Polygon
         },{
             ptype: 'gxp_createbuffer',
             actionTarget: 'editiontbar',
@@ -78,7 +87,12 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
         }, {
             ptype: 'gxp_newelementfromcoords',
             actionTarget: 'editiontbar',
-            tooltip: this.tooltipAddNewElement
+            tooltip: this.tooltipAddNewElement  
+        },{
+            ptype: "vw_featureeditor",
+            actionTarget: 'editiontbar',
+            featureManager : "featuremanager",
+            cls: "hiddenFeatureEditor"       
         }];
 
         Viewer.widgets.EditionToolbar.superclass.constructor.call(this, Ext.apply({
