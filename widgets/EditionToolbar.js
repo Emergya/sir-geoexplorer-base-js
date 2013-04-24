@@ -48,14 +48,16 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
         this.plugins = [{
             ptype: 'gxp_selectfeature',
             actionTarget: 'editiontbar',
-            tooltip: this.tooltipSelectFeature
+            tooltip: this.tooltipSelectFeature,
+            toggleGroup: "editionTools"
         },{
             ptype: 'gxp_addtagtomap',
             id: 'addtagtomap',
             actionTarget: 'editiontbar',
             addTagToMapTooltipText: this.tooltipAddTag,
             titlePrompt: "Añadir etiqueta",
-            promptText: "Inserte el texto de la etiqueta"
+            promptText: "Inserte el texto de la etiqueta",
+            toggleGroup: "editionTools"
         },{
         	ptype: 'gxp_addfeaturetomap',
         	id: 'addpointtomap',
@@ -63,7 +65,8 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
         	tooltip: this.tooltipAddPoint,
             iconCls: 'vw-icon-add-point',
             geometryTypes : ["Point"],
-            geometryHandler: OpenLayers.Handler.Point
+            geometryHandler: OpenLayers.Handler.Point,
+            toggleGroup: "editionTools"
         },{
         	ptype: 'gxp_addfeaturetomap',
         	id: 'addlinetomap',
@@ -71,7 +74,8 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
         	tooltip: this.tooltipAddLine,
             iconCls: 'vw-icon-add-line',            
             geometryTypes : ["Line", "Curve"],
-            geometryHandler: OpenLayers.Handler.Path
+            geometryHandler: OpenLayers.Handler.Path,
+            toggleGroup: "editionTools"
         },{
         	ptype: 'gxp_addfeaturetomap',
         	id: 'addpolygontomap',
@@ -79,15 +83,18 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
         	tooltip: this.tooltipAddPolygon,
             iconCls: 'vw-icon-add-polygon',             
             geometryTypes : ["Polygon", "Surface"],
-            geometryHandler: OpenLayers.Handler.Polygon
+            geometryHandler: OpenLayers.Handler.Polygon,
+            toggleGroup: "editionTools"
         },{
             ptype: 'gxp_createbuffer',
             actionTarget: 'editiontbar',
-            tooltip: this.tooltipAddBuffer
+            tooltip: this.tooltipAddBuffer,
+            toggleGroup: "editionTools"
         }, {
             ptype: 'gxp_newelementfromcoords',
             actionTarget: 'editiontbar',
-            tooltip: this.tooltipAddNewElement  
+            tooltip: this.tooltipAddNewElement,
+            toggleGroup: "editionTools"
         },{
             ptype: "vw_featureeditor",
             actionTarget: 'editiontbar',

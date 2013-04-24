@@ -56,6 +56,9 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
 	/** private: property[featuremanager]*/
     featureManager: "featuremanager",
 
+    /** public: property[toggleGroup]*/
+    toggleGroup: null,
+
     /** public: property[geometryHandler]
      * The OpenLayers.Handler sublclass that will handle feature creation.
      * Default value is OpenLayers.Handler.Point.
@@ -112,7 +115,18 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
             allowDepress: true,
             control: control,
             deactivateOnDisable: true,
-            map: this.target.mapPanel.map
+            map: this.target.mapPanel.map,
+            toggleGroup: this.toggleGroup,
+            listeners : {
+                toggle: function(button, pressed) {
+                    if (pressed) {
+                        control.activate();
+                    } else {
+                        control.deactivate();
+                    }
+                },
+                scope: this
+            }
 		}));
 
 		actions = gxp.plugins.AddFeatureToMap.superclass.addActions.apply(this, actions);

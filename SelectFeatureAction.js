@@ -79,6 +79,9 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
     /** private: property[selectedLayer]
      */
     selectedLayer: null,
+
+    /** public: property[toggleGroup] */
+    toggleGroup: null,
     
     /** private: method[constructor]
      */
@@ -106,6 +109,7 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
             iconCls: this.iconCls,
             tooltip: this.tooltip,
             enableToggle: true,
+            toggleGroup : this.toggleGroup,
             disabled: true,
             pressed: false,
             toggleHandler: function(action, state) {

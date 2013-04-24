@@ -54,6 +54,8 @@ gxp.plugins.AddTagToMap = Ext.extend(gxp.plugins.Tool, {
 
     layerRemoved: false,
 
+    toggleGroup : null,
+
 	/** i18n **/
 	addTagToMapTooltipText: "Add tag to map",
 	titlePrompt: "Write",
@@ -179,8 +181,18 @@ gxp.plugins.AddTagToMap = Ext.extend(gxp.plugins.Tool, {
     		control: control,
     		map: Viewer.getMapPanel().map,
     		enableToggle: true,
+    		toggleGroup : this.toggleGroup,
             pressed: false,
-            scope: this
+	         listeners : {
+	            toggle: function(button, pressed) {
+	                if (pressed) {
+	                    control.activate();
+	                } else {
+	                    control.deactivate();
+	                }
+	            },
+	            scope: this
+	        }
     	});
 	},
 

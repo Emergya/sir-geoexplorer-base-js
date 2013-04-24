@@ -70,6 +70,9 @@ gxp.plugins.CreateBufferAction = Ext.extend(gxp.plugins.Tool, {
     /** private: property[iconCls]
      */
     iconCls: 'vw-icon-buffer',
+
+    /** public: property[toggleGroup]*/
+    toggleGroup : null,
     
     /** private: method[constructor]
      */
@@ -93,6 +96,7 @@ gxp.plugins.CreateBufferAction = Ext.extend(gxp.plugins.Tool, {
             menuText: this.menuText,
             iconCls: this.iconCls,
             tooltip: this.tooltip,
+            toggleGroup : this.toggleGroup,
             handler: function(action, evt) {
 
                 var ds = Viewer.getComponent('NewBuffer');
