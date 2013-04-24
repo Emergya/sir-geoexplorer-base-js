@@ -230,7 +230,7 @@ Viewer.dialog.ChartWindow = Ext
                                 legend : {
                                     position : 'in'
                                 },
-                                title : "Monto Solicitado en sector"
+                                title : "Monto Invertido en sector:"
                             },
                             store : this._barStore,
                             columns : [
@@ -348,7 +348,7 @@ Viewer.dialog.ChartWindow = Ext
                                     width : small ? "70%" : "90%",
                                     height : small ? "70%" : "75%"
                                 },
-                                title : "Monto Solicitado en sector: " +
+                                title : "Monto Invertido en sector: " +
                                         formValues.sector + " - " +
                                         "Fuente: " + formValues.fuente +
                                         " - " + "Año: " + formValues.anyo +

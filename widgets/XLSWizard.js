@@ -79,15 +79,16 @@ Viewer.plugins.XLSWizard = Ext.extend(Ext.Window, {
     createLayerWaitMsgText: "Procesando archivo XLS. Por favor espere.",
     createLayerWaitMsgTitleText: "Procesando XLS",
     fieldNameEmptyText: 'Escriba un nombre para el campo (letras, números, . y _)',
-    projectionLabel: 'CRS: ',
-    coordinateXLabel: 'Coordenada X: ',
-    coordinateYLabel: 'Coordenada Y: ',
+    projectionLabel: 'CRS ',
+    coordinateXLabel: 'Coordenada X ',
+    coordinateYLabel: 'Coordenada Y ',
     layerTypeId: null,
     layerResourceId: null,
     columnNames: null,
     projection: null,
     columnX: null,
     columnY: null,
+    columsEmpty: '* Las columnas con cabecera vacía no serán importadas.',
     columnNamesStore: new Ext.data.ArrayStore({
         fields: [
            {name: 'column', type: 'String'},
@@ -235,6 +236,10 @@ Viewer.plugins.XLSWizard = Ext.extend(Ext.Window, {
                             displayField: "column", 
                             valueField: "column", 
                             fieldLabel: this.coordinateYLabel
+                        }, {
+                            xtype: 'label',
+                            cls: 'toolDescription',
+                            text: this.columsEmpty
                         }
                     ]
     			},{
@@ -356,8 +361,8 @@ Viewer.plugins.XLSWizard = Ext.extend(Ext.Window, {
                         		opacity: 1,
                         		visibility: true                            					
                         	});
-                        layer.metadata.layerResourceId = this.layerResourceId;
-                        layer.metadata.layerTypeId = this.layerTypeId;
+                        layer.metadata.layerResourceId = resp.data.layerResourceId;
+                        layer.metadata.layerTypeId = 4;
                         layer.metadata.temporal = true;
                         Viewer.getMapPanel().map.addLayer(layer);
                         this.close();
