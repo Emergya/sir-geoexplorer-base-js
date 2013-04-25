@@ -66,29 +66,31 @@ Viewer.plugins.XLSWizard = Ext.extend(Ext.Window, {
     step: 0,
 
     /** i18n **/
-    windowTitleText: "Crear nueva capa a partir de XLS",
-    fileEmptyText: "Seleccione un archivo XLS",
-    layerNameEmptyText: "Escriba un nombre para la capa",
-    projectionNameEmpty: "ID del Sistema de Referencia de Coordenadas",
-    buttonNextText: "Siguiente",
-    layerNameLabelText: "Nombre de la capa",
-    fileLabelText: "Achivo XLS",
-    chooseFileText: "Examinar...",
-    uploadWaitMsgText: "Enviando archivo. Por favor espere.",
-    waitTitleMsgText: "Subida de archivo",
-    createLayerWaitMsgText: "Procesando archivo XLS. Por favor espere.",
-    createLayerWaitMsgTitleText: "Procesando XLS",
-    fieldNameEmptyText: 'Escriba un nombre para el campo (letras, números, . y _)',
+    windowTitleText: "Create new layer from XLS",
+    fileEmptyText: "Select an XLS file",
+    layerNameEmptyText: "Type a name for the layer",
+    projectionNameEmpty: "Coordinate Reference System ID",
+    buttonNextText: "Next",
+    layerNameLabelText: "Layer's name",
+    fileLabelText: "XLS File",
+    chooseFileText: "Explore...",
+    uploadWaitMsgText: "Sending file. Please wait.",
+    waitTitleMsgText: "File Upload",
+    createLayerWaitMsgText: "XLS file processing. Please wait.",
+    createLayerWaitMsgTitleText: "XLS processing",
+    fieldNameEmptyText: 'Type a name for the field (letters, numbers and _)',
     projectionLabel: 'CRS ',
-    coordinateXLabel: 'Coordenada X ',
-    coordinateYLabel: 'Coordenada Y ',
+    coordinateXLabel: 'X coordinate',
+    coordinateYLabel: 'Y coordinate',
     layerTypeId: null,
     layerResourceId: null,
     columnNames: null,
     projection: null,
     columnX: null,
     columnY: null,
-    columsEmpty: '* Las columnas con cabecera vacía no serán importadas.',
+    columsEmpty: '* Columns with empty header will not be imported.',
+    descriptionTextXLS1: 'Enter the name for the new layer and select a XLS file to upload.',
+    descriptionTextXLS2: 'Select the reference system and the columns in which are stored the coordinates X and Y in the file.',
     columnNamesStore: new Ext.data.ArrayStore({
         fields: [
            {name: 'column', type: 'String'},
@@ -136,6 +138,11 @@ Viewer.plugins.XLSWizard = Ext.extend(Ext.Window, {
                         msgTarget: 'side'
     				},
                     items:[
+						{
+						    xtype: 'label',
+						    cls: 'toolDescription',
+						    text: this.descriptionTextXLS1
+						},
                         {
                         	xtype: 'textfield',
                         	id: 'name',
@@ -167,6 +174,11 @@ Viewer.plugins.XLSWizard = Ext.extend(Ext.Window, {
                         msgTarget: 'side'
     				},
                     items:[
+						{
+						    xtype: 'label',
+						    cls: 'toolDescription',
+						    text: this.descriptionTextXLS2
+						},
                         {
                         	//Codificación coordenadas
                         	xtype: 'combo',

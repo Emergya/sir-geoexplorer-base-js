@@ -49,6 +49,7 @@ GeoExt.Lang.add(
         uploadRasterText: "Subir un Raster...",
         uploadShapeText: "Subir archivo ZIP con SHP...",
         uploadXlsText: "Subir archivo XLS con coordenadas...",
+        uploadKmlImportText: "Subir archivo KML...",
         invalidWMSURLText: "Escriba una URL válida de un servidor WMS (p. ej. http://example.com/geoserver/wms)",
         addWMSLayerActionText: "Capas WMS...",
         temporaryLayerActionText: "Capa Temporal...",
@@ -136,10 +137,43 @@ GeoExt.Lang.add(
         notLoggedSaveText: "Necesitas logarte para activar esta opci\u00f3n"
     },
 
-    "Viewer.plugins.KMLUploadPanel.prototype": {
-        titleLabel: "Nombre",
-        titleEmptyText: "Nombre de la capa",
-        makePersistentText: "\u00bfDesea hacer persistente la capa KML '{0}'?"
+    "Viewer.plugins.KMLWizard.prototype": {
+    	windowTitleText: "Crear nueva capa a partir de KML",
+        fileEmptyText: "Seleccione un archivo KML",
+        layerNameEmptyText: "Escriba un nombre para la capa",
+        buttonNextText: "Siguiente",
+        layerNameLabelText: "Nombre de la capa",
+        fileLabelText: "Achivo KML",
+        chooseFileText: "Examinar...",
+        waitTitleMsgText: "Subida de archivo",
+        createLayerWaitMsgText: "Creando capa a partir del archivo KML. Por favor espere.",
+        createLayerWaitMsgTitleText: "Procesando KML",
+        fieldNameEmptyText: 'Escriba un nombre para el campo (letras, números, . y _)',
+    	descriptionTextKML: "Escriba el nombre para la nueva capa y seleccione un archivo KML para subir.",
+        descriptionTextXLS1: "Escriba el nombre para la nueva capa y seleccione un archivo XLS para subir.",
+        descriptionTextXLS2: "Seleccione el sistema de referencia y las columnas en las que se almacenan las coordenadas X e Y dentro del fichero.",
+    },
+    
+    "Viewer.plugins.XLSWizard.prototype": {
+    	windowTitleText: "Crear nueva capa a partir de XLS",
+        fileEmptyText: "Seleccione un archivo XLS",
+        layerNameEmptyText: "Escriba un nombre para la capa",
+        projectionNameEmpty: "ID del Sistema de Referencia de Coordenadas",
+        buttonNextText: "Siguiente",
+        layerNameLabelText: "Nombre de la capa",
+        fileLabelText: "Achivo XLS",
+        chooseFileText: "Examinar...",
+        uploadWaitMsgText: "Enviando archivo. Por favor espere.",
+        waitTitleMsgText: "Subida de archivo",
+        createLayerWaitMsgText: "Procesando archivo XLS. Por favor espere.",
+        createLayerWaitMsgTitleText: "Procesando XLS",
+        fieldNameEmptyText: 'Escriba un nombre para el campo (letras, números, . y _)',
+        projectionLabel: 'CRS ',
+        coordinateXLabel: 'Coordenada X ',
+        coordinateYLabel: 'Coordenada Y ',
+        columsEmpty: '* Las columnas con cabecera vacía no serán importadas.',
+        descriptionTextXLS1: "Escriba el nombre para la nueva capa y seleccione un archivo XLS para subir.",
+        descriptionTextXLS2: "Seleccione el sistema de referencia y las columnas en las que se almacenan las coordenadas X e Y dentro del fichero.",
     },
 
     "Viewer.plugins.RasterUploadPanel.prototype": {
