@@ -192,15 +192,26 @@ Viewer.widgets.PlanificationToolsLayersTree = Ext.extend(Ext.tree.TreePanel, {
             	ipt = [];
             	for(el in jsonObject){
             		if(!!jsonObject[el].id && !!jsonObject[el].type){
+
+                  instrType = jsonObject[el].type;
+                  //Special description
+                  if (instrType=='PRI'){
+                     instrType='Planos Reguladores Intercomunales (PRI)';
+                  }
+                 if (instrType=='PRC'){
+                     instrType='Planos Reguladores Comunales (PRC)';
+                  }
+
             			var item = new Ext.tree.TreeNode({
                             id: 'node-' + jsonObject[el].type,
-                            text: jsonObject[el].type,
+                            text: instrType,
                             leaf: false,
                             type: jsonObject[el].id.toString(),
                             expanded: true
                         });
             			this.itemsArray.push(item);
                 		this.root.appendChild(item);
+
             		}
             	}
             	this.reload();
