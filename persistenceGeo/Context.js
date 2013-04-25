@@ -496,8 +496,22 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
             },
 
             function(form, action) {
-                if(onFailure) {
-                    Ext.defer(onFailure, 0, eScope);
+                if(!!action
+                    && !!action.response
+                    && action.response.status == 200
+                    && action.response.statusText == 'OK'
+                    && !!action.response.responseText){
+                    /*
+                     * ON SUCCESS
+                     */
+                    var layer = this_.parseLayer(form, action);                
+                    if(onSuccess) {
+                        Ext.defer(onSuccess, 0, eScope, [layer]);
+                    }
+                }else{
+                    if(onFailure) {
+                        Ext.defer(onFailure, 0, eScope);
+                    }
                 }
             });
         } else if ( !! this.SAVE_MODES.USER == this.saveModeActive) {
