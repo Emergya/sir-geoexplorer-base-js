@@ -67,11 +67,16 @@ gxp.plugins.NewElementFromCoordsAction = Ext.extend(gxp.plugins.Tool, {
      *  Text for zoom action tooltip (i18n).
      */
     tooltip: 'Nuevo elemento',
+
+    /**
+     * public: property[featureManager]
+     */
+    featureManager: "featuremanager",
     
     /** private: property[iconCls]
      */
     iconCls: 'vw-icon-new-item-from-coords',
-    
+ 
     /** private: method[constructor]
      */
     constructor: function(config) {
@@ -85,7 +90,8 @@ gxp.plugins.NewElementFromCoordsAction = Ext.extend(gxp.plugins.Tool, {
         gxp.plugins.NewElementFromCoordsAction.superclass.init.apply(this, arguments);
         this.target.on('beforerender', this.addActions, this);
         window.app.on({
-            layerselectionchange: this.onLayerSelected,
+            layerselectionchange: this._enableOrDisable,
+            loginstatechange: this._enableOrDisable,
             scope: this
         });
     },
@@ -94,28 +100,20 @@ gxp.plugins.NewElementFromCoordsAction = Ext.extend(gxp.plugins.Tool, {
      */
     addActions: function() {
 
-        var selectedLayer = Viewer.getController('Layers').getSelectedLayer();
-        var disable = true;
-        try {
-            disable = selectedLayer.metadata.geometries.length == 0;
-        } catch(e) {
-        }
-
-        return gxp.plugins.NewElementFromCoordsAction.superclass.addActions.apply(this, [{
+        this.actions =  gxp.plugins.NewElementFromCoordsAction.superclass.addActions.apply(this, [{
             text: this.showButtonText ? this.buttonText : '',
             menuText: this.menuText,
             iconCls: this.iconCls,
             tooltip: this.tooltip,
-            disabled: disable,
-            handler: function(action, evt) {
+             handler: function(action, evt) {
 
                 var ds = Viewer.getComponent('NewElementFromCoords');
-                if (ds === undefined) {
+               if (ds === undefined) {
                     var mapPanel = Viewer.getMapPanel();
                     ds = new Viewer.dialog.NewElementFromCoords({
                         mapPanel: mapPanel,
                         map: mapPanel.map,
-                        activeLayer: Viewer.getController('Layers').getSelectedLayer()
+                        action: this
                     });
                     Viewer.registerComponent('NewElementFromCoords', ds);
                 }
@@ -126,29 +124,78 @@ gxp.plugins.NewElementFromCoordsAction = Ext.extend(gxp.plugins.Tool, {
                 }
             },
             scope: this
+            
         }]);
+
+        this._enableOrDisable();
+
+        return this.actions;
     },
 
-    onLayerSelected: function(layerRecord) {
 
-        var layer;
-        try {
-            layer = layerRecord.getLayer();
-        } catch (e) {
-            return;
-        }
+    /** private: method[getFeatureManager]
+     *  :returns: :class:`gxp.plugins.FeatureManager`
+     */
+     _enableOrDisable : function() {
+        var mgr = this.getFeatureManager();
+        var layerRecord = mgr.layerRecord;
 
-        var disable;
-        try {
-            disable = layer.metadata.geometries.length == 0;
-        } catch(e) {
-            disable = true;
-        }
 
-        for (var i=0, l=this.actions.length; i<l; i++) {
-            this.actions[i].setDisabled(disable);
+        var authIdLayer = null;
+        var authIdUser = null;
+        var isAdmin = null;
+        var layerId = null;
+        var isTemporal = null;
+        var layer = null;
+        // Institución de la capa
+        if(!!layerRecord && !!layerRecord.data && !!layerRecord.data.layer){
+            layer = layerRecord.data.layer;
+            if(layer.authId){
+                authIdLayer = layer.authId;
+            }
+
+            if(layer.layerID) {
+                layerId = layer.layerID;
+            }
+
+            if(layer.metadata && layer.metadata.temporal) {
+                isTemporal = true;
+            }
+        } 
+        // Institución del usuario
+        if(!!app && !!app.persistenceGeoContext 
+                && !!app.persistenceGeoContext.userInfo 
+                && !!app.persistenceGeoContext.userInfo.authorityId){
+            authIdUser = app.persistenceGeoContext.userInfo.authorityId;
+            isAdmin = app.persistenceGeoContext.userInfo.admin
         }
-    }
+        // Comprobamos si el usuario tiene permisos en la capa
+        if(layer && (isTemporal || layerId && (isAdmin || !!authIdUser && authIdLayer == authIdUser))){
+             this.actions[0].enable();
+        }else{
+            // Disable the edit options
+            this.actions[0].disable();
+
+            var ds = Viewer.getComponent('NewElementFromCoords');
+            if(ds && ds.isVisible()) {
+                ds.hide();
+            }
+        }
+    },
+
+    /** private: method[getFeatureManager]
+     *  :returns: :class:`gxp.plugins.FeatureManager`
+     */
+    getFeatureManager: function() {
+        var manager = this.target.tools[this.featureManager];
+        if (!manager) {
+            manager = window.app.tools[this.featureManager];
+            if(!manager){
+                throw new Error("Unable to access feature manager by id: " + this.featureManager);
+            }
+        }
+        return manager;
+    },
         
 });
 

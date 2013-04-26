@@ -514,6 +514,35 @@ GeoExt.Lang.add(
 
     "gxp.plugins.FeatureEditor.propertyEditor.prototype": {
         exceptionTitle: "Fallo al guardar"
+    },
+
+    "Ext.MessageBox" :{
+        buttonText: {
+            yes: "Sí",
+            no: "No",
+            cancel: "Cancelar",
+            ok: "Aceptar"
+        }
+    },
+
+    "Viewer.dialog.NewElementFromCoords.prototype" : {
+        addPointText: "Añadir Punto",
+        geometryLabels : {
+            "Point" : "Introduzca los puntos a añadir a la capa seleccionada:",
+            "Line": "Introduzca los vértices de la línea a añadir a la capa seleccionada:",
+            "Polygon" : "Introduzca los vértices del polígono a añadir a la capa seleccionada:"
+        },
+        latText: "Latitud",
+        lonText: "Longitud",
+        saveTitleText: '¿Guardar cambios en la capa?',
+        saveChangesText: "Guardar cambios",
+        discardChangesText: "Descartar cambios",
+        cancelText: "Cancelar",
+        saveMsgText: 'La capa activa tiene cambios sin guardar, ¿Desea guardarlos ahora?',
+        waitText: "Por favor, espere...",
+        saveErrorText: "Hubo un problema al guardar el nuevo elemento, pruebe de nuevo en unos instantes.",
+        saveSuccessText: "El nuevo elemento se añadió con éxito a la capa.",
+        removeText: "Eliminar"
     }
 
 });

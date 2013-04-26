@@ -49,7 +49,8 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
             ptype: 'gxp_selectfeature',
             actionTarget: 'editiontbar',
             tooltip: this.tooltipSelectFeature,
-            toggleGroup: "editionTools"
+            toggleGroup: "editionTools",
+            featureManager: "querymanager"
         },{
             ptype: 'gxp_addtagtomap',
             id: 'addtagtomap',
@@ -93,13 +94,12 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
         }, {
             ptype: 'gxp_newelementfromcoords',
             actionTarget: 'editiontbar',
-            tooltip: this.tooltipAddNewElement,
-            toggleGroup: "editionTools"
+            tooltip: this.tooltipAddNewElement
         },{
             ptype: "vw_featureeditor",
             actionTarget: 'editiontbar',
             featureManager : "featuremanager",
-            cls: "hiddenFeatureEditor"       
+            cls: "hiddenFeatureEditor"   
         }];
 
         Viewer.widgets.EditionToolbar.superclass.constructor.call(this, Ext.apply({

@@ -82,6 +82,22 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
 
     /** public: property[toggleGroup] */
     toggleGroup: null,
+
+    /** public: property[featureManager]*/
+    featureManager: "featuremanager",
+
+    /** private: property[featureLayer]
+     * Here we store the feature layer associated to the selected layer which we
+     * will use to select features.
+     */
+    featureLayer: null,
+
+    /**
+     * private: property[styleBackup]
+     * Used to store the initial style of the feature layer so we can restore it 
+     * when finishing a layer's selection.
+     */
+    styleBackup: null,
     
     /** private: method[constructor]
      */
@@ -101,7 +117,8 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
      */
     addActions: function() {
         var featureManager = this._getFeatureManager();
-        featureManager.on("layerchange", this._onLayerChange, this);
+        featureManager.on("layerchange", this._enableOrDisable, this);
+        app.on("loginstatechange", this._enableOrDisable,this);
 
         var actions = gxp.plugins.SelectFeatureAction.superclass.addActions.apply(this, [{
             text: this.showButtonText ? this.buttonText : '',
@@ -110,6 +127,7 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
             tooltip: this.tooltip,
             enableToggle: true,
             toggleGroup : this.toggleGroup,
+            deactivateOnDisable: true,
             disabled: true,
             pressed: false,
             toggleHandler: function(action, state) {
@@ -118,28 +136,92 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
                 Ext.select(".olMap").setStyle("cursor", state?"crosshair":"default");
                 Viewer.getController('Map').toggleSelectFeature(state);
 
+
+                if(state) {
+                    // The tool is added.
+                    this.styleBackup = this.featureLayer.styleMap;
+                    this.featureLayer.styleMap= new OpenLayers.StyleMap({
+                        extendBase: true
+                    });
+                    this.featureLayer.redraw();
+                } else {
+                   this._restoreStyles();
+                }
+
             },
             scope: this
         }]);
 
         this.toolAction = actions[0];
+
+        this._enableOrDisable();
+
         return actions;
     },
 
-     /** private: method[_onLayerChange]
-     *  :arg mgr: :class:`gxp.plugins.FeatureManager`
-     *  :arg layerRecord: ``GeoExt.data.LayerRecord``
-     *  :arg schema: ``GeoExt.data.AttributeStore``
-     */
-    _onLayerChange : function(mgr, layerRecord, schema) {
-        this.toolAction.setDisabled(!layerRecord);
+    _restoreStyles : function() {
+         this.featureLayer.styleMap= this.styleBackup;
+         this.featureLayer.redraw();
+    },
 
-        if(layerRecord) {
-            this.selectedLayer = layerRecord.getLayer();    
-        } else {
-            this.selectedLayer = null;
+   
+
+      /** private: method[_enableOrDisable]
+     */
+     _enableOrDisable : function() {
+        var mgr = this._getFeatureManager();
+        var layerRecord = mgr.layerRecord;
+
+        if(this.featureLayer) {
+            // We restore the styles if we change 
+            this._restoreStyles();
         }
         
+
+
+        var authIdLayer = null;
+        var authIdUser = null;
+        var isAdmin = null;
+        var layerId = null;
+        var isTemporal = null;
+        var layer = null;
+        // Institución de la capa
+        if(!!layerRecord && !!layerRecord.data && !!layerRecord.data.layer){
+            layer = layerRecord.data.layer;
+            if(layer.authId){
+                authIdLayer = layer.authId;
+            }
+
+            if(layer.layerID) {
+                layerId = layer.layerID;
+            }
+
+            if(layer.metadata && layer.metadata.temporal) {
+                isTemporal = true;
+            }
+        } 
+        // Institución del usuario
+        if(!!app && !!app.persistenceGeoContext 
+                && !!app.persistenceGeoContext.userInfo 
+                && !!app.persistenceGeoContext.userInfo.authorityId){
+            authIdUser = app.persistenceGeoContext.userInfo.authorityId;
+            isAdmin = app.persistenceGeoContext.userInfo.admin
+        }
+        // Comprobamos si el usuario tiene permisos en la capa
+        if(layer && (isTemporal || layerId && (isAdmin || !!authIdUser && authIdLayer == authIdUser))){
+
+            this.featureLayer = mgr.featureLayer;
+
+            this.actions[0].enable();
+        }else{
+            // Disable the edit options
+            this.actions[0].disable();
+
+            var ds = Viewer.getComponent('NewElementFromCoords');
+            if(ds && ds.isVisible()) {
+                ds.hide();
+            }
+        }
     },
 
      /** private: method[_getFeatureManager]
@@ -148,7 +230,7 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
      *  :arg schema: ``GeoExt.data.AttributeStore``
      */
     _getFeatureManager: function() {
-        var  manager = window.app.tools["featuremanager"];
+        var  manager = window.app.tools[this.featureManager];
         if(!manager){
             throw new Error("Unable to access feature manager by id: " + this.featureManager);
         }

@@ -139,7 +139,6 @@ gxp.plugins.ZoomToInitialValues = Ext.extend(gxp.plugins.Tool, {
         Ext.Ajax.request({
             url: app.defaultRestUrl +"/persistenceGeo/getUserZoneGeom/"+userInfo.id+"/"+this.target.mapPanel.map.projection,
             failure: function(response) {
-                console.debug("Error getting initial view bbox.")
                 this._initialViewBBox =null;
             },
             success: function(response) {
