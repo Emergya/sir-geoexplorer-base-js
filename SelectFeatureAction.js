@@ -160,8 +160,11 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
     },
 
     _restoreStyles : function() {
-         this.featureLayer.styleMap= this.styleBackup;
-         this.featureLayer.redraw();
+        if(this.styleBackup){
+            this.featureLayer.styleMap= this.styleBackup;
+            this.featureLayer.redraw();   
+        }
+         
     },
 
    

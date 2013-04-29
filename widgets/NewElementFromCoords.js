@@ -388,8 +388,7 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
     onCancelButtonClicked: function() {
         this.currentState = this.STATE_NONE;
         this.hide();
-        this.activeLayer.removeAllFeatures();
-        this.activeLayer.addFeatures(this.previousFeatures);
+        this.activeLayer.removeAllFeatures();        
     },
 
     onBeforeRender: function() {

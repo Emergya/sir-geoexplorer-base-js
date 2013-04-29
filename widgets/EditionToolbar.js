@@ -67,6 +67,7 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
             iconCls: 'vw-icon-add-point',
             geometryTypes : ["Point"],
             geometryHandler: OpenLayers.Handler.Point,
+            featureManager : "querymanager",
             toggleGroup: "editionTools"
         },{
         	ptype: 'gxp_addfeaturetomap',
@@ -76,6 +77,7 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
             iconCls: 'vw-icon-add-line',            
             geometryTypes : ["Line", "Curve"],
             geometryHandler: OpenLayers.Handler.Path,
+            featureManager : "querymanager",
             toggleGroup: "editionTools"
         },{
         	ptype: 'gxp_addfeaturetomap',
@@ -85,6 +87,7 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
             iconCls: 'vw-icon-add-polygon',             
             geometryTypes : ["Polygon", "Surface"],
             geometryHandler: OpenLayers.Handler.Polygon,
+            featureManager : "querymanager",
             toggleGroup: "editionTools"
         },{
             ptype: 'gxp_createbuffer',
@@ -98,8 +101,8 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
         },{
             ptype: "vw_featureeditor",
             actionTarget: 'editiontbar',
-            featureManager : "featuremanager",
-            cls: "hiddenFeatureEditor"   
+            featureManager : "querymanager",
+            cls: "hiddenFeatureEditor"
         }];
 
         Viewer.widgets.EditionToolbar.superclass.constructor.call(this, Ext.apply({
