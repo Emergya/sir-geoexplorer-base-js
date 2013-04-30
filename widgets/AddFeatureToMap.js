@@ -89,13 +89,13 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
 	addActions: function(){
 		var featureManager = this.getFeatureManager();
 		var featureLayer = featureManager.featureLayer;
-		featureManager.schemaCache = {};
-		featureManager = this.updateFeatureManager(featureManager);
+		//featureManager.schemaCache = {};
+		//featureManager = this.updateFeatureManager(featureManager);
 		var control = new OpenLayers.Control.DrawFeature(
 	            featureLayer,
-	            this.geometryHandler, 
-	            {
-	                eventListeners: {
+                this.geometryHandler, 
+	            {  
+                    eventListeners: {
 	                    featureadded: function(evt) {
 	                        if (this.autoLoadFeature === true) {
 	                            this.autoLoadedFeature = evt.feature;
@@ -230,7 +230,7 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
      *  :returns: :class:`gxp.plugins.FeatureManager`
      */
     updateFeatureManager: function(featureManager){
-    	var queryManager = this.getFeatureManager("querymanager");
+    	var queryManager = this.getFeatureManager();
     	featureManager.fetchSchema = queryManager.fetchSchema;
     	featureManager.getSchemaFromWMS = queryManager.getSchemaFromWMS;
     	featureManager.setFeatureStore = queryManager.setFeatureStore;
