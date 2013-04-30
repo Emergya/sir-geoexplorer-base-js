@@ -159,6 +159,18 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
         } catch(e) {}
     },
 
+    showLoadMask: function(show){
+        // if(show){
+        //     this.loadMask || (this.loadMask = new Ext.LoadMask(
+        //         this.getId(),
+        //         { msg: 'Buscando...' }
+        //     ));
+        //     this.loadMask.show();
+        // }else if(!!this.loadMask && !!this.loadMask.hide){
+        //     this.loadMask.hide();
+        // }
+    },
+
     onSearchButtonClicked: function(widget, evt) {
 
         for (var i=0, l=this.controller.queryDef.length; i<l; i++) {
@@ -167,11 +179,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
             item.value = field.getValue();
         }
 
-        this.loadMask || (this.loadMask = new Ext.LoadMask(
-            this.getId(),
-            { msg: 'Buscando...' }
-        ));
-        this.loadMask.show();
+        //this.showLoadMask(true);
 
         //TODO: HANDLE here this.controller.doRequest();
 
@@ -184,10 +192,11 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
         this.controller.layer.params['FILTER'] = xmlQueryAdapter.getWMSFilterParam();
         this.controller.layer.redraw();
 
-        this._manager.loadFeatures(ogcFilter, function (){  
+
+        this._manager.loadFeatures(ogcFilter, function (){
+            console.log("here2");  
             this.grid.setStore(this._manager.featureStore);
             this.showGrid(true);
-            this.loadMask.hide();
             this.btnZoomToResult.setDisabled(false);
             this.btnPrint.setDisabled(false);
         }, this);
@@ -206,16 +215,16 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                 expandContainer.ownerCt.collapse();
             }
         }
-        
+        this.showLoadMask(false);
     },
 
     onQueryLoaded: function(features) {
-        this.loadMask.hide();
+        this.showLoadMask(false);
         console.info('load', features);
     },
 
     onQueryLoadError: function(response) {
-        this.loadMask.hide();
+        this.showLoadMask(false);
         Ext.Msg.show({
             title: 'Error en la petición',
             msg: response.message,
