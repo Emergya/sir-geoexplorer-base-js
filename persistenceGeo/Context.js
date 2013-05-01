@@ -631,6 +631,30 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
 
 
         return layer;
+    },
+
+    /**
+     * api: method[isOwner]
+     * 
+     * Check if user logged is owner of a layer. 
+     * If the user is valid and admin, this method return always true.
+     */
+    isOwner: function(layer){
+        var isOwner = false; 
+        if(!!this.userInfo 
+            && this.userInfo.valid
+            && this.userInfo.admin){
+            isOwner = true;
+        }else if(this.saveModeActive == this.SAVE_MODES.USER
+            && !! this.userInfo && !! this.userInfo.id){
+            isOwner = layer.layerID && layer.userID && layer.userID = this.userInfo.id;
+        }else if(this.saveModeActive == this.SAVE_MODES.GROUP
+            && !! this.userInfo && !! this.userInfo.id){
+            isOwner = layer.layerID && layer.groupID && layer.groupID = this.userInfo.authorityId;
+        }else if(this.saveModeActive == this.SAVE_MODES.ANONYMOUS){
+            isOwner = layer.layerID && !layer.userID && !layer.groupID;
+        }
+        return isOwner;
     }
 
 });

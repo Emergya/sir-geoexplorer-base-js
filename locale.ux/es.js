@@ -543,6 +543,11 @@ GeoExt.Lang.add(
         saveErrorText: "Hubo un problema al guardar el nuevo elemento, pruebe de nuevo en unos instantes.",
         saveSuccessText: "El nuevo elemento se añadió con éxito a la capa.",
         removeText: "Eliminar"
+    },
+
+    "Viewer.plugins.WMSStylesDialogMod.prototype": {
+        updateDefaultStyleText: 'Guardar',
+        updateDefaultTip: 'Establece el estilo seleccionado como estilo por defecto al visualizar la capa'
     }
 
 });

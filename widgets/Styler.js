@@ -93,14 +93,15 @@ Viewer.plugins.Styler = Ext.extend(gxp.plugins.Styler, {
      *  Enable the launch action if the service is available.
      */
     enableActionIfAvailable: function(url) {
+        // ovewrite url with app.proxy
+        if(url.indexOf(app.proxy) < 0){
+            url = app.proxy + url;
+        }
         Ext.Ajax.request({
             method: "PUT",
             url: url,
             callback: function(options, success, response) {
-                // we expect a 405 error code here if we are dealing
-                // with GeoServer and have write access.
-                this.launchAction.setDisabled(response.status !== 405 
-                        && response.status !== 401); // 401 is proxy result not logged
+                this.launchAction.setDisabled(response.status !== 200); // 200 pproxy!!
             },
             scope: this
         });
@@ -120,7 +121,7 @@ Viewer.plugins.Styler = Ext.extend(gxp.plugins.Styler, {
         // TODO: Inheritance of target between WMSStyleDialog, RulePanel... PointSymbolizerMod
         Viewer.PointSymbolizerMod.prototype.defaultRestUrl = this.target.defaultRestUrl;
 
-        Ext.apply(config, gxp.WMSStylesDialog.createGeoServerStylerConfig(record));
+        Ext.apply(config, gxp.WMSStylesDialog.createGeoServerStylerConfig(record, null, this.target.persistenceGeoContext));
         if (this.rasterStyling === true) {
             config.plugins.push({
                 ptype: "gxp_wmsrasterstylesdialog"
