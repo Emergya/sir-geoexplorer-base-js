@@ -45,19 +45,20 @@ Viewer.widgets.InformationToolbar = Ext.extend(Ext.Toolbar, {
         this.plugins = [{
             ptype: 'gxp_defaultsearches',
             actionTarget: 'informationtbar',
-            tooltip: this.tooltipDefaultSearches
+            tooltip: this.tooltipDefaultSearches,
+            toggleGroup: 'globalToggle'
         },{
             ptype: 'gxp_measurelength',
             lengthMenuText: 'Medir longitud',
             lengthTooltip: this.tooltipLengthMeasure,
             actionTarget: 'informationtbar',
-            toggleGroup: 'measure'
+            toggleGroup: 'globalToggle'
         },{
             ptype: 'gxp_measurearea',
             areaMenuText: 'Medir área',
             areaTooltip: this.tooltipAreaMeasure,
             actionTarget: 'informationtbar',
-            toggleGroup: 'measure'
+            toggleGroup: 'globalToggle'
         },{
             ptype: "vw_queryform",
             featureManager: "querymanager",
@@ -70,7 +71,8 @@ Viewer.widgets.InformationToolbar = Ext.extend(Ext.Toolbar, {
         }, {
             ptype: 'gxp_pointinformation',
             actionTarget: 'informationtbar',
-            tooltip: this.tooltipPointInformation
+            tooltip: this.tooltipPointInformation,
+            toggleGroup: 'globalToggle'
         }
         // , {
         //     ptype: 'vw_wmsgetfeatureinfo',

@@ -73,6 +73,9 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
     /** private: property[iconCls]
      */
     iconCls: 'gxp-icon-print',
+
+    /** public: property[toggleGroup]*/
+    toggleGroup: null,
     
     /** private: method[constructor]
      */
@@ -96,7 +99,11 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
             buttonText: this.showButtonText ? this.buttonText : '',
             menuText: this.menuText,
             iconCls: this.iconCls,
-            tooltip: this.tooltip,            
+            tooltip: this.tooltip,       
+            enableToggle: true,
+            allowDepress: true,           
+            toggleGroup: this.toggleGroup,
+            deactivateOnDisable: true,     
             handler: function() {
                 var ds = Viewer.getComponent('PDFPrintWindow');
                 if (ds === undefined) {
@@ -120,6 +127,12 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                                 });
                                 Viewer.registerComponent('PDFPrintWindow', ds);
                                 ds.show();
+                                  ds.on("hide", function() {
+                                    // We deactivate the tool if we close the window.
+                                    if(this.actions[0].items[0].pressed){
+                                        this.actions[0].items[0].toggle();    
+                                    }
+                                },this);
                             },                           
 
                             printexception : function(printProvider, response) {
@@ -141,12 +154,21 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                     printProvider.loadCapabilities();
                 } else {
                     if (ds.isVisible()) {
-                    ds.hide();
+                        ds.hide();
                     } else {
                         ds.show();
                     }    
                 }
-            },            
+            }, 
+            listeners : {
+                toggle: function(button, pressed) {
+                    var ds = Viewer.getComponent('PDFPrintWindow');
+                    if (!pressed && ds) {
+                        ds.hide();
+                    } 
+                },
+                scope: this
+            },           
             scope: this
         }]);
     } 

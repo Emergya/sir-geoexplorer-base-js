@@ -71,6 +71,9 @@ gxp.plugins.PointInformationAction = Ext.extend(gxp.plugins.Tool, {
     /** private: property[iconCls]
      */
     iconCls: 'vw-icon-point-information',
+
+    /** public: property[toggleGroup]*/
+    toggleGroup: null,
     
     /** private: method[constructor]
      */
@@ -93,7 +96,11 @@ gxp.plugins.PointInformationAction = Ext.extend(gxp.plugins.Tool, {
             text: this.showButtonText ? this.buttonText : '',
             menuText: this.menuText,
             iconCls: this.iconCls,
-            tooltip: this.tooltip,
+            tooltip: this.tooltip,            
+            enableToggle: true,
+            allowDepress: true,           
+            toggleGroup: this.toggleGroup,
+            deactivateOnDisable: true,
             handler: function(action, evt) {
 
                 var ds = Viewer.getComponent('PointInformation');
@@ -107,14 +114,29 @@ gxp.plugins.PointInformationAction = Ext.extend(gxp.plugins.Tool, {
                         geoProjection: Viewer.GEO_PROJECTION,
                         utmProjection: Viewer.UTM_PROJECTION
                     });
+                    ds.on("hide", function() {
+                        // We deactivate the tool if we close the window.
+                        if(this.actions[0].items[0].pressed){
+                            this.actions[0].items[0].toggle();    
+                        }
+                    },this);
                     Viewer.registerComponent('PointInformation', ds);
                 }
-                if (ds.isVisible()) {
-                    ds.hide();
-                } else {
+                if (action.pressed) {
                     ds.show();
+                } else {                    
+                    ds.hide();
                 }
 
+            },
+            listeners : {
+                toggle: function(button, pressed) {
+                    var ds = Viewer.getComponent('PointInformation');
+                    if (!pressed && ds) {
+                        ds.hide();
+                    } 
+                },
+                scope: this
             },
             scope: this
         }]);

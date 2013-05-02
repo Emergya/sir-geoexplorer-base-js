@@ -111,12 +111,12 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
 			tooltip: this.tooltip,
             iconCls: this.iconCls,
             disabled: true,
-            enableToggle: true,
-            allowDepress: true,
             control: control,
-            deactivateOnDisable: true,
-            map: this.target.mapPanel.map,
+            enableToggle: true,
+            allowDepress: true,           
             toggleGroup: this.toggleGroup,
+            deactivateOnDisable: true,
+            map: this.target.mapPanel.map,            
             listeners : {
                 toggle: function(button, pressed) {
                     if (pressed) {

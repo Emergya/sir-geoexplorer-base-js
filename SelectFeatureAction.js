@@ -408,13 +408,7 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
         var mgr = this._getFeatureManager();
         var layerRecord = mgr.layerRecord;
 
-        if(this.featureLayer) {
-            // We restore the styles if we change 
-            this._restoreStyles();
-        }
         
-
-
         var authIdLayer = null;
         var authIdUser = null;
         var isAdmin = null;

@@ -27,15 +27,15 @@
  */
 
 Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
-	
-	/** i18n **/
-	tooltipSelectFeature: "Select Feature",
-	tooltipAddTag: "Add Tag to Map",
-	tooltipAddPoint: "Add Point to Map",
-	tooltipAddLine: "Add Line to Map",
-	tooltipAddPolygon: "Add Polygon to Map",
-	tooltipAddBuffer: "Create a new buffer",
-	tooltipAddNewElement: "Create a new element",
+
+    /** i18n **/
+    tooltipSelectFeature: "Select Feature",
+    tooltipAddTag: "Add Tag to Map",
+    tooltipAddPoint: "Add Point to Map",
+    tooltipAddLine: "Add Line to Map",
+    tooltipAddPolygon: "Add Polygon to Map",
+    tooltipAddBuffer: "Create a new buffer",
+    tooltipAddNewElement: "Create a new element",
 
     constructor: function(config) {
 
@@ -49,55 +49,56 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
             ptype: 'gxp_selectfeature',
             actionTarget: 'editiontbar',
             tooltip: this.tooltipSelectFeature,
-            toggleGroup: "editionTools",
+            toggleGroup: "globalToggle",
             featureManager: "querymanager"
-        },{
+        }, {
             ptype: 'gxp_addtagtomap',
             id: 'addtagtomap',
             actionTarget: 'editiontbar',
             addTagToMapTooltipText: this.tooltipAddTag,
             titlePrompt: "Añadir etiqueta",
             promptText: "Inserte el texto de la etiqueta",
-            toggleGroup: "editionTools"
-        },{
-        	ptype: 'gxp_addfeaturetomap',
-        	id: 'addpointtomap',
-        	actionTarget: 'editiontbar',
-        	tooltip: this.tooltipAddPoint,
+            toggleGroup: "globalToggle"
+        }, {
+            ptype: 'gxp_addfeaturetomap',
+            id: 'addpointtomap',
+            actionTarget: 'editiontbar',
+            tooltip: this.tooltipAddPoint,
             iconCls: 'vw-icon-add-point',
-            geometryTypes : ["Point"],
+            geometryTypes: ["Point"],
             geometryHandler: OpenLayers.Handler.Point,
-            featureManager : "featuremanager",
-            toggleGroup: "editionTools"
-        },{
-        	ptype: 'gxp_addfeaturetomap',
-        	id: 'addlinetomap',
-        	actionTarget: 'editiontbar',
-        	tooltip: this.tooltipAddLine,
-            iconCls: 'vw-icon-add-line',            
-            geometryTypes : ["Line", "Curve"],
+            featureManager: "featuremanager",
+            toggleGroup: "globalToggle"
+        }, {
+            ptype: 'gxp_addfeaturetomap',
+            id: 'addlinetomap',
+            actionTarget: 'editiontbar',
+            tooltip: this.tooltipAddLine,
+            iconCls: 'vw-icon-add-line',
+            geometryTypes: ["Line", "Curve"],
             geometryHandler: OpenLayers.Handler.Path,
-            featureManager : "featuremanager",
-            toggleGroup: "editionTools"
-        },{
-        	ptype: 'gxp_addfeaturetomap',
-        	id: 'addpolygontomap',
-        	actionTarget: 'editiontbar',
-        	tooltip: this.tooltipAddPolygon,
-            iconCls: 'vw-icon-add-polygon',             
-            geometryTypes : ["Polygon", "Surface"],
+            featureManager: "featuremanager",
+            toggleGroup: "globalToggle"
+        }, {
+            ptype: 'gxp_addfeaturetomap',
+            id: 'addpolygontomap',
+            actionTarget: 'editiontbar',
+            tooltip: this.tooltipAddPolygon,
+            iconCls: 'vw-icon-add-polygon',
+            geometryTypes: ["Polygon", "Surface"],
             geometryHandler: OpenLayers.Handler.Polygon,
-            featureManager : "featuremanager",
-            toggleGroup: "editionTools"
-        },{
+            featureManager: "featuremanager",
+            toggleGroup: "globalToggle"
+        }, {
             ptype: 'gxp_createbuffer',
             actionTarget: 'editiontbar',
             tooltip: this.tooltipAddBuffer,
-            toggleGroup: "editionTools"
+            toggleGroup: "globalToggle"
         }, {
             ptype: 'gxp_newelementfromcoords',
             actionTarget: 'editiontbar',
-            tooltip: this.tooltipAddNewElement
+            tooltip: this.tooltipAddNewElement,
+            toggleGroup: "globalToggle"
         }];
 
         Viewer.widgets.EditionToolbar.superclass.constructor.call(this, Ext.apply({
@@ -107,10 +108,10 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
     },
 
     /** private: method[getPluginById]*/
-    getPlugin: function(id_plugin){
+    getPlugin: function(id_plugin) {
         var plugin = null;
-        for(var i=0; i<this.plugins.length; i++){
-            if(this.plugins[i].id && this.plugins[i].id == id_plugin){
+        for (var i = 0; i < this.plugins.length; i++) {
+            if (this.plugins[i].id && this.plugins[i].id == id_plugin) {
                 plugin = this.plugins[i];
                 break;
             }
