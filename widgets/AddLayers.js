@@ -534,13 +534,22 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
 
         if(records.length == 1 && 
             records[0].getLayer() instanceof OpenLayers.Layer.Vector){
-            this.target.mapPanel.map.addLayer(records[0].getLayer());
-            this.layer = records[0].getLayer();
-            records[0].getLayer().events.register("loadend", this, this.onLoadEnd);
+            this.addVectorLayer(records, isUpload);
+        }else{
+            this.addWMSLayers(records, isUpload);
         }
 
         //Viewer.plugins.AddLayers.superclass.addLayers.call(this, records, isUpload);
 
+        
+    },
+
+    /** private: method[addWMSLayers]
+     *  :arg records: ``Array`` the layer records to add
+     *  :arg isUpload: ``Boolean`` Do the layers to add come from an upload?
+     *  Only adds WMS layers
+     */
+    addWMSLayers: function(records, isUpload) {
         var source = this.selectedSource;
         var layerStore = this.target.mapPanel.layers,
             extent, record, layer;
@@ -582,6 +591,17 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 this.target.tools[actionPlugin].addOutput(outputConfig);
             }
         }
+    },
+
+    /** private: method[addWMSLayers]
+     *  :arg records: ``Array`` the layer records to add
+     *  :arg isUpload: ``Boolean`` Do the layers to add come from an upload?
+     *  Only adds Vector layers without source paremeter
+     */
+    addVectorLayer: function(records, isUpload) {
+        this.target.mapPanel.map.addLayer(records[0].getLayer());
+        this.layer = records[0].getLayer();
+        records[0].getLayer().events.register("loadend", this, this.onLoadEnd);
     },
 
     /** api: method[onLoadEnd]
