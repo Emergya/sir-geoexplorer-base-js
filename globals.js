@@ -199,7 +199,8 @@ Ext.ns(
     Viewer.trackUrl = function(url) {
         Ext.Ajax.request({
             url: 'proxy/?url=http://localhost:8080/sir-ohiggins/stats/' + url,
-            method: 'GET'
+            method: 'POST',
+            disableCaching: false            
         });
     };
 
