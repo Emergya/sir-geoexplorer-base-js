@@ -99,7 +99,8 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
             actionTarget: 'editiontbar',
             tooltip: this.tooltipAddNewElement,
             toggleGroup: "globalToggle"
-        },
+        }
+        //},
         //      {
         //            ptype: 'gxp_adddatacolumn',
         //            actionTarget: 'editiontbar',
@@ -111,13 +112,8 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
         //            tooltip: this.tooltipDeleteColumn,
         //            toggleGroup: "editionTools"
         //    
-        //        }, 
-        { //add new button before. This tool MUST BE THE LAST ALWAYS
-            ptype: "vw_featureeditor",
-            actionTarget: 'editiontbar',
-            featureManager: "featuremanager",
-            cls: "hiddenFeatureEditor"
-        }];
+        //        }
+        ];
 
         Viewer.widgets.EditionToolbar.superclass.constructor.call(this, Ext.apply({
             id: 'editiontbar',
