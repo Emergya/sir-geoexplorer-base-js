@@ -97,7 +97,23 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
         }, {
             ptype: 'gxp_newelementfromcoords',
             actionTarget: 'editiontbar',
-            tooltip: this.tooltipAddNewElement
+            tooltip: this.tooltipAddNewElement,
+            toggleGroup: "editionTools"
+//        }, {
+//            ptype: 'gxp_adddatacolumn',
+//            actionTarget: 'editiontbar',
+//            tooltip: this.tooltipAddColumn,
+//            toggleGroup: "editionTools"
+//        }, {
+//            ptype: 'gxp_deletedatacolumn',
+//            actionTarget: 'editiontbar',
+//            tooltip: this.tooltipDeleteColumn,
+//            toggleGroup: "editionTools"
+        }, { //add new button before. This tool MUST BE THE LAST ALWAYS
+            ptype: "vw_featureeditor",
+            actionTarget: 'editiontbar',
+            featureManager : "featuremanager",
+            cls: "hiddenFeatureEditor"
         }];
 
         Viewer.widgets.EditionToolbar.superclass.constructor.call(this, Ext.apply({

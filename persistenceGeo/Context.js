@@ -647,10 +647,10 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
             isOwner = true;
         }else if(this.saveModeActive == this.SAVE_MODES.USER
             && !! this.userInfo && !! this.userInfo.id){
-            isOwner = layer.layerID && layer.userID && layer.userID = this.userInfo.id;
+            isOwner = layer.layerID && layer.userID && layer.userID == this.userInfo.id;
         }else if(this.saveModeActive == this.SAVE_MODES.GROUP
             && !! this.userInfo && !! this.userInfo.id){
-            isOwner = layer.layerID && layer.groupID && layer.groupID = this.userInfo.authorityId;
+            isOwner = layer.layerID && layer.groupID && layer.groupID == this.userInfo.authorityId;
         }else if(this.saveModeActive == this.SAVE_MODES.ANONYMOUS){
             isOwner = layer.layerID && !layer.userID && !layer.groupID;
         }

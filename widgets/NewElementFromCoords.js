@@ -429,7 +429,7 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
         });
 
         var padding = 'padding: 10px 16px;';
-        var border = 'border: 0px solid transparent;'
+        var border = 'border: 0px solid transparent;';
 
         var self= this;
         var c = {
