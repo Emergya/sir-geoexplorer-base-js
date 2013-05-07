@@ -55,6 +55,8 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
         "REGION": "Región"        
     },
 
+    errorText: "Ocurrió un error.",
+
     
     /** api: config[closest]
      *  ``Boolean`` Find the zoom level that most closely fits the specified
@@ -109,6 +111,14 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
             ignoreFields: ['the_geom'],
             height: 200
         });
+
+        this.grid.on("reconfigure", function(grid, store, colModel){
+
+            if(colModel.config && colModel.config.length) {
+                this.btnZoomToResult.setDisabled(false);
+                this.btnPrint.setDisabled(false);
+            }
+        },this);
 
         var layer = new OpenLayers.Layer.WMS(this.controller.title,
                 this.controller.wfsServiceUrl.replace('wfs', 'wms'), {
@@ -194,11 +204,9 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
 
 
         this._manager.loadFeatures(ogcFilter, function (){
-            console.log("here2");  
             this.grid.setStore(this._manager.featureStore);
             this.showGrid(true);
-            this.btnZoomToResult.setDisabled(false);
-            this.btnPrint.setDisabled(false);
+            
         }, this);
     },
 
@@ -365,7 +373,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                     },
                     {
                         type: "par",
-                        text: this.controller.title,
+                        text: this.controller.title.toUpperCase(),
                         x: 65,
                         y: 15,                       
                         newFont : {
@@ -377,9 +385,13 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
             footer: {
                 margin: 15,
                 items : [{
+                    text: (new Date()).format("d/m/Y"),
+                    keepPosition: true
+                },{
                     type: "html",
                     content: '<a href="http://sig.minenergia.cl/sig-minen">http://sig.minenergia.cl/sig-minen</a>',
-                    keepPosition:true
+                    keepPosition:true,
+                    x: pageWidth/2 - 30
                 },{
                     text: "Página %PAGE_NUMBER%",
                     align: "L",
@@ -387,6 +399,8 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                 }]
             }
         };
+
+
 
         Ext.MessageBox.wait("Por favor espere...");
 
@@ -404,6 +418,12 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                 // We should have get a json text here
 
                 var result = Ext.decode(response.responseText);
+                if(result.error) {
+                    console.log(result.error);
+                    Ext.MessageBox.updateProgress(1);
+                    Ext.MessageBox.hide();
+                    Ext.MessageBox.alert("", this.errorText)
+                }
 
                 // We can use localhost this way because of the proxy
                 app.downloadFile(url, {
@@ -481,9 +501,21 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
 
          
         //var content  = this._cratePDFTable(columns, data);
-        var content = this._createList(columns, data);
+        var content = this._createPDFList(columns, data);
         
 
+        // We add a summary at the end of the document.
+        content+="<p><b>Número de registros encontrados: </b>" +data.length+"</p>";
+
+        if(featureColumns.indexOf("POT_BR_MW")) {
+            var potBrut = data.reduce(function(acc, element){
+                return acc + (+element["POT_BR_MW"]);
+            }, 0);
+
+            content+= " <p><b>"+this.columnLabels["POT_BR_MW"]+ " Total: </b>"+ Ext.util.Format.number(potBrut,"0.000,00/i")+"</p>";
+        }
+
+       
         var items = [{
             type: "html",
             content: content,
@@ -491,10 +523,13 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                 size: 8
             }
         }];
+
+       
+
         return items;
     },
 
-    _createList : function(columns, data) {
+    _createPDFList : function(columns, data) {
 
         var bodyTemplate = new Ext.XTemplate(      
             '<li><dt><b>\{{values.firstCol.dataIndex}\}</b></dt>',
@@ -504,9 +539,11 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                         '<li><i>{headerLabel}</i>: \{{dataIndex}\}</li>',                                                   
                     '</tpl>',
                 '</ul>',
+                '<br>',
             '</dd></li>');
 
-        bodyTemplate = bodyTemplate.apply({firstCol :  columns[0], otherColumns: columns.slice(1)});
+        var otherColumns = columns.slice(1);
+        bodyTemplate = bodyTemplate.apply({firstCol :  columns[0], otherColumns: otherColumns});
         
         var html = new Ext.XTemplate(          
               '<ul style="margin-left:0">',     
