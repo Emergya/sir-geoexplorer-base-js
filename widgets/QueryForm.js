@@ -36,6 +36,8 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
      * Defaults false.
      */
     showMenuText: false,
+
+    resultCountText: "{0} results were found.",
     
     /** private: method[constructor]
      */
@@ -51,7 +53,20 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
         gxp.plugins.QueryForm.superclass.init.apply(this, arguments);
         target.on('beforerender', this.addActions, this);
     },
-    
+
+    /** api: method[addOutput]
+     */
+    addOutput : function(config) {
+        var form = Viewer.widgets.QueryForm.superclass.addOutput.call(this, config);
+        var queryButton = form.toolbars[0].items.items[2];
+        queryButton.on("click", function(){
+            // We only need to show the results count msg if the query form started the query.
+            this._queryFormQuery = true;
+         }, this);
+
+        return form;
+    },
+
     /** api: method[addActions]
      */
     addActions: function(actions) {
@@ -80,42 +95,51 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
                             this.target.tools[this.featureManager].loadFeatures();
                         }
                     }
+
+
                 },
                 scope: this
             }];
         }
-        if(!this.target.tools[this.featureManager]
+
+        var featureManager = this.target.tools[this.featureManager];
+
+        if(!featureManager
             && !!this.target.target
             && !!this.target.target.tools[this.featureManager]){
             var tmpTarget = this.target;
             this.target = this.target.target;
-            this.actions = gxp.plugins.QueryForm.superclass.addActions.apply(this, actions);
-            // support custom actions
-            if (this.actionTarget !== null && this.actions) {
-                this.target.tools[this.featureManager].on("layerchange", function(mgr, rec, schema) {
-                    //if(! schema){
-                        //TODO: Solo capas KML y WMS con varias 'LAYERS', desactiva la consulta
-                    //}
-                    for (var i=this.actions.length-1; i>=0; --i) {
-                        this.actions[i].setDisabled(!schema);
-                    }
-                }, this);
-            }
+            featureManager = this.target.tools[this.featureManager];
+            
+           
             //this.target = tmpTarget;
-        }else{
-            this.actions = gxp.plugins.QueryForm.superclass.addActions.apply(this, actions);
-            // support custom actions
-            if (this.actionTarget !== null && this.actions) {
-                this.target.tools[this.featureManager].on("layerchange", function(mgr, rec, schema) {
-                    //if(! schema){
-                        //TODO: Solo capas KML y WMS con varias 'LAYERS', desactiva la consulta
-                    //}
-                    for (var i=this.actions.length-1; i>=0; --i) {
-                        this.actions[i].setDisabled(!schema);
-                    }
-                }, this);
-            }
         }
+
+        this.actions = gxp.plugins.QueryForm.superclass.addActions.apply(this, actions);
+
+        // support custom actions
+        if (this.actionTarget !== null && this.actions) {
+            this.target.tools[this.featureManager].on("layerchange", function(mgr, rec, schema) {
+                //if(! schema){
+                    //TODO: Solo capas KML y WMS con varias 'LAYERS', desactiva la consulta
+                //}
+                for (var i=this.actions.length-1; i>=0; --i) {
+                    this.actions[i].setDisabled(!schema);
+                }
+            }, this);
+        }
+
+         
+
+        featureManager.on({           
+            "query": function(tool, store) {
+                if (this._queryFormQuery && store && store.getCount()) {
+                    this._queryFormQuery = false;                        
+                    Ext.Msg.alert("", this.resultCountText.replace("{0}",store.getCount()));                    
+                }
+            },
+            scope: this
+        });
         
     }
         

@@ -568,6 +568,12 @@ GeoExt.Lang.add(
             [OpenLayers.Filter.Comparison.LIKE, "similar a "],
             [OpenLayers.Filter.Comparison.BETWEEN, "entre"]
         ]
+    },
+
+    "Viewer.widgets.QueryForm.prototype" : {
+        resultCountText: "Se encontraron {0} resultados."
     }
+
+
 
 });
