@@ -44,14 +44,14 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
     // We define the translations of the column names into human readable names. If not present here, 
     // we will just take the column's name and lowercase it (except the first letter).
     columnLabels : {
-        "POT_BR_MW" : "Potencia Bruta (MW)" ,
+        "POT_BR_MW" : "Potencia Total (MW)" ,
         "N_UNIDADES" : "Nº Unidades",
         "RCA": "Resolución de Calificación Ambiental",
         "SISTE_ELEC": "Sistema Eléctrico",
-        "COMBUSTIBL": "Combustible",
-        "EMI_RCA": "Emisiones según R.C.A.",
+        "COMBUSTIBL": "Tipo de combustible",
+        "EMI_RCA": "Emisiones establecidas en RCA",
         "PROPIETARI" : "Propietario",
-        "CAUDAL_ECO": "Caudal Ecológico",
+        "CAUDAL_ECO": "Caudal Ecológico (m³/seg)",        
         "REGION": "Región"        
     },
 
