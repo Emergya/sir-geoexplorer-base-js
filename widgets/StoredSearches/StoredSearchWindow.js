@@ -389,9 +389,9 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                     keepPosition: true
                 },{
                     type: "html",
-                    content: '<a href="http://sig.minenergia.cl/sig-minen">http://sig.minenergia.cl/sig-minen</a>',
+                    content: '<a href="http://sig.minenergia.cl/sig-minen/moduloCartografico">http://sig.minenergia.cl/sig-minen/moduloCartografico</a>',
                     keepPosition:true,
-                    x: pageWidth/2 - 30
+                    x: pageWidth/2 - 47
                 },{
                     text: "Página %PAGE_NUMBER%",
                     align: "L",
