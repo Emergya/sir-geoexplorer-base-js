@@ -374,6 +374,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                     {
                         type: "par",
                         text: this.controller.title.toUpperCase(),
+                        align: "C",
                         x: 65,
                         y: 15,                       
                         newFont : {
