@@ -92,16 +92,19 @@ gxp.plugins.NewElementFromCoordsAction = Ext.extend(gxp.plugins.Tool, {
     init: function(target) {
         gxp.plugins.NewElementFromCoordsAction.superclass.init.apply(this, arguments);
         this.target.on('beforerender', this.addActions, this);
-        window.app.on({
-            layerselectionchange: this._enableOrDisable,
-            loginstatechange: this._enableOrDisable,
-            scope: this
-        });
+
     },
 
     /** api: method[addActions]
      */
     addActions: function() {
+        var featureManager = this.getFeatureManager();
+        featureManager.on("layerchange", this._enableOrDisable, this);
+        window.app.on({
+            layerselectionchange: this._enableOrDisable,
+            loginstatechange: this._enableOrDisable,
+            scope: this
+        });
 
         this.actions =  gxp.plugins.NewElementFromCoordsAction.superclass.addActions.apply(this, [{
             text: this.showButtonText ? this.buttonText : '',
@@ -170,7 +173,7 @@ gxp.plugins.NewElementFromCoordsAction = Ext.extend(gxp.plugins.Tool, {
         var isTemporal = null;
         var layer = null;
         // Institución de la capa
-        if(!!layerRecord && !!layerRecord.data && !!layerRecord.data.layer){
+        if(!!layerRecord && !!layerRecord.data && !!layerRecord.data.layer && !!layerRecord.data.layer.params){
             layer = layerRecord.data.layer;
             if(layer.authId){
                 authIdLayer = layer.authId;
@@ -193,7 +196,11 @@ gxp.plugins.NewElementFromCoordsAction = Ext.extend(gxp.plugins.Tool, {
         }
         // Comprobamos si el usuario tiene permisos en la capa
         if(layer && (isTemporal || layerId && (isAdmin || !!authIdUser && authIdLayer == authIdUser))){
-             this.actions[0].enable();
+             if(!mgr.schema || !mgr.geometryType){
+                 this.actions[0].disable();
+             } else {
+                 this.actions[0].enable();
+             }
         }else{
             // Disable the edit options
             this.actions[0].disable();

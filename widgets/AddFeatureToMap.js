@@ -84,6 +84,7 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
     init: function(target) {
         gxp.plugins.AddFeatureToMap.superclass.init.apply(this, arguments);   
         this.target.on('beforerender', this.addActions, this);
+
     },
     /** api: method[addActions] */
 	addActions: function(){
@@ -130,9 +131,14 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
 		}));
 
 		actions = gxp.plugins.AddFeatureToMap.superclass.addActions.apply(this, actions);
-		featureManager.on("layerchange", this._enableOrDisable, this);
-        app.on("loginstatechange", this._enableOrDisable,this);
-
+		
+        featureManager.on("layerchange", this._enableOrDisable, this);
+        window.app.on({
+            layerselectionchange: this._enableOrDisable,
+            loginstatechange: this._enableOrDisable,
+            scope: this
+        });
+        
         this._enableOrDisable();
 
 		return actions;
@@ -168,7 +174,7 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
         var isTemporal = null;
         var layer = null;
         // Institución de la capa
-        if(!!layerRecord && !!layerRecord.data && !!layerRecord.data.layer){
+        if(!!layerRecord && !!layerRecord.data && !!layerRecord.data.layer && !!layerRecord.data.layer.params){
             layer = layerRecord.data.layer;
             if(layer.authId){
                 authIdLayer = layer.authId;
@@ -192,24 +198,21 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
         // Comprobamos si el usuario tiene permisos en la capa
         if(layer && (isTemporal || layerId && (isAdmin || !!authIdUser && authIdLayer == authIdUser))){
             // There's a schema
-            if(!schema){
-                // Disable the edit options
+            if(!schema || !mgr.geometryType){
                 this.actions[0].disable();
+                return;
+            } 
+
+            if(mgr.geometryType.indexOf("Multi") != -1){
+                geometryType = mgr.geometryType.replace("Multi", "");
             }else{
-                // Feature Types
-                if(!!mgr.geometryType){
-                    if(mgr.geometryType.indexOf("Multi") != -1){
-                        geometryType = mgr.geometryType.replace("Multi", "");
-                    }else{
-                        geometryType = mgr.geometryType;
-                    }
-                    if(!!geometryType && this.geometryTypes.indexOf(geometryType)>=0){
-                        this.setActionControlLayer(mgr.featureLayer);
-                        this.actions[0].enable();
-                    }else{
-                        this.actions[0].disable();
-                    }
-                }
+                geometryType = mgr.geometryType;
+            }
+            if(!!geometryType && this.geometryTypes.indexOf(geometryType)>=0){
+                this.setActionControlLayer(mgr.featureLayer);
+                this.actions[0].enable();
+            }else{
+                this.actions[0].disable();
             }
         }else{
             // Disable the edit options

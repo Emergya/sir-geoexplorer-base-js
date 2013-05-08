@@ -572,8 +572,11 @@ GeoExt.Lang.add(
 
     "Viewer.widgets.QueryForm.prototype" : {
         resultCountText: "Se encontraron {0} resultados."
+    },
+
+    "gxp.plugins.SelectFeatureAction.prototype" : {
+        waitText: "Por favor espere...",
+        errorText: "Ocurrió un error, inténtelo de nuevo en unos instantes.",
     }
-
-
 
 });
