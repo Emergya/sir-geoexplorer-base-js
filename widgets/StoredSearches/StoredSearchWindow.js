@@ -368,7 +368,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                 items: [
                     {
                         type: "image",
-                        url: "http://localhost:9080/theme/app/img/logo_ministerio.png",
+                        url: "http://sig.minenergia.cl/sig-minen/moduloCartografico/theme/app/img/logo_ministerio.png",
                         height: 25
                     },
                     {
