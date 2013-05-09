@@ -120,6 +120,12 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
     init: function(target) {
         gxp.plugins.SelectFeatureAction.superclass.init.apply(this, arguments);
         this.target.on('beforerender', this.addActions, this);
+
+        // We add the events that will notify other tools about features added.
+        this.addEvents("selectionchanged");
+
+        // We make the tool avalaible
+        Viewer.registerComponent(this.id, this);
     },
 
     /** api: method[addActions]
@@ -146,6 +152,10 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
                 "style": style
             });
         Viewer.getMapPanel().map.addLayer(this.selectionLayer);
+
+        // We register events on the selection layer to launch our own event.
+        this.selectionLayer.events.register("featuresadded", this, this._fireSelectionChanged);
+        this.selectionLayer.events.register("featuresremoved", this, this._fireSelectionChanged);
 
 
         // We create a selection control for the temporal layer, so we can deselect features when we click the feature.
@@ -183,7 +193,7 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
                 mapCtr.toggleSelectFeature(state);
 
                 // We clean the selection layer every time we deactivate, activate or reactivate the tool.
-                this.selectionLayer.removeAllFeatures();
+                this.clearSelection();
 
 
                 if(state) {
@@ -207,6 +217,10 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
         this._enableOrDisable();
 
         return actions;
+    },
+
+    _fireSelectionChanged : function () {
+        this.fireEvent("selectionchanged", this, this.selectionLayer.features);
     },
 
      /** private: method[_onMapClicked]
@@ -323,7 +337,7 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
         var isTemporal = null;
         var layer = null;
         // Institución de la capa
-        if(!!layerRecord && !!layerRecord.data && !!layerRecord.data.layer && !!layerRecord.data.layer.params){
+        if(!!layerRecord && !!layerRecord.data && !!layerRecord.data.layer && layerRecord.data.layer.params && mgr.geometryType){
             layer = layerRecord.data.layer;
             if(layer.authId){
                 authIdLayer = layer.authId;
@@ -342,16 +356,21 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
                 && !!app.persistenceGeoContext.userInfo 
                 && !!app.persistenceGeoContext.userInfo.authorityId){
             authIdUser = app.persistenceGeoContext.userInfo.authorityId;
-            isAdmin = app.persistenceGeoContext.userInfo.admin
+            isAdmin = app.persistenceGeoContext.userInfo.admin;
         }
 
-        this.selectionLayer.removeAllFeatures();
+        this.clearSelection();
         // Comprobamos si el usuario tiene permisos en la capa
-        if(layer && (isTemporal || layerId && (isAdmin || !!authIdUser && authIdLayer == authIdUser))) {
-            this.actions[0].enable();
+        if(layer) {
+            this.toolAction.enable();
         }else{
+            // We need to manually deactivate if disabled, as it seems
+            // that the deactivateOnDisable property is not working here...
+            if( this.toolAction.items[0].pressed) {
+                this.toolAction.items[0].toggle();
+            }
             // Disable the edit options
-            this.actions[0].disable();
+            this.toolAction.disable();
         }
     },
 
@@ -367,6 +386,13 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
         }
         return manager;
     },
+
+    /** public: method[clearSelection] 
+     * Removes the current selection.
+     */
+    clearSelection : function() {
+        this.selectionLayer.removeAllFeatures();
+    }
         
 });
 

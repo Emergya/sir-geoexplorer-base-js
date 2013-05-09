@@ -577,6 +577,19 @@ GeoExt.Lang.add(
     "gxp.plugins.SelectFeatureAction.prototype" : {
         waitText: "Por favor espere...",
         errorText: "Ocurrió un error, inténtelo de nuevo en unos instantes.",
+    },
+
+    "gxp.plugins.DeleteSelectedFeaturesAction.prototype" : {
+        buttonText: 'Borrar elementos seleccionados',
+        menuText: 'Borrar elementos seleccionados',
+        tooltip: 'Borrar elementos seleccionados',
+        waitText: "Por favor, espere...",
+        errorText: "Ocurrió un error. Por favor vuelva a intentarlo en unos instantes.",
+
+        confirmQuestionText: "Los elementos seleccionados se eliminarán permanentemente. ¿Desea continuar?",
+        deleteText: "Borrar elementos",
+        cancelText: "No borrar",
+        successText: "Los elementos fueron borrados con éxito."
     }
 
 });
