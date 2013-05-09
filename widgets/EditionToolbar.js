@@ -36,6 +36,8 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
     tooltipAddPolygon: "Add Polygon to Map",
     tooltipAddBuffer: "Create a new buffer",
     tooltipAddNewElement: "Create a new element",
+    tooltipAddColumn: "Add new Column to selected layer",
+    tooltipDeleteColumn: "Delete column from selected layer",
 
     constructor: function(config) {
 
@@ -99,20 +101,18 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
             actionTarget: 'editiontbar',
             tooltip: this.tooltipAddNewElement,
             toggleGroup: "globalToggle"
+        }, {
+            ptype: 'gxp_adddatacolumn',
+            actionTarget: 'editiontbar',
+            tooltip: this.tooltipAddColumn,
+            toggleGroup: "editionTools"
+        }, {
+            ptype: 'gxp_deletedatacolumn',
+            actionTarget: 'editiontbar',
+            tooltip: this.tooltipDeleteColumn,
+            toggleGroup: "editionTools"
+        
         }
-        //},
-        //      {
-        //            ptype: 'gxp_adddatacolumn',
-        //            actionTarget: 'editiontbar',
-        //            tooltip: this.tooltipAddColumn,
-        //            toggleGroup: "editionTools"
-        //        }, {
-        //            ptype: 'gxp_deletedatacolumn',
-        //            actionTarget: 'editiontbar',
-        //            tooltip: this.tooltipDeleteColumn,
-        //            toggleGroup: "editionTools"
-        //    
-        //        }
         ];
 
         Viewer.widgets.EditionToolbar.superclass.constructor.call(this, Ext.apply({

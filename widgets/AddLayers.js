@@ -164,7 +164,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 scope: this
             }));
             items.push(new Ext.menu.Item({
-                iconCls: 'vw-icon-add-layer-wms',
+                iconCls: 'vw-icon-add-layer-shp',
                 text: this.uploadKmlImportText,
                 handler: this.uploadKmlHandler,
                 scope: this
