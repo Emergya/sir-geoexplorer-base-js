@@ -98,7 +98,7 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
             ptype: 'gxp_createbuffer',
             actionTarget: 'editiontbar',
             tooltip: this.tooltipAddBuffer,
-            toggleGroup: "globalToggle"
+            featureSelector: "featureselector"
         }, {
             ptype: 'gxp_newelementfromcoords',
             actionTarget: 'editiontbar',

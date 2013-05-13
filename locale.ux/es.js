@@ -590,6 +590,17 @@ GeoExt.Lang.add(
         deleteText: "Borrar elementos",
         cancelText: "No borrar",
         successText: "Los elementos fueron borrados con éxito."
+    },
+
+    "Viewer.dialog.CreateBuffer.prototype" : {
+        waitText: "Por favor, espere...",
+        errorText: "Se ha producido un error, inténtelo de nuevo en unos instantes.",
+        confirmCreateText: "Se creará una capa temporal con el buffer previsualizado. ¿Desea continuar?",
+        createBufferLayerText: "Crear capa con el buffer",
+        dontCreateBufferLayerText: "No crear capa",
+        bufferLayerCreatedText: "Se creó el buffer en la nueva capa '{0}' con éxito.",
+        invalidDistanceText : "La distancia tiene que ser mayor que 0 y menor que 10.000."
     }
+  
 
 });

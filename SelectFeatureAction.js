@@ -204,7 +204,7 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
                     this.selectionControl.initLayer(this.selectionLayer);
                     this.selectionControl.activate();
                 } else {
-                    mapCtr.mapPanel.map.events.unregister("click", this, this.noFeatureClick);
+                   mapCtr.mapPanel.map.events.unregister("click", this, this._onMapClicked);
                    this.selectionControl.deactivate();
                 }
 
