@@ -204,6 +204,8 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
                     this.selectionControl.initLayer(this.selectionLayer);
                     this.selectionControl.activate();
                 } else {
+
+                    this.clearSelection();
                    mapCtr.mapPanel.map.events.unregister("click", this, this._onMapClicked);
                    this.selectionControl.deactivate();
                 }
@@ -351,14 +353,7 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
                 isTemporal = true;
             }
         } 
-        // Institución del usuario
-        if(!!app && !!app.persistenceGeoContext 
-                && !!app.persistenceGeoContext.userInfo 
-                && !!app.persistenceGeoContext.userInfo.authorityId){
-            authIdUser = app.persistenceGeoContext.userInfo.authorityId;
-            isAdmin = app.persistenceGeoContext.userInfo.admin;
-        }
-
+   
         this.clearSelection();
         // Comprobamos si el usuario tiene permisos en la capa
         if(layer) {
@@ -392,6 +387,7 @@ gxp.plugins.SelectFeatureAction = Ext.extend(gxp.plugins.Tool, {
      */
     clearSelection : function() {
         this.selectionLayer.removeAllFeatures();
+        this._getFeatureManager().clearFeatures();
     }
         
 });

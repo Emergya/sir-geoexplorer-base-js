@@ -36,6 +36,7 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
     tooltipAddPolygon: "Add Polygon to Map",
     tooltipAddBuffer: "Create a new buffer",
     tooltipAddNewElement: "Create a new element",
+    tooltipModifyFeature: "Modify feature",
 
     constructor: function(config) {
 
@@ -45,14 +46,26 @@ Viewer.widgets.EditionToolbar = Ext.extend(Ext.Toolbar, {
         this.doAuthorized = window.app.doAuthorized;
         this.isAuthorized = window.app.isAuthorized;
 
-        this.plugins = [{
+        this.plugins = [ {
             ptype: 'gxp_selectfeature',
             id: "featureselector",
             actionTarget: 'editiontbar',
             tooltip: this.tooltipSelectFeature,
             toggleGroup: "globalToggle",
             featureManager: "featuremanager"
-        }, {
+       
+        },{
+            ptype : "vw_featureeditor",
+            modifyOnly : true,
+            tooltip: this.tooltipModifyFeature,
+            featureManager: "featuremanager",
+            actionTarget: 'editiontbar',
+            toggleGroup : "globalToggle",
+            supportAbstractGeometry: true,
+            supportNoGeometry: true,
+            autoLoadFeature: true,
+            showSelectedOnly : true
+        },{
             ptype: "gxp_deleteselectedfeatures",
             actionTarget: "editiontbar",
             featureManager: "featuremanager"

@@ -71,6 +71,10 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
      */    
     geometryTypes: ["Point"],
 
+    errorText: "An error has ocurred. Please try again.",
+
+    outputTarget: "map",
+
     /** private: method[constructor]*/
     constructor: function(config) {
           gxp.plugins.AddFeatureToMap.superclass.constructor
@@ -88,14 +92,17 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
     },
     /** api: method[addActions] */
 	addActions: function(){
+        var popup= null;
+
 		var featureManager = this.getFeatureManager();
 		var featureLayer = featureManager.featureLayer;
+        featureLayer.map = Viewer.getMapPanel().map;
 		//featureManager.schemaCache = {};
 		//featureManager = this.updateFeatureManager(featureManager);
 		var control = new OpenLayers.Control.DrawFeature(
 	            featureLayer,
                 this.geometryHandler, 
-	            {  
+	            {  map: Viewer.getMapPanel().map,
                     eventListeners: {
 	                    featureadded: function(evt) {
 	                        if (this.autoLoadFeature === true) {
@@ -106,9 +113,43 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
 	                }
 	            }
 	        );
-		control.setMap(Viewer.getMapPanel().map);
+
+        this.drawControl = control;
+
+         this.selectControl = new OpenLayers.Control.SelectFeature(featureLayer, {
+            clickout: false,
+            multipleKey: "fakeKey",
+            map: Viewer.getMapPanel().map,
+            eventListeners: {
+                "activate": function() {                
+                    featureManager.showLayer(
+                        this.id, this.showSelectedOnly && "selected"
+                    );
+                    this.selectControl.unselectAll(
+                        popup && popup.editing && {except: popup.feature}
+                    );
+                },
+                "deactivate": function() {
+                   if (popup) {
+                        if (popup.editing) {
+                            popup.on("cancelclose", function() {
+                                this.selectControl.activate();
+                            }, this, {single: true});
+                        }
+                        popup.on("close", function() {
+                            featureManager.hideLayer(this.id);
+                        }, this, {single: true});
+                        popup.close();
+                    } else {
+                        featureManager.hideLayer(this.id);
+                    }
+                },
+                scope: this
+            }
+        });
+
 		var actions = [];
-		actions.push(new GeoExt.Action({
+		actions.push(new Ext.Action({
 			tooltip: this.tooltip,
             iconCls: this.iconCls,
             disabled: true,
@@ -136,6 +177,205 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
         window.app.on({
             layerselectionchange: this._enableOrDisable,
             loginstatechange: this._enableOrDisable,
+            scope: this
+        });
+
+
+        featureManager.featureLayer.events.on({
+            "beforefeatureremoved": function(evt) {
+                if (this.popup && evt.feature === this.popup.feature) {
+                    this.selectControl.unselect(evt.feature);
+                }
+            },
+            "featureunselected": function(evt) {
+                var feature = evt.feature;
+                if (feature && feature.geometry && popup && !popup.hidden) {
+                    popup.close();
+                }
+            },
+            "beforefeatureselected": function(evt) {
+                //TODO decide if we want to allow feature selection while a
+                // feature is being edited. If so, we have to revisit the
+                // SelectFeature/ModifyFeature setup, because that would
+                // require to have the SelectFeature control *always*
+                // activated *after* the ModifyFeature control. Otherwise. we
+                // must not configure the ModifyFeature control in standalone
+                // mode, and use the SelectFeature control that comes with the
+                // ModifyFeature control instead.
+                if(popup) {
+                    return !popup.editing;
+                }
+            },
+            "featureselected": function(evt) {
+                var feature = evt.feature;
+                var featureStore = featureManager.featureStore;
+                if(this.selectControl.active && feature.geometry !== null) {
+                    // deactivate select control so no other features can be
+                    // selected until the popup is closed
+                   
+                    //this.selectControl.deactivate();
+                    // deactivate will hide the layer, so show it again
+                    featureManager.showLayer(this.id, false);
+                    
+                    popup = this.addOutput({
+                        xtype: "gxp_featureeditpopup",
+                        collapsible: false,
+                        feature: featureStore.getByFeature(feature),
+                        vertexRenderIntent: "vertex",
+                        readOnly: false,
+                        fields: null,
+                        excludeFields: null,
+                        editing: feature.state === OpenLayers.State.INSERT,
+                        schema: featureManager.schema,
+                        allowDelete: true,
+                        width: 200,
+                        height: 250
+                    });
+                    popup.on({
+                        "close": function() {
+                          
+                            this.drawControl.activate();
+                            this.selectControl.deactivate();
+                            this.selectControl.unselect(feature);
+                            featureManager.featureLayer.removeFeatures(feature);
+                        },
+                        "featuremodified": function(popup, feature) {
+                            featureStore.on({
+                                beforewrite: {
+                                    fn: function(store, action, rs, options) {
+                                        if (this.commitMessage === true) {
+                                            options.params.handle = this._commitMsg;
+                                            delete this._commitMsg;
+                                        }
+
+                                        
+                                    },
+                                    single: true
+                                },
+                                beforesave: {
+                                    fn: function() {
+                                        if (popup && popup.isVisible()) {
+                                            popup.disable();                                            
+                                        }
+                                        if (this.commitMessage === true) {
+                                            if (!this._commitMsg) {
+                                                var fn = arguments.callee;
+                                                Ext.Msg.show({
+                                                    prompt: true,
+                                                    title: this.commitTitle,
+                                                    msg: this.commitText,
+                                                    buttons: Ext.Msg.OK,
+                                                    fn: function(btn, text) {
+                                                        if (btn === 'ok') {
+                                                            this._commitMsg = text;
+                                                            featureStore.un('beforesave', fn, this);
+                                                            featureStore.save();
+                                                        }
+                                                    },
+                                                    scope: this,
+                                                    multiline: true
+                                                });
+                                                return false;
+                                            }
+                                        }
+                                    },
+                                    single: this.commitMessage !== true
+                                },
+                                write: {
+                                    fn: function() {
+                                        if (popup) {
+                                            if (popup.isVisible()) {
+                                                popup.enable();
+                                            }
+                                            if (this.closeOnSave) {
+                                                popup.close();
+                                            }
+
+                                            this.selectControl.unselect(feature);
+                                            featureManager.featureLayer.removeAllFeatures();
+                                        }
+                                    },
+                                    single: true
+                                },
+                                exception: {
+                                    fn: function(proxy, type, action, options, response, records) {
+                                        var msg = this.exceptionText;
+                                        if (type === "remote") {
+                                            // response is service exception
+                                            if (response.exceptionReport) {
+                                                msg = gxp.util.getOGCExceptionText(response.exceptionReport);
+                                            }
+                                        } else {
+                                            // non-200 response from server
+                                            msg = "Status: " + response.status;
+                                        }
+                                        // fire an event on the feature manager
+                                        featureManager.fireEvent("exception", featureManager, 
+                                            response.exceptionReport || {}, msg, records);
+                                        // only show dialog if there is no listener registered
+                                        if (featureManager.hasListener("exception") === false && 
+                                            featureStore.hasListener("exception") === false) {
+                                                Ext.Msg.show({
+                                                    title: this.exceptionTitle,
+                                                    msg: msg,
+                                                    icon: Ext.MessageBox.ERROR,
+                                                    buttons: {ok: true}
+                                                });
+                                        }
+                                        if (popup && popup.isVisible()) {
+                                            popup.enable();
+                                            popup.startEditing();
+                                        }
+                                    },
+                                    single: true
+                                },
+                                scope: this
+                            });                                
+                            if(feature.state === OpenLayers.State.DELETE) {
+                                /**
+                                 * If the feature state is delete, we need to
+                                 * remove it from the store (so it is collected
+                                 * in the store.removed list.  However, it should
+                                 * not be removed from the layer.  Until
+                                 * http://trac.geoext.org/ticket/141 is addressed
+                                 * we need to stop the store from removing the
+                                 * feature from the layer.
+                                 */
+                                featureStore._removing = true; // TODO: remove after http://trac.geoext.org/ticket/141
+                                featureStore.remove(featureStore.getRecordFromFeature(feature));
+                                delete featureStore._removing; // TODO: remove after http://trac.geoext.org/ticket/141
+                            }
+                            featureStore.save();
+                        },
+                        "canceledit": function(popup, feature) {
+                            featureStore.commitChanges();
+                        },
+                        scope: this
+                    });
+                    this.popup = popup;
+                }
+            },
+            "sketchcomplete": function(evt) {
+                // Why not register for featuresadded directly? We only want
+                // to handle features here that were just added by a
+                // DrawFeature control, and we need to make sure that our
+                // featuresadded handler is executed after any FeatureStore's,
+                // because otherwise our selectControl.select statement inside
+                // this handler would trigger a featureselected event before
+                // the feature row is added to a FeatureGrid. This, again,
+                // would result in the new feature not being shown as selected
+                // in the grid.
+                if(!this.drawControl.active) {
+                    // We are not drawing with this tool.
+                    return;
+                }
+                featureManager.featureLayer.events.register("featuresadded", this, function(evt) {
+                    featureManager.featureLayer.events.unregister("featuresadded", this, arguments.callee);
+                    this.drawControl.deactivate();
+                    this.selectControl.activate();
+                    this.selectControl.select(evt.features[0]);
+                });
+            },
             scope: this
         });
         
@@ -224,9 +464,8 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
      *  :arg layer: OpenLayers.Layer
      */
     setActionControlLayer: function(layer){
-    	if(this.actions.length > 0){
-    		this.actions[0].control.layer = layer;
-    	}
+        this.selectControl.layer = layer;
+        this.drawControl.layer = layer;
     },
     /** private: method[updateFeatureManager]
      *  :arg featureManager: :class:`gxp.plugins.FeatureManager`
