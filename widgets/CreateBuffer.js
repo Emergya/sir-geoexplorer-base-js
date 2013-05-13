@@ -258,8 +258,6 @@ Viewer.dialog.CreateBuffer = Ext.extend(Ext.Window, {
 
     _doPreviewBufferCreation: function() {
 
-        console.debug("Create preview!");
-
         var radius = this.distanceField.getValue();
         var units = this.radioGroup.getValue().getGroupValue();
 
@@ -269,7 +267,7 @@ Viewer.dialog.CreateBuffer = Ext.extend(Ext.Window, {
 
 
         if (radius == this._lastRadius && units == this._lastUnits) {
-            console.debug("Trying to repeat preview!");
+            // To prevent having to calculate already shown buffers.       
             return;
         }
 
