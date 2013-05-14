@@ -76,7 +76,11 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
     /** public: api[waitText] */
     waitText: "Please wait...",
 
+    /** public: api[outputTarget] */
     outputTarget: "map",
+
+    /** private: property[actionTool] */
+    actionTool : null,
 
     /** private: method[constructor]*/
     constructor: function(config) {
@@ -142,6 +146,7 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
                         popup.on("close", function() {
                             featureManager.hideLayer(this.id);
                         }, this, {single: true});
+                         popup.feature.state=null;
                         popup.close();
                     } else {
                         featureManager.hideLayer(this.id);
@@ -165,9 +170,10 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
             listeners : {
                 toggle: function(button, pressed) {
                     if (pressed) {
-                        control.activate();
+                        this.drawControl.activate();
                     } else {
-                        control.deactivate();
+                        this.drawControl.deactivate();
+                        this.selectControl.deactivate();
                     }
                 },
                 scope: this
@@ -175,6 +181,8 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
 		}));
 
 		actions = gxp.plugins.AddFeatureToMap.superclass.addActions.apply(this, actions);
+
+        this.actionTool = actions[0];
 		
         featureManager.on("layerchange", this._enableOrDisable, this);
         window.app.on({
@@ -193,6 +201,7 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
             "featureunselected": function(evt) {
                 var feature = evt.feature;
                 if (feature && feature.geometry && popup && !popup.hidden) {
+                    popup.feature.state=null;
                     popup.close();
                 }
             },
@@ -213,11 +222,7 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
                 var feature = evt.feature;
                 var featureStore = featureManager.featureStore;
                 if(this.selectControl.active && feature.geometry !== null) {
-                    // deactivate select control so no other features can be
-                    // selected until the popup is closed
-                   
-                    //this.selectControl.deactivate();
-                    // deactivate will hide the layer, so show it again
+                    
                     featureManager.showLayer(this.id, false);
                     
                     popup = this.addOutput({
@@ -236,11 +241,12 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
                     });
                     popup.on({
                         "close": function() {
-                          
-                            this.drawControl.activate();
+                            if(this.actionTool.items[0].pressed) {                             
+                                // We only start the drawing control if the tool is still selected.
+                                this.drawControl.activate();    
+                            }
+                            
                             this.selectControl.deactivate();
-                            this.selectControl.unselect(feature);
-                            featureManager.featureLayer.removeFeatures(feature);
                         },
                         "featuremodified": function(popup, feature) {
                             featureStore.on({
@@ -360,6 +366,7 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
                 }
                 featureManager.featureLayer.events.register("featuresadded", this, function(evt) {
                     featureManager.featureLayer.events.unregister("featuresadded", this, arguments.callee);
+
                     this.drawControl.deactivate();
                     this.selectControl.activate();
                     this.selectControl.select(evt.features[0]);
@@ -428,7 +435,11 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
         if(layer && (isTemporal || layerId && (isAdmin || !!authIdUser && authIdLayer == authIdUser))){
             // There's a schema
             if(!schema || !mgr.geometryType){
-                this.actions[0].disable();
+                // We need to manually toggle before disabling.
+                if(this.actionTool.items[0].pressed) {
+                    this.actionTool.items[0].toggle();
+                }
+                this.actionTool.disable();
                 return;
             } 
 
@@ -439,13 +450,23 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
             }
             if(!!geometryType && this.geometryTypes.indexOf(geometryType)>=0){
                 this.setActionControlLayer(mgr.featureLayer);
-                this.actions[0].enable();
+                this.actionTool.enable();
             }else{
-                this.actions[0].disable();
+                // We need to manually toggle before disabling.
+                if(this.actionTool.items[0].pressed) {
+                    this.actionTool.items[0].toggle();
+                }
+                this.actionTool.disable();
             }
         }else{
+        
+            // We need to manually toggle before disabling.
+            if(this.actionTool.items[0].pressed) {
+                this.actionTool.items[0].toggle();
+            }
+
             // Disable the edit options
-            this.actions[0].disable();
+            this.actionTool.disable();
         }
     },
 
@@ -471,12 +492,12 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
     },
 
     setHandler: function(multi){
-        this.actions[0].control.handler.destroy();
+        this.actionTool.control.handler.destroy();
 
         var handler = this.geometryHandler;
 
-        this.actions[0].control.handler = new handler(this.actions[0].control, this.actions[0].control.callbacks,
-                Ext.apply(this.actions[0].control.handlerOptions, {multi: multi}));
+        this.actionTool.control.handler = new handler(this.actionTool.control, this.actionTool.control.callbacks,
+                Ext.apply(this.actionTool.control.handlerOptions, {multi: multi}));
     }
 });
 
