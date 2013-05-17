@@ -1,5 +1,5 @@
 /*
- * Parser.js Copyright (C) 2012 This file is part of PersistenceGeo project
+ * LoginWindow.js Copyright (C) 2013 This file is part of PersistenceGeo project
  * 
  * This software is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,16 +25,16 @@
  */
 
 /** api: (define)
- *  module = PersistenceGeo
- *  class = Parser
+ *  module = PersistenceGeo.widgets
+ *  class = LoginWindow
  */
 Ext.namespace("PersistenceGeo.widgets");
 
 /**
- * Class: PersistenceGeo.Parser
+ * Class: PersistenceGeo.widgets.LoginWindow
  * 
- * The PArser is designed to parse data behind persistenceGeo 
- * library and a viewer
+ * Login window for persistence geo applications
+ * 
  */
 PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
 

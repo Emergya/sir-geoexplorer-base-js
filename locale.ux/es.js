@@ -656,6 +656,15 @@ GeoExt.Lang.add(
     "Viewer.plugins.FeatureEditorAction.prototype" : {
         errorText: "Ocurrió un error. Por favor pruebe de nuevo en unos instantes.",
         waitText: "Por favor, espere..."        
+    },
+
+    "PersistenceGeo.widgets.NewSourceDialog.prototype" : {
+        storeAndAddServerText: "Guardar",
+        storeAndAddServerTitleText: "A\u00F1ade el servidor y lo guarda para todos los usuarios de la plataforma",
+        addServerText: "A\u00F1adir",
+        addServerTitleText: "A\u00F1de el servidor para la sesi\u00f3n actual",
+        cancelTitleText: "Cierra la ventana sin a\u00F1adir el servidor",
+        sourceNameTitleText: "Nombre"
     }
 
 });

@@ -657,10 +657,63 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 data.push([id, source.title || id, source.url]);                
             }
         }
+
+        var target = this.target;
+        
         var sources = new Ext.data.ArrayStore({
             fields: ["id", "title", "url"],
             data: data
         });
+
+        //old init
+        this.initCapGridFromSourceAndData(data, sources, target);
+
+        //restore layer sources
+        var tmpSources = {};
+        Ext.Ajax.request ({ 
+            url: this.target.defaultRestUrl + '/persistenceGeo/loadAllSourceTools', 
+            method: 'POST',    
+            success: function(response) { 
+                var json = Ext.util.JSON.decode(response.responseText);
+                var sources2 = json.data;
+                for (var i = 0; i < json.results; i++) {
+                    source = sources2[i];
+                    tmpSources[source.url] = sources2[i];
+                    if (source.ptype == "gxp_wmscsource"
+                            && !!source.url && !!source.id) {
+                        this.target.addLayerSource({
+                            config: {url: source.url, name: source.name}, // assumes default of gx_wmssource
+                            callback: function(id) { 
+                                // add to combo and select
+                                var record = new sources.recordType({
+                                    id: id,
+                                    title: tmpSources[target.layerSources[id].url].name
+                                });
+                                sources.insert(0, [record]);
+                            },
+                            fallback: function(source, msg) {
+                                //TODO
+                                console.error("Error loading "+ msg);
+                            },
+                            scope: this
+                        });        
+                    }
+                }      
+            }, 
+            failure: function(response) { 
+                //TODO
+                console.error("Error loading sources!!");
+            },
+            scope: this 
+        });
+        
+    },
+
+    /**
+     * private: method[initCapGridFromSourceAndData]
+     * Constructs a window with a capabilities grid.
+     */
+    initCapGridFromSourceAndData: function(data, sources, target) {
 
         var expander = this.createExpander();
         
@@ -759,6 +812,8 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 scope: this
             }
         });
+
+        this.sourceComboBox = sourceComboBox;
         
         var capGridToolbar = null;
         if (this.target.proxy || data.length > 1) {
@@ -776,8 +831,9 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
         }
         
         var newSourceDialog = {
-            xtype: "gxp_newsourcedialog",
+            xtype: "pgeo_newsourcedialog",
             header: false,
+            target: this.target,
             invalidURLText: this.invalidWMSURLText,
             listeners: {
                 "hide": function(cmp) {
@@ -786,10 +842,11 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                     }
                 },
                 "urlselected": function(newSourceDialog, url) {
-                    newSourceDialog.setLoading();
+                    newSourceDialog.setLoading(); 
+
                     this.target.addLayerSource({
                         config: {url: url}, // assumes default of gx_wmssource
-                        callback: function(id) {
+                        callback: function(id) { 
                             // add to combo and select
                             var record = new sources.recordType({
                                 id: id,
