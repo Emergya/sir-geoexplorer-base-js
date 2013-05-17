@@ -308,14 +308,7 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
                     this.confirmUserInfo(userInfo);
                 }, 
                 failure: function(response) { 
-                    if(action.failureType == 'server'){
-                        obj = Ext.util.JSON.decode(response.responseText);
-     
-                        Ext.Msg.alert('Error en login', obj.errors.reason);
-                    }else{
-                        Ext.Msg.alert('¡Cuidado!', 'No se encuentra el servidor de autenticaci&oacute;n : ' + response.responseText);
-     
-                    }
+                    Ext.Msg.alert('¡Cuidado!', 'No se encuentra el servidor de autenticaci&oacute;n : ' + response.responseText);
                     this.cancelAuthentication();
                 },
                 scope: this 
