@@ -44,6 +44,10 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
     featureInfo: null,
     lastQueriedPoint: null,
 
+    numberFormat: "0.000,00/i",
+    linkTemplate : '<a href="{0}" target="_new" title="Click para abrir en nueva pestaña/ventana">{0}</a>',
+ 
+
     constructor: function(config) {
 
         this.layersWithInfo = {};
@@ -200,6 +204,21 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
 
             for (var i=0, ii=features.length; i<ii; ++i) {
                 var feature = features[i];
+              
+                // We set default custom renderers so we intercept urls and show'em as links.
+                var customRenderers = {};
+                var self = this;
+                for(var field in feature.attributes) {
+                    customRenderers[field] = function(value) {
+                        if(Ext.form.VTypes.url(value)) {
+                            return (new Ext.Template(self.linkTemplate).apply([value]));
+                        } else if (Ext.isNumber(+value)) {
+                            return Ext.util.Format.number(+value,self.numberFormat);
+                        }
+                        return value;
+                    }
+                }
+
                 config.push(Ext.apply({
                     xtype: 'gxp_editorgrid',
                     readOnly: true,
@@ -207,6 +226,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
                     feature: feature,
                     fields: fields,
                     propertyNames: propertyNames,
+                    customRenderers : customRenderers,
                     listeners: {
                         'beforeedit': function (e) {
                             return false;
@@ -316,7 +336,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
 				pack: 'start'
 			},
 			border: false,
-			padding: '10px 16px',
+			padding: '5px',
 			items: [{
 				xtype: 'form',
 				border: true,

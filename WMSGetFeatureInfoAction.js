@@ -72,8 +72,10 @@ Viewer.plugins.WMSGetFeatureInfoAction = Ext.extend(gxp.plugins.WMSGetFeatureInf
                 for (var i = 0, len = info.controls.length; i < len; i++){
                     var control = info.controls[i];
                     if (pressed) {
+                        Ext.select(".olMap").setStyle("cursor", "crosshair");
                         control.activate();
                     } else {
+                        Ext.select(".olMap").setStyle("cursor", "default");
                         control.deactivate();
                         this.featureInfoDialog.hide();
                     }

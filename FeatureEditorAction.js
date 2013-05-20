@@ -228,6 +228,7 @@ Viewer.plugins.FeatureEditorAction = Ext.extend(gxp.plugins.FeatureEditor, {
                 }
             },
             "featureselected": function(evt) {
+
                 var feature = evt.feature;
                 if (feature) {
                     this.fireEvent("featureeditable", this, feature, true);
@@ -258,7 +259,7 @@ Viewer.plugins.FeatureEditorAction = Ext.extend(gxp.plugins.FeatureEditor, {
                     });
                     popup.on({
                         "close": function() {
-                            if (this.readOnly === false) {
+                            if (this.readOnly === false && this.drawControl.active) {
                                this.selectControl.activate();
                             }
                             if(feature.layer && feature.layer.selectedFeatures.indexOf(feature) !== -1) {
