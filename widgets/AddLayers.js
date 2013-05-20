@@ -79,6 +79,13 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
     tempLayerCreateButtonText: "Create",
     tempLayerCancelButtonText: "Cancel",
     tempLayerDescriptionText: "Create a temporary layer of selected geometry type",
+
+    /** Remove parameters **/
+    removeText: "Remove",
+    removeTitleText: "Remove source permanently",
+    removeSourceWindowTitleText: "Remove source",
+    removeSourceWindowText: "Remove Source '{0}' ({1}) removed permanently?",
+    verboseRemove: true,
     
     uploadShpWindow: null,
     uploadXlsWindow: null,
@@ -146,16 +153,16 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             }
             
             items.push(new Ext.menu.Item({
-            	iconCls: 'vw-icon-add-layer-shp',
-            	text: this.uploadShapeText,
-            	handler: this.uploadShapeHandler,
-            	scope: this
+                iconCls: 'vw-icon-add-layer-shp',
+                text: this.uploadShapeText,
+                handler: this.uploadShapeHandler,
+                scope: this
             }));
             items.push(new Ext.menu.Item({
                 iconCls: 'vw-icon-add-layer-shp',
                 text: this.uploadXlsText,
                 handler: this.uploadXlsHandler,
-            	scope: this
+                scope: this
             }));
             items.push(new Ext.menu.Item({
                 iconCls: 'gxp-icon-filebrowse',
@@ -227,20 +234,20 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
      * api: method[uploadShapeHandler]
      */
     uploadShapeHandler: function() {
-    	if (!this.uploadShpWindow) {
-    		this.uploadShpWindow = new Viewer.plugins.ShpWizard();
-    		this.uploadShpWindow.on({
-    			'close': {
-    				fn: function() {
-    					this.uploadShpWindow = null;    					
-    				},
-    				scope: this
-    			}
-    		});
+        if (!this.uploadShpWindow) {
+            this.uploadShpWindow = new Viewer.plugins.ShpWizard();
+            this.uploadShpWindow.on({
+                'close': {
+                    fn: function() {
+                        this.uploadShpWindow = null;                        
+                    },
+                    scope: this
+                }
+            });
 
-    	}
-    	this.uploadShpWindow.show();
-    	
+        }
+        this.uploadShpWindow.show();
+        
     },
      /**
      * api: method[uploadXlsHandler]
@@ -664,6 +671,11 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             fields: ["id", "title", "url"],
             data: data
         });
+        
+        this.storedSources = new Ext.data.ArrayStore({
+            fields: ["id", "title", "url"],
+            data: []
+        });
 
         //old init
         this.initCapGridFromSourceAndData(data, sources, target);
@@ -681,6 +693,12 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                     tmpSources[source.url] = sources2[i];
                     if (source.ptype == "gxp_wmscsource"
                             && !!source.url && !!source.id) {
+                        var storedRecord = new sources.recordType({
+                            id: source.id,
+                            title: source.name,
+                            url: source.url
+                        });
+                        this.storedSources.insert(0, [storedRecord]);
                         this.target.addLayerSource({
                             config: {url: source.url, name: source.name}, // assumes default of gx_wmssource
                             callback: function(id) { 
@@ -769,6 +787,8 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 scope: this
             }
         });
+
+        this.capGridPanel = capGridPanel;
         
         var sourceComboBox = new Ext.form.ComboBox({
             ref: "../sourceComboBox",
@@ -784,26 +804,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             mode: "local",
             value: data[idx][0],
             listeners: {
-                select: function(combo, record, index) {
-                    var id = record.get("id");
-                    if (id === this.addServerId) {
-                        showNewSourceDialog();
-                        sourceComboBox.reset();
-                        return;
-                    }
-                    var source = this.target.layerSources[id];
-                    capGridPanel.reconfigure(source.store, capGridPanel.getColumnModel());
-                    // TODO: remove the following when this Ext issue is addressed
-                    // http://www.extjs.com/forum/showthread.php?100345-GridPanel-reconfigure-should-refocus-view-to-correct-scroller-height&p=471843
-                    capGridPanel.getView().focusRow(0);
-                    this.setSelectedSource(source);
-                    // blur the combo box
-                    //TODO Investigate if there is a more elegant way to do this.
-                    (function() {
-                        combo.triggerBlur();
-                        combo.el.blur();
-                    }).defer(100);
-                },
+                select: this.defaultSourceComboSelect,
                 focus: function(field) {
                     if (target.proxy) {
                         field.reset();
@@ -835,6 +836,16 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             header: false,
             target: this.target,
             invalidURLText: this.invalidWMSURLText,
+            storedSources: this.storedSources,
+            onUrlSaved: function (source){
+                var storedRecord = new this.storedSources.recordType({
+                    id: source.id,
+                    title: source.name,
+                    url: source.url
+                });
+                this.storedSources.insert(0, [storedRecord]);
+                this.hide();
+            },
             listeners: {
                 "hide": function(cmp) {
                     if (!this.outputTarget) {
@@ -867,19 +878,12 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 scope: this
             }
         };
+
+        this.newSourceDialog = newSourceDialog;
+
         var me = this;
         function showNewSourceDialog() {
-            if (me.outputTarget) {
-                me.addOutput(newSourceDialog);
-            } else {
-                new Ext.Window({
-                    title: gxp.NewSourceDialog.prototype.title,
-                    modal: true,
-                    hideBorders: true,
-                    width: 300,
-                    items: newSourceDialog
-                }).show();
-            }
+            me.showNewSourceDialog();
         }        
         
         
@@ -944,31 +948,154 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
         
     },
 
-    createBbarItems: function(capGridPanel, filters, addLayers){
+    showNewSourceDialog: function() {
+        if (this.outputTarget) {
+            this.addOutput(this.newSourceDialog);
+        } else {
+            new Ext.Window({
+                title: gxp.NewSourceDialog.prototype.title,
+                modal: true,
+                hideBorders: true,
+                width: 300,
+                items: this.newSourceDialog
+            }).show();
+        }
+    },        
 
-        return ["->",
-            new Ext.Button({
-                text: this.onlyCompatibleText,
-                iconCls: "gxp-icon-filter",
-                enableToggle: true,
-                handler: function(button, state){
-                    this.filterCapaGrid(button, state, capGridPanel, filters);
-                },
-                scope : this
-            }),
-            new Ext.Button({
-                text: this.addButtonText,
-                iconCls: "gxp-icon-addlayers",
-                handler: addLayers,
-                scope : this
-            }),
-            new Ext.Button({
-                text: this.doneText,
+    defaultSourceComboSelect: function(combo, record, index) {
+        var id = record.get("id");
+        if (id === this.addServerId) {
+            this.showNewSourceDialog();
+           this.sourceComboBox.reset();
+            return;
+        }
+        var source = this.target.layerSources[id];
+        this.capGridPanel.reconfigure(source.store, this.capGridPanel.getColumnModel());
+        // TODO: remove the following when this Ext issue is addressed
+        // http://www.extjs.com/forum/showthread.php?100345-GridPanel-reconfigure-should-refocus-view-to-correct-scroller-height&p=471843
+        this.capGridPanel.getView().focusRow(0);
+        this.setSelectedSource(source);
+        // blur the combo box
+        //TODO Investigate if there is a more elegant way to do this.
+        (function() {
+            combo.triggerBlur();
+            combo.el.blur();
+        }).defer(100);
+    },
+
+    createBbarItems: function(capGridPanel, filters, addLayers){
+        var defaultBbar = ["->",
+                new Ext.Button({
+                    text: this.onlyCompatibleText,
+                    iconCls: "gxp-icon-filter",
+                    enableToggle: true,
+                    handler: function(button, state){
+                        this.filterCapaGrid(button, state, capGridPanel, filters);
+                    },
+                    scope : this
+                }),
+                new Ext.Button({
+                    text: this.addButtonText,
+                    iconCls: "gxp-icon-addlayers",
+                    handler: addLayers,
+                    scope : this
+                }),
+                new Ext.Button({
+                    text: this.doneText,
+                    handler: function() {
+                        this.capGrid.hide();
+                    },
+                    scope: this
+                })];
+        var isAuthorized = this.target.isAuthorizedIn("ROLE_ADMINISTRATOR");
+        if(isAuthorized ){
+            defaultBbar.push(this.obtainAdminBbar());
+            return defaultBbar;
+        }else{
+            return defaultBbar;
+        }
+    },
+
+    /**
+     * Method:[obtainAdminBbar]
+     * 
+     * Obtain extra buttons for admin user logged
+     **/
+    obtainAdminBbar: function(){
+        var items = new Array();
+        if(!!this.storedSources
+            && !!this.storedSources.data){
+
+            var deleteButton = new Ext.Button({
+                text: this.removeText,
+                title: this.removeTitleText,
+                disabled: true,
                 handler: function() {
-                    this.capGrid.hide();
+                    var id = this._deleteButtonConfig.id, name = this._deleteButtonConfig.name;
+                    if(this.verboseRemove){
+                        Ext.Msg.confirm(this.removeSourceWindowTitleText, String.format(this.removeSourceWindowText, name, id), this.removeLayerSourceConfirm, this);
+                    }else{
+                        this.removeLayerSource(id);
+                    }
                 },
                 scope: this
-            })];
+            });
+            this.sourceComboBox.addListener('select', function(combo, record, index) {
+                var id = null;
+                var name = null;
+                var url = null;
+                var wmsSourceId = record.get('id');
+                storedSourceSelected = null;
+                for(var i = 0; i< this.storedSources.data.length; i++){
+                    if(this.selectedSource.url == this.storedSources.data.get(i).get('url')){
+                        id = this.storedSources.data.get(i).get('id');
+                        name = this.storedSources.data.get(i).get('title');
+                        url = this.storedSources.data.get(i).get('url');
+                        storedSourceSelected = this.storedSources.data.get(i);
+                        break;
+                    }  
+                }
+                this._deleteButtonConfig = {
+                    id: id,
+                    name: name,
+                    url: url, 
+                    wmsSourceId: wmsSourceId, 
+                    deleteableRecord: record,
+                    storedSourceSelected: storedSourceSelected
+                };
+                if(!!id && !!name){
+                    deleteButton.setDisabled(false);
+                }else{
+                    deleteButton.setDisabled(true);
+                }
+                //this.defaultSourceComboSelect(combo, record, index);
+            }, this);
+            items.push(deleteButton)
+        }
+        return items;
+    },
+
+    removeLayerSourceConfirm: function (btn){
+        if(btn == 'yes'){
+            this.removeLayerSource(this._deleteButtonConfig.id);
+        }
+    },
+
+    removeLayerSource: function(id){
+        Ext.Ajax.request ({ 
+            url: this.target.defaultRestUrl + '/persistenceGeo/deleteSourceTool/' + id, 
+            method: 'POST',    
+            success: function(response) {
+                this.sourceComboBox.store.remove(this._deleteButtonConfig.deleteableRecord);
+                this.storedSources.remove(this._deleteButtonConfig.storedSourceSelected);
+                this.sourceComboBox.onSelect(this.sourceComboBox.store.getAt(0), 0);
+            }, 
+            failure: function(response) { 
+                //TODO
+                console.error("Error removing source!!");
+            },
+            scope: this 
+        });
     },
 
     filterCapaGrid: function (button, state, capGridPanel, filters){
@@ -1088,7 +1215,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             }]
         });
         win.show();
-	},
+    },
 
     createTemporaryLayer: function() {
 

@@ -415,7 +415,9 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
         this.target.persistenceGeoContext.activeStore = true;
         this.target.persistenceGeoContext.scope = this;
         this.target.persistenceGeoContext.saveModeActive = this.target.persistenceGeoContext.SAVE_MODES.GROUP;
-        this.target.persistenceGeoContext.load();
+        this.target.persistenceGeoContext.load();  
+        // We send an event to inform listeners that we have logged a user.
+        this.target.fireEvent("loginstatechange", this.target, this.userInfo);
     },
 
     /**

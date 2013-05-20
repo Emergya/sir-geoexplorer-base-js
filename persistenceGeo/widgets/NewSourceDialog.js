@@ -53,7 +53,7 @@ PersistenceGeo.widgets.NewSourceDialog = Ext.extend(gxp.NewSourceDialog,{
      */
     initComponent: function() {
 
-        this.addEvents("urlselected");
+        this.addEvents("urlselected","urlsaved");
 
         this.urlTextField = new Ext.form.TextField({
             fieldLabel: "URL",
@@ -175,6 +175,17 @@ PersistenceGeo.widgets.NewSourceDialog = Ext.extend(gxp.NewSourceDialog,{
             this.addSource(url, this.hide, failure, this);
         }, this);
 
+
+        this.on("urlsaved", this.onUrlSaved, this);
+
+    },
+
+    /** API: method[onUrlSaved]
+     * 
+     * Saved server callback
+     */
+    onUrlSaved: function(source){
+        console.log("Saved "+ source.url + "!");
     },
      
     /** private: method[storeAndAddServer]
@@ -208,7 +219,7 @@ PersistenceGeo.widgets.NewSourceDialog = Ext.extend(gxp.NewSourceDialog,{
                 success: function(response) { 
                     var json = Ext.util.JSON.decode(response.responseText);
                     var source = json.data;
-                    console.log("Saved "+ source.url + "!");
+                    this.fireEvent("urlsaved", source, this);
                 }, 
                 failure: function(response) { 
                     console.log("Error saving "+ url + "!");

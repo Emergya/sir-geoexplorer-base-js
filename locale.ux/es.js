@@ -62,7 +62,11 @@ GeoExt.Lang.add(
         tempLayerNameLabelText: "Nombre",
         tempLayerCreateButtonText: "Crear",
         tempLayerCancelButtonText: "Cancelar",
-        tempLayerDescriptionText: "Crea una capa temporal del tipo de geometría indicado."
+        tempLayerDescriptionText: "Crea una capa temporal del tipo de geometría indicado.",
+        removeText: "Borrar",
+        removeTitleText: "Borra el servidor para todos los usuarios de la plataforma",
+        removeSourceWindowTitleText: "Aviso: Borrar servidor",
+        removeSourceWindowText: "¿Desea borrar el servidor'{0}' (id = {1}) para todos los usuarios de la plataforma?"
     },
 
     "OpenLayers.Control.LoadLayerWizard.prototype": {
