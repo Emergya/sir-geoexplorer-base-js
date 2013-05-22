@@ -102,7 +102,7 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
 
                 paramsToExport = {
                     'service': 'WFS',
-                    'version': 1.0.0,
+                    'version': '1.0.0',
                     'request': 'GetFeature',
                     'typename': this.selectedLayer.params.LAYERS,
                     'outputformat': 'shape-zip'
