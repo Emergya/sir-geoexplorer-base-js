@@ -37,6 +37,9 @@ Ext.namespace("PersistenceGeo.widgets");
  * 
  */
 PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
+    
+    /** ptype **/
+    ptype: "pgeo_loginwindow",
 
     /** Session and widget parameters and variables **/
     persistenceGeoContext: null,
