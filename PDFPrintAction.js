@@ -46,16 +46,16 @@ Ext.namespace("gxp.plugins");
  *    Provides an action for showing channel selector dialog.
  */
 gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
-    
+
     /** api: ptype = gxp_extendedtoolbar */
     ptype: "gxp_pdfprint",
-    
+
     /** i18n * */
     /** api: config[buttonText]
      *  ``String`` Text to show button
      */
     buttonText: 'Print',
-     
+
     /** api: config[menuText]
      *  ``String``
      *  Text for show in menu item (i18n).
@@ -63,20 +63,20 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
     menuText: 'Print',
     errorText:"An error was found. Please try again later.",
 
-   
+
     /** api: config[tooltip]
      *  ``String``
      *  Text for channel tool tooltip (i18n).
      */
     tooltip: 'Print',
-    
+
     /** private: property[iconCls]
      */
     iconCls: 'gxp-icon-print',
 
     /** public: property[toggleGroup]*/
     toggleGroup: null,
-    
+
     /** private: method[constructor]
      */
     constructor: function(config) {
@@ -94,16 +94,17 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
     /** api: method[addActions]
      */
     addActions: function() {
-    	
-    	return gxp.plugins.PDFPrintAction.superclass.addActions.apply(this, [{
+
+        var actions =  gxp.plugins.PDFPrintAction.superclass.addActions.apply(this, [{
             buttonText: this.showButtonText ? this.buttonText : '',
             menuText: this.menuText,
             iconCls: this.iconCls,
-            tooltip: this.tooltip,       
+            tooltip: this.tooltip,
             enableToggle: true,
-            allowDepress: true,           
+            allowDepress: true,
             toggleGroup: this.toggleGroup,
-            deactivateOnDisable: true,     
+            deactivateOnDisable: true,
+            disabled:true,
             handler: function() {
                 var ds = Viewer.getComponent('PDFPrintWindow');
                 if (ds === undefined) {
@@ -117,8 +118,8 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                                 Ext.MessageBox.hide();
                                 // We modifiy the service urls so they actually work.
                                 printProvider.capabilities.createURL = app.sources.local.url.replace("ows","pdf/create.json");
-                                printProvider.capabilities.printURL = app.sources.local.url.replace("ows","pdf/print.pdf");                                
-                                
+                                printProvider.capabilities.printURL = app.sources.local.url.replace("ows","pdf/print.pdf");
+
                                 ds = new Viewer.dialog.PDFPrintWindow({
                                     persistenceGeoContext: this.target.persistenceGeoContext,
                                     printProvider : printProvider,
@@ -130,10 +131,10 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                                   ds.on("hide", function() {
                                     // We deactivate the tool if we close the window.
                                     if(this.actions[0].items[0].pressed){
-                                        this.actions[0].items[0].toggle();    
+                                        this.actions[0].items[0].toggle();
                                     }
                                 },this);
-                            },                           
+                            },
 
                             printexception : function(printProvider, response) {
                                 Ext.MessageBox.updateProgress(1);
@@ -157,22 +158,27 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                         ds.hide();
                     } else {
                         ds.show();
-                    }    
+                    }
                 }
-            }, 
+            },
             listeners : {
                 toggle: function(button, pressed) {
                     var ds = Viewer.getComponent('PDFPrintWindow');
                     if (!pressed && ds) {
                         ds.hide();
-                    } 
+                    }
                 },
                 scope: this
-            },           
+            },
             scope: this
         }]);
-    } 
-    
+
+        this.target.on("ready", function() {
+            actions[0].enable();
+        }, this);
+
+        return actions;
+    }
 });
 
 Ext.preg(gxp.plugins.PDFPrintAction.prototype.ptype, gxp.plugins.PDFPrintAction);
