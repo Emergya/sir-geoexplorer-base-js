@@ -666,6 +666,12 @@ GeoExt.Lang.add(
             'LENGTH': 'Longitud de la polilínea seleccionada:',
             'PERIMETER': 'Perímetro del polígono seleccionado:'
         }
+    },
+
+    'PersistenceGeo.tree.LayerOpacitySlider.prototype':{
+        opacityText: 'Opacidad',
+        opacityTooltipText: 'Cambia la opacidad de la capa',
+        opacityWindowText: 'Opacidad de la capa <div class="pgeo_layeropacityslider-layerName">{0}</div>'
     }
 
 });
