@@ -53,8 +53,14 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 	errorText: "An error was found. Please try again later.",
 	logoFileTypeUnsupportedText: "Supported image file types are PNG and JPEG",
 
-	pdfFooterText: "Gobierno Regional del Libertador Bernardo O'Higgins\nPlaza de Los Héroes s/n. Rancagua.\nFono: (72) 205900 - Fax (72) 237148",
-	logoImgUri: "http://localhost/sir-ohiggins/moduloCartografico/theme/app/img/logo-gobierno_de_chile.jpg",
+	/** api: config[pdfFooterText]
+	 * If not present no footer will be added to the pdf. If pressent, the footer will contain the specified text.
+	 */
+	pdfFooterText: null,
+	/** api: config[logoImgUri]
+	 * The url/data uri used for the main pdf logo. No logo will be shown if no uri is supplied.
+	 */
+	pdfLogoUri: null,
 	legendImgUrlTpl: "{url}SERVICE=WMS&VERSION=1.1.1&REQUEST=GetLegendGraphic&EXCEPTIONS=application%2Fvnd.ogc.se_xml&LAYER={name}&transparent=true&format=image/png&legend_options=fontAntiAliasing:true;fontSize:11;fontName:Arial",
 
 	labelWidth: 80,
@@ -188,13 +194,13 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 			height: 200,
 			items: [{
 					xtype: "gx_zoomslider",
+					baseCls: "previewMapSlider", // So we control styles
 					aggressive: true,
 					vertical: true,
 					height: 100,
 					// Hack for correct positining due bad styles.
-					style: "top: 20px !important",
-					x: 10,
-					y: 20
+					x: 5,
+					y: 10
 				}
 			]
 		}));
@@ -586,7 +592,7 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 	_retrieveMapPDFUrl: function() {
 		// We use geoserver's mapfish based print service to generate a pdf (because we cant get directly an image
 		// because the version being to low or because having tried hard enough...)
-		this.printProvider.customParams.layout = "FIRST_PAGE";
+		this.printProvider.customParams.layout = "MAP";
 		this.printProvider.customParams.dpi = this._getFormValue("resolution");
 		this.printProvider.customParams.renderLegend = false;
 
@@ -623,7 +629,7 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 		var params = {
 			size: pageSize,
 			margin: {
-				"top": margin+10,
+				"top": margin+5,
 				"bottom": margin+10,
 				"left": margin,
 				"right": margin
@@ -632,7 +638,15 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 			header: {
 				items: this._createPDFHeaderContents(margin, pageWidth)
 			},
-			footer: {
+			items: this._createPDFContents(margin, pageWidth, this._pdfImagesData.mapPDFUrl),
+			outputFile: "impresion_modulo_cartografico",
+			keepFile: true,
+			outputFormat: outputFormat
+		};
+
+		if(this.pdfFooterText) {
+			// We add a footer only if avalaible.
+			params.footer = {
 				items: [{
 					type: "par",
 					newFont:{
@@ -642,12 +656,8 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 					align: "C"
 				}],
 				margin:20
-			},
-			items: this._createPDFContents(margin, pageWidth, this._pdfImagesData.mapPDFUrl),
-			outputFile: "impresion_modulo_cartografico",
-			keepFile: true,
-			outputFormat: outputFormat
-		};
+			};
+		}
 
 		Ext.Ajax.request({
 			url: url,
@@ -693,12 +703,14 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 
 	_createPDFHeaderContents: function(margin, pageWidth) {
 		var items = [];
-		items.push({
-			type: "image",
-			width: 22,
-			url: this.logoImgUri
-		});
 
+		if(this.pdfLogoUri) {
+			items.push({
+				type: "image",
+				width: 22,
+				url: this.pdfLogoUri
+			});
+		}
 
 		if (this._getFormValue("logo")) {
 			items.push({
@@ -738,7 +750,8 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 			url: mapPDFUrl,
 			width: mapSize,
 			dy: spacing,
-			dx: avalaibleWidth * 0.05
+			dx: avalaibleWidth * 0.05,
+			border:true
 		});
 
 		var font = this._getFormValue("comment_font");
@@ -750,7 +763,8 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 				size: size,
 				style: "B"
 			},
-			x: margin
+			x: margin,
+			dy: spacing
 		});
 
 		items.push({
@@ -787,29 +801,27 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 
 		Ext.each(this._previewMapPanel.map.layers, function(layer) {
 			if ( !! layer.url && layer.params && layer.params.LAYERS) {
-				for(var i=0; i<10; i++) {
-					// Its viewable, so we add an title element...			
-					items.push({
-						newFont: {
-							"family": font,
-							"size": 10,
-							"style": "N"
-						},
-						text: layer.name,
-						dy: 5
-					});
-					// ... and the legend image itself.
-					items.push({
-						"type": "image",
-						"url": urlTpl.apply({
-							"url" : layer.url,
-							"name": layer.params.LAYERS
-						}),
-						"dx":2,
-						"dpi": 120 // So the leyends are downscaled
+				// Its viewable, so we add an title element...			
+				items.push({
+					newFont: {
+						"family": font,
+						"size": 10,
+						"style": "N"
+					},
+					text: layer.name,
+					dy: 5
+				});
+				// ... and the legend image itself.
+				items.push({
+					"type": "image",
+					"url": urlTpl.apply({
+						"url" : layer.url,
+						"name": layer.params.LAYERS
+					}),
+					"dx":2,
+					"dpi": 120 // So the leyends are downscaled
 
-					});
-				}
+				});
 			}
 		},this);
 		return items;

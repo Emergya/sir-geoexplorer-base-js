@@ -50,6 +50,17 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
     /** api: ptype = gxp_extendedtoolbar */
     ptype: "gxp_pdfprint",
 
+    /** api: config[pdfFooterText] 
+     * If present, the text used for the footer. No footer will be shown if not pressent.
+     */
+    pdfFooterText: null,
+
+    /** api: config[pdfLogoUri]
+     * If pressent the url/data uri used for the main logo of the printed PDF. If not present
+     * no logo will be printed.
+     */
+    pdfLogoUri : null,
+
     /** i18n * */
     /** api: config[buttonText]
      *  ``String`` Text to show button
@@ -124,7 +135,9 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                                     persistenceGeoContext: this.target.persistenceGeoContext,
                                     printProvider : printProvider,
                                     target: this.target,
-                                    action: this
+                                    action: this,
+                                    pdfFooterText: this.pdfFooterText,
+                                    pdfLogoUri: this.pdfLogoUri
                                 });
                                 Viewer.registerComponent('PDFPrintWindow', ds);
                                 ds.show();
