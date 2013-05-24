@@ -109,7 +109,7 @@ Viewer.dialog.CreateBuffer = Ext.extend(Ext.Window, {
             "msg": this.confirmCreateText,
             "buttons": {
                 "yes": this.createBufferLayerText,
-                "no": this.dontCreateBufferLayerText,
+                "no": this.dontCreateBufferLayerText
             },
             "fn": function(result) {
                 if (result == "yes") {
@@ -125,10 +125,11 @@ Viewer.dialog.CreateBuffer = Ext.extend(Ext.Window, {
     _doBufferLayerCreation: function() {
         Ext.Msg.wait(this.waitText);
         Ext.Ajax.request({
+            method: "POST",
             url: '../../vectorialLayerController/newTempLayer',
             params: {
-                "layerName": "Buffer " + (new Date()).format("d-m-Y H:i:s.u"),
-                "geometryType": "POLYGON",
+                "layerName": "Buffer "+ (new Date()).format("d-m-Y H:i:s.u"),
+                "geometryType": "POLYGON"
 
             },
             "success": function(response) {
@@ -266,7 +267,7 @@ Viewer.dialog.CreateBuffer = Ext.extend(Ext.Window, {
         }
 
 
-        if (radius == this._lastRadius && units == this._lastUnits) {
+        if (radius == this._lastRadius && units == this._lastUnits && this.action.selectedFeatures.length== this._lastFeatureCount) {
             // To prevent having to calculate already shown buffers.       
             return;
         }
@@ -279,6 +280,7 @@ Viewer.dialog.CreateBuffer = Ext.extend(Ext.Window, {
 
         this.bufferLayer.removeAllFeatures();
 
+        this._lastFeatureCount= this.action.selectedFeatures.length;
 
         var self = this;
         setTimeout(function() {
@@ -310,7 +312,7 @@ Viewer.dialog.CreateBuffer = Ext.extend(Ext.Window, {
     onBeforeRender: function() {
 
         var padding = 'padding: 10px 16px;';
-        var border = 'border: 0px solid transparent;'
+        var border = 'border: 0px solid transparent;';
 
         this.form = {
             xtype: 'form',

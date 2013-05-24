@@ -46,15 +46,15 @@ Ext.namespace("gxp.plugins");
  *    Provides an action for showing the default search dialog.
  */
 gxp.plugins.CreateBufferAction = Ext.extend(gxp.plugins.Tool, {
-    
+
     /** api: ptype = gxp_extendedtoolbar */
     ptype: "gxp_createbuffer",
-    
+
     /** api: config[buttonText]
      *  ``String`` Text to show next to the zoom button
      */
     buttonText: 'Crear buffer',
-     
+
     /** api: config[menuText]
      *  ``String``
      *  Text for zoom menu item (i18n).
@@ -66,7 +66,7 @@ gxp.plugins.CreateBufferAction = Ext.extend(gxp.plugins.Tool, {
      *  Text for zoom action tooltip (i18n).
      */
     tooltip: 'Crear buffer',
-    
+
     /** private: property[iconCls]
      */
     iconCls: 'vw-icon-buffer',
@@ -93,7 +93,7 @@ gxp.plugins.CreateBufferAction = Ext.extend(gxp.plugins.Tool, {
     },
 
     /** private: method[_handleSelectionChange]
-     */    
+     */
     _handleSelectionChange: function() {
         var featureSelector = this._getFeatureSelector();
         featureSelector.on("selectionchanged", this._onFeatureSelectionChange, this);
@@ -104,6 +104,13 @@ gxp.plugins.CreateBufferAction = Ext.extend(gxp.plugins.Tool, {
 
         if(features && features.length > 0) {
             this.toolAction.enable();
+
+            var ds = Viewer.getComponent('NewBuffer');
+            if(ds && !ds.hidden) {
+                // We update the buffer with the newly selected features.
+                ds.createPreviewBuffer();
+            }
+
         } else {
 
             // We need to manually deactivate if disabled, as it seems
@@ -114,7 +121,7 @@ gxp.plugins.CreateBufferAction = Ext.extend(gxp.plugins.Tool, {
         }
     },
 
-    
+
     _getFeatureSelector : function() {
         return Viewer.getComponent(this.featureSelector);
     },
@@ -127,10 +134,10 @@ gxp.plugins.CreateBufferAction = Ext.extend(gxp.plugins.Tool, {
             menuText: this.menuText,
             iconCls: this.iconCls,
             tooltip: this.tooltip,
-            enableToggle: true,        
+            enableToggle: true,
             deactivateOnDisable: true,
             disabled: true,
-            pressed: false,            
+            pressed: false,
             toggleHandler: function(action, evt) {
 
                 var ds = Viewer.getComponent('NewBuffer');
@@ -164,10 +171,9 @@ gxp.plugins.CreateBufferAction = Ext.extend(gxp.plugins.Tool, {
 
     _deactivateButton : function() {
         if(this.toolAction.items[0].pressed){
-            this.toolAction.items[0].toggle();    
+            this.toolAction.items[0].toggle();
         }
     }
-        
 });
 
 Ext.preg(gxp.plugins.CreateBufferAction.prototype.ptype, gxp.plugins.CreateBufferAction);
