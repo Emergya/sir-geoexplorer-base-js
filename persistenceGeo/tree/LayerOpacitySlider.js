@@ -135,7 +135,7 @@ PersistenceGeo.tree.LayerOpacitySlider = Ext.extend(gxp.plugins.Tool, {
     /** private: method[checkIfEnable]
      *  :arg layerRec: ``GeoExt.data.LayerRecord``
      *
-     *  Enable this.launchAction if the layer don't be management by 
+     *  Enable this.launchAction if the layer can't be management by 
      *  the user logged or disable this.launchAction otherwise if this.checkUserInfo flag is active
      */
     checkIfEnable: function(record) {

@@ -360,6 +360,7 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
                 try {
                     var layer = layers[i];
                     layer.groupLayers = this._groupIndexes;
+                    layer.initialLayerOptions = layersOptions;
                     //Layers must be visible by default
                     layer.setVisibility(visible);
                     this.map.addLayer(layer);
@@ -652,7 +653,7 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
             && !! this.userInfo && !! this.userInfo.id){
             isOwner = layer.layerID && layer.groupID && layer.groupID == this.userInfo.authorityId;
         }else if(this.saveModeActive == this.SAVE_MODES.ANONYMOUS){
-            isOwner = layer.layerID && !layer.userID && !layer.groupID;
+            isOwner = layer.layerID && !layer.folderID && !layer.userID && !layer.groupID;
         }
         return isOwner;
     }

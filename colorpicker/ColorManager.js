@@ -100,8 +100,9 @@ Ext.apply(Styler.ColorManager.prototype, {
                 title: "Color Picker",
                 layout: "fit",
                 closeAction: "hide",
-                width: 405,
-                height: 300,
+                cls: "x-cp-window",
+                width: 410,
+                height: 440,
                 plain: true,
                 items: Styler.ColorManager.picker
             });

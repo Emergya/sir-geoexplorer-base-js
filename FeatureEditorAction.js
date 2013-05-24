@@ -30,7 +30,6 @@
 /**
  * @requires plugins/FeatureEditor.js
  */
-
 /** api: (define)
  *  module = gxp.plugins
  *  class = FeatureEditorAction
@@ -640,8 +639,19 @@ Viewer.plugins.FeatureEditorAction = Ext.extend(gxp.plugins.FeatureEditor, {
             this.actions[1].disable();
 
         }
+    },
+    
+    /** private: method[onLayerChange]
+     *  :arg mgr: :class:`gxp.plugins.FeatureManager`
+     *  :arg layer: ``GeoExt.data.LayerRecord``
+     *  :arg schema: ``GeoExt.data.AttributeStore``
+     */
+    onLayerChange: function(mgr, layer, schema) {
+        if(!!mgr 
+            && !!mgr.geometryType){ // skip exception
+            Viewer.plugins.FeatureEditorAction.superclass.onLayerChange.apply(this, arguments);
+        }
     }
-
 
 });
 
