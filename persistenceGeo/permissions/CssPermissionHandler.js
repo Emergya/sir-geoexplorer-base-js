@@ -74,7 +74,7 @@ PersistenceGeo.permissions.CssPermissionHandler = Ext.extend(PersistenceGeo.perm
         }
         if(iconCls.length>0){
             for (var iconIndex = 0; iconIndex< iconCls.length; iconIndex++){
-                if(!iconCls[iconIndex] in this.excludes){
+                if(!(iconCls[iconIndex] in this.excludes)){
                     var buttons = $("."+iconCls[iconIndex]);
                     for(var i = 0; i <buttons.length; i++){
                        this.showHideButton(buttons[i], hide);
