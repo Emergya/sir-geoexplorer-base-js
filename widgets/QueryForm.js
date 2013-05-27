@@ -135,7 +135,7 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
             "query": function(tool, store) {
                 if (this._queryFormQuery && store && store.getCount()) {
                     this._queryFormQuery = false;                        
-                    Ext.Msg.alert("", this.resultCountText.replace("{0}",store.getCount()));                    
+                    Ext.Msg.alert("", this.resultCountText.replace("{0}",featureManager.numberOfFeatures));                    
                 }
             },
             scope: this
