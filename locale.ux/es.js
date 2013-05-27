@@ -672,6 +672,11 @@ GeoExt.Lang.add(
         opacityText: 'Opacidad',
         opacityTooltipText: 'Cambia la opacidad de la capa',
         opacityWindowText: 'Opacidad de la capa <div class="pgeo_layeropacityslider-layerName">{0}</div>'
+    },
+
+    'Viewer.plugins.FichaInversion.prototype' : {
+        waitText: "Por favor, espere...",
+        errorText: "Ocurrió un error, pruebe de nuevo en unos instantes."
     }
 
 });
