@@ -60,7 +60,14 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
     selectedLayer: null,
 
     requireLogin: true,
+
+    /** apy: config[rasterTypeIDs]
+     * The list of ids of the layer types that mean a layer is raster.
+     * This should be replaced by other more sturdier, less hacky, test.         
+     */
     rasterTypeIDs: [1, 2, 3, 8, 9, 10],
+
+    action: null,
 
     /** private: method[init]
      * :arg target: ``Object`` The object initializing this plugin.
@@ -73,18 +80,19 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
     /** api: method[addActions] */
     addActions: function() {
 
+        var enabled = this._checkEnabled();
+
         var actions =
             PersistenceGeo.tree.MakeLayerPersistent.superclass.addActions.apply(
                 this, [{
             menuText: this.exportToSHPText,
             iconCls: 'gxp-icon-export-shp',
-            disabled: true,
+            disabled: !enabled,
             tooltip: this.exportToSHPTooltipText,
             handler: function() {
                 var urlToExport = null;
                 var paramsToExport = null;
-                var urlLocalGeoServer = 
-                    app.sources.local.url.replace('/ows', '');
+                var urlLocalGeoServer = app.sources.local.url.replace('/ows', '');
                 if (this.selectedLayer.url) {
                     if (this.selectedLayer.url.indexOf(urlLocalGeoServer) != -1) {
                         urlToExport = urlLocalGeoServer;
@@ -138,6 +146,8 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
             scope: this
         }]);
 
+        this.action = actions[0];
+
         var owner = this.target;
         if (this.objectOwner === 'toolbar') {
             owner = app;
@@ -145,11 +155,8 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
         owner.on('layerselectionchange', function(record) {
             if (record && record.data) {
                 this.selectedLayer = record.data.layer;
-
-                //if(this.objectOwner === 'toolbar') {
-                    this.enableOrDisableAction();
-//                }
             }
+            this.enableOrDisableAction();
         }, this);
 
         this.enableOrDisableAction();
@@ -157,11 +164,11 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
 
     prepareUrlToDownload: function(data) {
         var urlToReturn = null;
-        if (data != null) {
+        if (data !== null) {
             urlToReturn = data.url;
             var cont = 0;
-            if (data.params != null) {
-                for (p in data.params) {
+            if (data.params !== null) {
+                for (var p in data.params) {
                     if (cont === 0) {
                         urlToReturn += '?' + p + '=' + data.params[p];
                         cont++;
@@ -182,26 +189,29 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
         }
     },
     enableOrDisableAction: function() {
-        if (!this.selectedLayer) {
+        var enabled = this._checkEnabled();
+
+        // We add a timeout so the menu item get's actually disabled.
+        var self = this;
+        setTimeout(function() {
+            self.action.setDisabled(!enabled);
+        },10);
+    },
+
+    _checkEnabled : function() {
+
+          if (!this.selectedLayer) {
             this.selectedLayer = Viewer.getSelectedLayer();
         }
 
         var layerSelected = !!this.selectedLayer;
-
-        var hasLayerTypeId = layerSelected && this.selectedLayer.metadata && this.selectedLayer.metadata.layerTypeId;
+        var hasLayerTypeId = layerSelected && this.selectedLayer.metadata && !!this.selectedLayer.metadata.layerTypeId;
         var isVectorial = layerSelected && hasLayerTypeId && this.rasterTypeIDs.indexOf(this.selectedLayer.metadata.layerTypeId) < 0;
         var userLogged = !this.requireLogin || !!app.persistenceGeoContext.userLogin;
 
-        if (isVectorial && userLogged && this.isLocalGeoserver(this.selectedLayer.url)) {
-            Ext.each(this.actions, function(item) {
-                item.enable();
-                    }, this);
-        } else {
-            Ext.each(this.actions, function(item) {
-               item.disable();
-            }, this);
-        }
+        var enabled = isVectorial && userLogged && this.isLocalGeoserver(this.selectedLayer.url);
 
+        return enabled;
     }
 });
 
