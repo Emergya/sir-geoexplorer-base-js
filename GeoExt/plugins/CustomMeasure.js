@@ -56,11 +56,11 @@ Ext.namespace("gxp.plugins");
  *    Provides two actions for measuring length and area.
  */
 gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
-    
+
     /** api: ptype = gxp_custommeasure */
     ptype: "gxp_custommeasure",
 
-     /** api: config[iconCls]
+    /** api: config[iconCls]
      *  ``String``
      *  Class used for the button's icon.
      */
@@ -72,7 +72,7 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
      */
     selectIconClass: "vw-icon-mapselection",
 
-     /** api: config[drawIconCls]
+    /** api: config[drawIconCls]
      *  ``String``
      *  Class used for the draw menu item's icon.
      */
@@ -86,6 +86,11 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
      * The id of the feature manager used to support measure-on-feature-selection.
      */
     featureManager: "featuremanager",
+
+    /** api: config[measureColor]
+     * The color used by the lines drawn by the measurement-by-drawing tool
+     */
+    measureColor : "#EF4C50",
 
     /** api: config[outputTarget]
      *  ``String`` Popups created by this tool are added to the map by default.
@@ -117,9 +122,9 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
     },
 
     geometryTypesForSelection: {
-        "AREA": ["Polygon","Surface"],
-        "PERIMETER":["Polygon","Surface"],
-        "LENGTH": ["Curve","LineString","Line"]
+        "AREA": ["Polygon", "Surface"],
+        "PERIMETER": ["Polygon", "Surface"],
+        "LENGTH": ["Curve", "LineString", "Line"]
     },
 
     /**
@@ -129,23 +134,23 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
      */
     measureMode: "AREA",
 
-   
+
     MODE_AREA: "AREA",
     MODE_LENGTH: "LENGTH",
     MODE_PERIMETER: "PERIMETER",
 
-    map : null,
+    map: null,
 
     selectControl: null,
     measureControl: null,
 
-    handlers : {
+    handlers: {
         "AREA": OpenLayers.Handler.Polygon,
         "LENGTH": OpenLayers.Handler.Path,
         "PERIMETER": OpenLayers.Handler.Polygon
     },
 
-     /** private: method[constructor]
+    /** private: method[constructor]
      */
     constructor: function(config) {
         gxp.plugins.CustomMeasure.superclass.constructor.apply(this, arguments);
@@ -159,7 +164,7 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
     },
 
 
-      /** private: method[init]
+    /** private: method[init]
      * :arg target: ``Object`` The object initializing this plugin.
      */
     init: function(target) {
@@ -167,7 +172,7 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
         this.target.on('beforerender', this.addActions, this);
     },
 
-    
+
     /** private: method[createMeasureControl]
      * :param: handlerType: the :class:`OpenLayers.Handler` for the measurement
      *     operation
@@ -181,45 +186,48 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
         var styleMap = new OpenLayers.StyleMap({
             "default": new OpenLayers.Style(null, {
                 rules: [new OpenLayers.Rule({
-                    symbolizer: {
-                        "Point": {
-                            pointRadius: 4,
-                            graphicName: "square",
-                            fillColor: "white",
-                            fillOpacity: 1,
-                            strokeWidth: 1,
-                            strokeOpacity: 1,
-                            strokeColor: "#333333"
-                        },
-                        "Line": {
-                            strokeWidth: 3,
-                            strokeOpacity: 1,
-                            strokeColor: "#666666",
-                            strokeDashstyle: "dash"
-                        },
-                        "Polygon": {
-                            strokeWidth: 2,
-                            strokeOpacity: 1,
-                            strokeColor: "#666666",
-                            fillColor: "white",
-                            fillOpacity: 0.3
+                        symbolizer: {
+                            "Point": {
+                                pointRadius: 4,
+                                graphicName: "square",
+                                fillColor: "white",
+                                fillOpacity: 1,
+                                strokeWidth: 1,
+                                strokeOpacity: 1,
+                                strokeColor: this.measureColor
+                            },
+                            "Line": {
+                                strokeWidth: 3,
+                                strokeOpacity: 1,
+                                strokeColor: this.measureColor,
+                                strokeDashstyle: "dash"
+                            },
+                            "Polygon": {
+                                strokeWidth: 2,
+                                strokeOpacity: 1,
+                                strokeColor: this.measureColor,
+                                fillColor: "white",
+                                fillOpacity: 0.3
+                            }
                         }
-                    }
-                })]
+                    })]
             })
         });
-        
 
         var controlOptions = Ext.apply({}, this.initialConfig.controlOptions);
         Ext.applyIf(controlOptions, {
             geodesic: true,
             persist: true,
-            handlerOptions: {layerOptions: {styleMap: styleMap}},
+            handlerOptions: {
+                layerOptions: {
+                    styleMap: styleMap
+                }
+            },
             eventListeners: {
                 measurepartial: function(event) {
                     this.cleanup();
-                    this.measureTooltip = this._createTooltip(event,title);
-                    if(event.measure > 0) {
+                    this.measureTooltip = this._createTooltip(event, title);
+                    if (event.measure > 0) {
                         var px = this.measureControl.handler.lastUp;
                         var p0 = this.target.mapPanel.getPosition();
                         this.measureTooltip.targetXY = [p0[0] + px.x, p0[1] + px.y];
@@ -228,44 +236,41 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
                 },
                 measure: function(event) {
                     this.cleanup();
-                    this.measureTooltip = this._createTooltip(event,title);
-                     if(event.measure > 0) {
-                       
-
-                         var components = event.geometry.components;
-                         var lastPointIdx = components.length-1;
-                         if(components.length==1 && components[0].components) {
+                    this.measureTooltip = this._createTooltip(event, title);
+                    if (event.measure > 0) {
+                        var components = event.geometry.components;
+                        var lastPointIdx = components.length - 1;
+                        if (components.length == 1 && components[0].components) {
                             // Area points are inside a single element, ad have one more point (because the poligon closes);
                             components = components[0].components;
-                            lastPointIdx = components.length-2;                            
-                         }
+                            lastPointIdx = components.length - 2;
+                        }
 
-                         var lastLonLat = components[lastPointIdx];
-                        
-                         this.measureTooltip.targetXY = this._calculateTooltipXY(lastLonLat);
-                         this.measureTooltip.show();
-                     }
+                        var lastLonLat = components[lastPointIdx];
+                        this.measureTooltip.targetXY = this._calculateTooltipXY(lastLonLat);
+                        this.measureTooltip.show();
+                    }
                 },
                 deactivate: this.cleanup,
                 scope: this
             }
         });
-        
-        this.measureControl = new OpenLayers.Control.Measure(handlerType, 
+
+        this.measureControl = new OpenLayers.Control.Measure(handlerType,
             controlOptions);
 
         return this.measureControl;
     },
 
-    _calculateTooltipXY : function(point) {
-         point = {
-            lon : point.x,
-            lat : point.y
-         };
+    _calculateTooltipXY: function(point) {
+        point = {
+            lon: point.x,
+            lat: point.y
+        };
 
-         var p0 = this.target.mapPanel.getPosition();
-         var px = this.target.mapPanel.map.getViewPortPxFromLonLat(point);
-         return [p0[0] + px.x, p0[1] + px.y];
+        var p0 = this.target.mapPanel.getPosition();
+        var px = this.target.mapPanel.map.getViewPortPxFromLonLat(point);
+        return [p0[0] + px.x, p0[1] + px.y];
     },
 
     /** api: method[addActions]
@@ -288,20 +293,19 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
             buttonText: this.tooltip,
             menuText: this.tooltip,
             tooltip: this.tooltip,
-            buttonText: this.buttonText,
-            enableToggle: true,  
-            toggleGroup : this.toggleGroup,
+            enableToggle: true,
+            toggleGroup: this.toggleGroup,
             scope: this,
             listeners: {
-                "click" : function() {
+                "click": function() {
                     // We don't want the button to be marked as pressed util we
                     // we click in one of the menu's options.
                     this.button.toggle(false);
                 },
-                "toggle" : function(button, pressed)  {
-                    if(!pressed) {
+                "toggle": function(button, pressed) {
+                    if (!pressed) {
                         // We need to uncheck the items manually...
-                        this.drawInMapMenuItem.setChecked(false)
+                        this.drawInMapMenuItem.setChecked(false);
                         this.selectFeatureMenuItem.setChecked(false);
                     }
                 },
@@ -309,41 +313,38 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
             },
             menu: new Ext.menu.Menu({
                 items: [
-                    this.drawInMapMenuItem =new Ext.menu.CheckItem(
-                         new GeoExt.Action({
-                            text: this.drawInMapText,
-                            toggleGroup: this.toggleGroup,
-                            group: this.toggleGroup,
-                            map: this.target.mapPanel.map,
-                            listeners:{
-                                scope: this,
-                                "click": function() {
-                                    // We activate the button.
-                                    this.button.toggle(true);
-                                }
-                            },
-                            control: this.createMeasureControl(
-                               this.handlers[this.measureMode], this.drawPopupTooltips[this.measureMode]
-                            )
-                        })
-                    ),
-                     this.selectFeatureMenuItem=new Ext.menu.CheckItem(
-                       new GeoExt.Action({
-                            text: this.selectFeatureText,                           
-                            toggleGroup: this.toggleGroup,
-                            group: this.toggleGroup,
-                            deactivateOnDisabled: true,
-                            control: this._createSelectionControl(),
-                            listeners:{
-                                scope: this,
-                                "click": function() {
-                                    // We activate the button.
-                                    this.button.toggle(true);
-                                }
-                            },
-                            "map": this.target.mapPanel.map
-                        })
-                    )
+                    this.drawInMapMenuItem = new Ext.menu.CheckItem(
+                        new GeoExt.Action({
+                        text: this.drawInMapText,
+                        toggleGroup: this.toggleGroup,
+                        group: this.toggleGroup,
+                        map: this.target.mapPanel.map,
+                        listeners: {
+                            scope: this,
+                            "click": function() {
+                                // We activate the button.
+                                this.button.toggle(true);
+                            }
+                        },
+                        control: this.createMeasureControl(
+                            this.handlers[this.measureMode], this.drawPopupTooltips[this.measureMode])
+                    })),
+                    this.selectFeatureMenuItem = new Ext.menu.CheckItem(
+                        new GeoExt.Action({
+                        text: this.selectFeatureText,
+                        toggleGroup: this.toggleGroup,
+                        group: this.toggleGroup,
+                        deactivateOnDisabled: true,
+                        control: this._createSelectionControl(),
+                        listeners: {
+                            scope: this,
+                            "click": function() {
+                                // We activate the button.
+                                this.button.toggle(true);
+                            }
+                        },
+                        "map": this.target.mapPanel.map
+                    }))
                 ]
             })
         });
@@ -353,81 +354,80 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
         return gxp.plugins.CustomMeasure.superclass.addActions.apply(this, [this.button]);
     },
 
-    _enableOrDisableFeatureSelection : function() {
+    _enableOrDisableFeatureSelection: function() {
         var mgr = this._getFeatureManager();
         var layerRecord = mgr.layerRecord;
         var schema = mgr.schema;
 
 
-        var geometryType = null;      
+        var geometryType = null;
         var layer = null;
         // Institución de la capa
-        if(!!layerRecord && !!layerRecord.data && !!layerRecord.data.layer){
-            layer = layerRecord.data.layer;          
-        } 
-       
+        if ( !! layerRecord && !! layerRecord.data && !! layerRecord.data.layer) {
+            layer = layerRecord.data.layer;
+        }
+
         // Comprobamos si el usuario tiene permisos en la capa
-        if(layer){
+        if (layer) {
             // There's a schema
-            if(!schema || !mgr.geometryType){
+            if (!schema || !mgr.geometryType) {
                 this.button.toggle(false);
                 this.selectFeatureMenuItem.disable();
                 return;
-            } 
+            }
 
-            if(mgr.geometryType.indexOf("Multi") != -1){
+            if (mgr.geometryType.indexOf("Multi") != -1) {
                 geometryType = mgr.geometryType.replace("Multi", "");
-            }else{
+            } else {
                 geometryType = mgr.geometryType;
             }
 
             // We allow selecting features if the geometry type of the selected layer
             // is allowed for the measurement mode.
             var geometryTypes = this.geometryTypesForSelection[this.measureMode];
-            if(!!geometryType && geometryTypes.indexOf(geometryType)>=0){
+            if ( !! geometryType && geometryTypes.indexOf(geometryType) >= 0) {
                 this.selectFeatureMenuItem.enable();
-            }else{
+            } else {
                 this.button.toggle(false);
                 this.selectFeatureMenuItem.disable();
             }
-        }else{        
+        } else {
             this.button.toggle(false);
             this.selectFeatureMenuItem.disable();
         }
     },
 
-    cleanup : function() {
+    cleanup: function() {
         if (this.measureTooltip) {
             this.measureTooltip.destroy();
-        }  
+        }
     },
 
-    _createSelectionControl : function() {
+    _createSelectionControl: function() {
 
-        var featureManager= this._getFeatureManager();
+        var featureManager = this._getFeatureManager();
         var featureLayer = featureManager.featureLayer;
 
-        this.selectControl =  new OpenLayers.Control.SelectFeature(featureLayer, {
+        this.selectControl = new OpenLayers.Control.SelectFeature(featureLayer, {
             clickout: false,
             multipleKey: "fakeKey",
             eventListeners: {
-                "activate": function() {   
+                "activate": function() {
                     // We change the cursor over the map to indicate selection.
                     Ext.select(".olMap").setStyle("cursor", "crosshair");
                     // And enable said selection.
-                    this.map.events.register("click", this, this.noFeatureClick);                        
+                    this.map.events.register("click", this, this.noFeatureClick);
                     featureManager.showLayer(
-                        this.id, this.showSelectedOnly && "selected"
-                    );
+                        this.id, this.showSelectedOnly && "selected");
                     this.selectControl.unselectAll();
-                    
+
                 },
                 "deactivate": function() {
                     // We remove al traces of activity.
-                    this.target.mapPanel.map.events.unregister("click", this, this.noFeatureClick);  
+                    this.target.mapPanel.map.events.unregister("click", this, this.noFeatureClick);
                     Ext.select(".olMap").setStyle("cursor", "default");
 
-                    featureManager.featureLayer.removeAllFeatures();                 
+                    featureManager.featureLayer.removeAllFeatures();
                     featureManager.hideLayer(this.id);
                     this.cleanup();
                 },
@@ -438,11 +438,11 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
 
         featureLayer.events.on({
             "featureunselected": function(evt) {
-               this.cleanup();
+                this.cleanup();
             },
             "featureselected": function(evt) {
 
-                if(!this.button.pressed) {
+                if (!this.button.pressed) {
                     // This tool is not active but we are listening to events anyways,
                     // so we need to do nothing in these cases.
                     return;
@@ -453,26 +453,26 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
                 var feature = evt.feature;
 
                 var measureData = {
-                    geometry : feature.geometry
+                    geometry: feature.geometry
                 };
 
 
                 // We measure the selected geometry. We don't need to do this for MODE_PERIMETER because
                 // we handle that type in _createTooltip
-                if(this.measureMode==this.MODE_LENGTH) {
+                if (this.measureMode == this.MODE_LENGTH) {
                     var perimeterData = this.measureControl.getBestLength(feature.geometry);
                     measureData.measure = perimeterData[0];
                     measureData.units = perimeterData[1];
                     measureData.order = 1;
-                } else if(this.measureMode==this.MODE_AREA) {
+                } else if (this.measureMode == this.MODE_AREA) {
                     var perimeterData = this.measureControl.getBestArea(feature.geometry);
                     measureData.measure = perimeterData[0];
                     measureData.units = perimeterData[1];
                     measureData.order = 2;
                 }
 
-                var title= this.selectionPopupTooltips[this.measureMode];
-                this.measureTooltip = this._createTooltip(measureData,title);
+                var title = this.selectionPopupTooltips[this.measureMode];
+                this.measureTooltip = this._createTooltip(measureData, title);
 
                 var centroid = feature.geometry.getCentroid();
                 this.measureTooltip.targetXY = this._calculateTooltipXY(centroid);
@@ -484,12 +484,12 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
         return this.selectControl;
     },
 
-    _createTooltip : function(metricData, title) {
+    _createTooltip: function(metricData, title) {
         // We calculate here the metrics for MODE_PERIMETER because the measure control doesn't
         // seemingly return us perimeter info in the event so we need to do that manually.
-        if(this.measureMode==this.MODE_PERIMETER) {
+        if (this.measureMode == this.MODE_PERIMETER) {
             var perimeterData = this.measureControl.getBestLength(metricData.geometry);
-        
+
             metricData.measure = perimeterData[0];
             metricData.units = perimeterData[1];
             metricData.order = 1;
@@ -504,24 +504,27 @@ gxp.plugins.CustomMeasure = Ext.extend(gxp.plugins.ClickableFeatures, {
             draggable: false,
             mouseOffset: [0, 0],
             showDelay: 1,
-            listeners: {hide: this.cleanup, scope:this}
+            listeners: {
+                hide: this.cleanup,
+                scope: this
+            }
         });
     },
 
-    _getFeatureManager : function() {
+    _getFeatureManager: function() {
         return app.tools[this.featureManager];
     },
 
-    _createMeasureLabel : function(metricData) {
-            var metric = metricData.measure;
-            var order = metricData.order;
-            var metricUnit = metricData.units;        
+    _createMeasureLabel: function(metricData) {
+        var metric = metricData.measure;
+        var order = metricData.order;
+        var metricUnit = metricData.units;
 
-            var dim = order == 2 ?'<sup>2</sup>' :'';
+        var dim = order == 2 ? '<sup>2</sup>' : '';
 
-            return Ext.util.Format.number(metric, this.numberFormat) + " " + metricUnit + dim;
-        }
-        
+        return Ext.util.Format.number(metric, this.numberFormat) + " " + metricUnit + dim;
+    }
+
 });
 
 Ext.preg(gxp.plugins.CustomMeasure.prototype.ptype, gxp.plugins.CustomMeasure);
