@@ -674,6 +674,20 @@ GeoExt.Lang.add(
         opacityWindowText: 'Opacidad de la capa <div class="pgeo_layeropacityslider-layerName">{0}</div>'
     },
 
+    'PersistenceGeo.widgets.LoginWindow.prototype':{
+        title: "Login",
+        backText: "Volver",
+        nextText: "Siguiente",
+        loginText: "Login",
+        logoutText: "Logout, {user}",
+        loginErrorText: "Usuario o contrase\u00f1.a inv\u00e1lida",
+        userFieldText: "Usuario",
+        passwordFieldText: "Contras\u00f1a", 
+        saveErrorText: "Error al salvar: ",
+        loginUserErrorTitleText: 'Error de login!',
+        loginUserErrorText: 'Usuario \'{0}\' desconocido.\n Por favor, compruebe su contrase\u00f1a o consulte con el administrador'
+    },
+
     'Viewer.plugins.FichaInversion.prototype' : {
         waitText: "Por favor, espere...",
         errorText: "Ocurrió un error, pruebe de nuevo en unos instantes."

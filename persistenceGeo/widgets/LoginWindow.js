@@ -67,6 +67,13 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
     userFieldText: "User",
     passwordFieldText: "Password", 
     saveErrorText: "Trouble saving: ",
+    loginUserErrorTitleText: 'Login error!',
+    loginUserErrorText: 'Unknow user \'{0}\'.\n Please check username and password or contact with the system administrator',
+
+    /**
+     * Used to check if the login button is pressed by an user
+     **/
+    buttonPressed: false,
 
     constructor: function(config) {
         Ext.apply(this, config);
@@ -126,11 +133,12 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
 
         function submitLogin() {
             panel.buttons[0].disable();
+            this.buttonPressed = true;
             panel.getForm().submit({
                 success: function(form, action) {
                     this.postLoginFunction(form, action);
                     this.un("beforedestroy", this.cancelAuthentication, this);
-                    this.close();
+                    this.hide();
                 },
                 failure: function(form, action) {
                     if (!!action.response.status 
@@ -140,16 +148,9 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
                         // debug return action.response.status == 404 || 405 || 200
                         this.postLoginFunction(form, action);
                         this.un("beforedestroy", this.cancelAuthentication, this);
-                        this.close();
+                        this.hide();
                         Ext.Msg.alert('¡Cuidado!', 'Modo debug activo. Pueden producirse problemas con la sesi&oacute;n de usuario.');
                     }else{
-                        if(action.failureType == 'server'){
-                            obj = Ext.util.JSON.decode(action.response.responseText);
-         
-                            Ext.Msg.alert('Error en el login', obj.errors.reason);
-                        }else{
-                            Ext.Msg.alert('¡Cuidado!', 'No se encuentra el servidor de autenticaci&oacute;n : ' + action.response.responseText);
-                        }
                         this.authorizedRoles = [];
                         panel.buttons[0].enable();
                         form.markInvalid({
@@ -163,6 +164,7 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
         }
 
         config.items = panel;
+        this.panel = panel;
 
         if(!!this.target){
             if(this.target.loginText){
@@ -441,6 +443,22 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
         var text = this.loginText;
         var handler = this.authenticate;
         this.applyLoginState('login', text, handler, this);
+        this.panel.buttons[0].enable();
+        var form = this.panel.getForm();
+        if(this.buttonPressed
+            && !!form
+            && !!form.getFieldValues()["j_password"]
+            && !!form.getFieldValues()["j_username"]
+            && form.getFieldValues()["j_username"].length > 0
+            && form.getFieldValues()["j_password"].length > 0){
+            form.markInvalid({
+                "j_username": this.loginErrorText,
+                "j_password": this.loginErrorText
+            });
+            this.buttonPressed = false;
+            this.show();
+            Ext.Msg.alert(this.loginUserErrorTitleText, String.format(this.loginUserErrorText, form.getFieldValues()["j_username"]));
+        }
     },
 
     /** private: method[showLogout]
