@@ -89,9 +89,11 @@ PersistenceGeo.permissions.CssPermissionHandler = Ext.extend(PersistenceGeo.perm
         if(element !=null){
             if(element.tagName == "TD"){
                 countVar++; // Principal toolbar
-            }else if(element.tagName == "LI"){
-                countVar = 2; // Tree toolbar
             }
+            // TODO: Use to hide and show tree contextMenu
+            // else if(element.tagName == "LI"){
+            //     countVar = 2; // Tree toolbar
+            // }
             if(countVar == 2){
                 if(hide){
                     element.style.display = "none";
