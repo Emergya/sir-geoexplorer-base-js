@@ -39,7 +39,7 @@ Ext.namespace("PersistenceGeo.permissions");
 PersistenceGeo.permissions.CssPermissionHandler = Ext.extend(PersistenceGeo.permissions.PermissionHandler,{
 
     /** Exclude buttons hide!! **/
-    excludes: {"loginbutton":{}, "login":{}},
+    excludes: {"loginbutton":{}, "login":{}, "logout":{}},
 
     constructor: function(config) {
         Ext.apply(this, config);
