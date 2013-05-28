@@ -34,6 +34,9 @@ Viewer.controller.PlanificationTools = Ext.extend(Viewer.controller.Controller, 
     layersWindow: null,
     rulesWindow: null,
 
+    // We will increase the IPT layer id by this amount  so it don't collide with existing public layers in the TOC. HACKFIX for #83417.
+    magicNumber: 10000000,
+
     addedLayers: {
         _data: {},
         add: function(layer) {
@@ -56,9 +59,9 @@ Viewer.controller.PlanificationTools = Ext.extend(Viewer.controller.Controller, 
             return layers;
         }
     },
-    
+
     constructor: function(config) {
-        
+
         this.mapPanel = Viewer.getMapPanel();
         this.map = this.mapPanel.map;
         this.persistenceGeoContext = app.persistenceGeoContext;
@@ -113,7 +116,7 @@ Viewer.controller.PlanificationTools = Ext.extend(Viewer.controller.Controller, 
         }
 
         if (checked === false) {
-            var layer = this.addedLayers.get(node.id);
+            var layer = this.addedLayers.get(node.id+this.magicNumber);
             if (layer !== null) {
                 this.removeLayersFromMap([layer]);
                 this.addedLayers.remove(node.id);
@@ -127,7 +130,7 @@ Viewer.controller.PlanificationTools = Ext.extend(Viewer.controller.Controller, 
     addCheckedLayer: function(layerData) {
 
         var layer = this.persistenceGeoContext.getLayerFromData(layerData);
-        this.onLayersLoaded([layer], null,  null);
+        this.onLayersLoaded([layer], null, null);
         this.addedLayers.add(layer);
     },
 
@@ -140,10 +143,13 @@ Viewer.controller.PlanificationTools = Ext.extend(Viewer.controller.Controller, 
 
         var countLayers = layers.length;
 
-        for (var i=0, l=countLayers; i<l; i++) {
+        for (var i = 0, l = countLayers; i < l; i++) {
+            // FIXHACK for #83417: We increase the id so it doesn't conflict with public layers that might be loaded.
+            layers[i].layerID+=this.magicNumber;
 
             var exists = this.map.getLayersBy('layerID', layers[i].layerID);
-            if (exists.length == 0) {
+            if (exists.length === 0) {
+                // The layer isn't currently added.
 
                 var layer = layers[i];
                 layer.visibility = true;
@@ -155,7 +161,7 @@ Viewer.controller.PlanificationTools = Ext.extend(Viewer.controller.Controller, 
                     layer.layerName = layerName[1];
                 } else {
                     layer.layerWorkspace = '';
-                    layer.layerName  = layer.name;
+                    layer.layerName = layer.name;
                 }
 
                 this.rulesWindow.addTab(layer, function(status) {
@@ -173,7 +179,7 @@ Viewer.controller.PlanificationTools = Ext.extend(Viewer.controller.Controller, 
     },
 
     removeLayersFromMap: function(layers) {
-        for (var i=0, l=layers.length; i<l; i++) {
+        for (var i = 0, l = layers.length; i < l; i++) {
             this.map.removeLayer(layers[i]);
             this.rulesWindow.removeTab(layers[i]);
         }
