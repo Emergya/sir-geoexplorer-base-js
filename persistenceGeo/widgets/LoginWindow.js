@@ -465,6 +465,7 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
      *  Show the logout button.
      */
     showLogout: function(user) {
+        this.buttonPressed = false;
         var text = new Ext.Template(this.logoutText).applyTemplate({user: user});
         var handler = this.logout;
         this.applyLoginState('logout', text, handler, this);
