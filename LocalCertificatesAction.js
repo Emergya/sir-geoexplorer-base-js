@@ -38,7 +38,7 @@
 /** api: (extends)
  *  plugins/Tool.js
  */
-Ext.namespace("gxp.plugins");
+Ext.namespace('gxp.plugins');
 
 /** api: constructor
  *  .. class:: pointInformationAction(config)
@@ -48,7 +48,7 @@ Ext.namespace("gxp.plugins");
 gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
 
     /** api: ptype = gxp_extendedtoolbar */
-    ptype: "gxp_localcertificates",
+    ptype: 'gxp_localcertificates',
 
     /** i18n * */
     /** api: config[buttonText]
@@ -64,9 +64,9 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
 
     searchFormText: 'Show search form',
     selectInMapText: 'Select in map',
-    selectPropertyInMapText: "Select a property in the map, please.",
-    errorText: "An error happened, please try again in a few moments.",
-    waitText: "Please wait...",
+    selectPropertyInMapText: 'Select a property in the map, please.',
+    errorText: 'An error happened, please try again in a few moments.',
+    waitText: 'Please wait...',
 
 
     /** api: config[tooltip]
@@ -99,7 +99,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
      */
     addActions: function() {
 
-        app.on("loginstatechange", this._onLoginStateChanged, this);
+        app.on('loginstatechange', this._onLoginStateChanged, this);
 
         var hidden = this._checkHidden(app.persistenceGeoContext.userInfo);
         return this._toolItems = gxp.plugins.LocalCertificatesAction.superclass.addActions.apply(this, [{
@@ -111,13 +111,13 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
             menu: new Ext.menu.Menu({
                 items: [
                 new Ext.menu.Item({
-                    iconCls: "vw-icon-localcertificate-searchform-action",
+                    iconCls: 'vw-icon-localcertificate-searchform-action',
                     text: this.searchFormText,
                     handler: this._showSearchFormHandler,
                     scope: this
                 }),
                 new Ext.menu.Item({
-                    iconCls: "vw-icon-mapselection",
+                    iconCls: 'vw-icon-mapselection',
                     text: this.selectInMapText,
                     handler: this._selectInMapHandler,
                     scope: this
@@ -134,10 +134,10 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
         var toolButton = this._toolItems[0];
         if (hidden) {
 
-            // We destroy the search form 
+            // We destroy the search form
             var ds = Viewer.getComponent('LocalCertificatesWindow');
             if (ds) {
-                Viewer.unregisterComponent("LocalCertificatesWindow");
+                Viewer.unregisterComponent('LocalCertificatesWindow');
                 ds.destroy();
             }
 
@@ -152,7 +152,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
     },
 
     _checkHidden: function(userInfo) {
-        if (!userInfo || !userInfo.authority || userInfo.authority.indexOf("Municipalidad") == -1) {
+        if (!userInfo || !userInfo.authority || userInfo.authority.indexOf('Municipalidad') == -1) {
             return true;
         }
 
@@ -182,38 +182,38 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
 
     _cancelMapSelection: function() {
         // We change the cursor over the map to indicate selection.
-        Ext.select(".olMap").setStyle("cursor", "default");
+        Ext.select('.olMap').setStyle('cursor', 'default');
         var map = Viewer.getMapPanel().map;
-        map.events.unregister("click", this, this._onPropertySelected);
+        map.events.unregister('click', this, this._onPropertySelected);
     },
 
     _selectInMapHandler: function() {
-        Ext.MessageBox.alert("", this.selectPropertyInMapText)
+        Ext.MessageBox.alert('', this.selectPropertyInMapText);
 
         // We change the cursor over the map to indicate selection.
-        Ext.select(".olMap").setStyle("cursor", "crosshair");
+        Ext.select('.olMap').setStyle('cursor', 'crosshair');
 
         this.addLocalityLayer();
-       
+
         // We call the initial view for the user.
         app.tools.zoomToInitialValues.zoomToInitialValues();
 
          var map = Viewer.getMapPanel().map;
         // We wait for the user's click
-        map.events.register("click", this, this._onPropertySelected);
+        map.events.register('click', this, this._onPropertySelected);
     },
 
-    addLocalityLayer : function() {
+    addLocalityLayer: function() {
          var map = Viewer.getMapPanel().map;
-        var layerName = "gore:" + this.getLayerName();
+        var layerName = 'gore:' + this.getLayerName();
         // We show the parcels layer in the map so the user can use that as reference.
         var baseLayer = new OpenLayers.Layer.WMS(
-            "Propiedad Rural " + this.getLocalityName(false),
-            app.sources.local.url + "/wms", {
+            'Propiedad Rural ' + this.getLocalityName(false),
+            app.sources.local.url + '/wms', {
             layers: layerName,
-            outputFormat: "image/png",
+            outputFormat: 'image/png',
             transparent: true,
-            styles: "Borde_comuna"
+            styles: 'Borde_comuna'
         });
 
 
@@ -221,8 +221,8 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
     },
 
     getLayerName: function(layerType) {
-        var layerPrefix = "PROPIEDAD_RURAL";
-        if (typeof(layerType) != "undefined" && layerType) {
+        var layerPrefix = 'PROPIEDAD_RURAL';
+        if (typeof(layerType) != 'undefined' && layerType) {
             layerPrefix = layerType;
         }
 
@@ -232,14 +232,14 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
             return null;
         }
 
-        return layerPrefix + "_" + localityName;
+        return layerPrefix + '_' + localityName;
     },
 
     _onPropertySelected: function(eventData) {
         // We change back the cursor after selection.
-        Ext.select(".olMap").setStyle("cursor", "default");
+        Ext.select('.olMap').setStyle('cursor', 'default');
         var map = Viewer.getMapPanel().map;
-        map.events.unregister("click", this, this._onPropertySelected);
+        map.events.unregister('click', this, this._onPropertySelected);
 
         // We get the coordinates of the clicked point in the map
         var point = map.getLonLatFromViewPortPx(eventData.xy);
@@ -249,14 +249,14 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
         Ext.MessageBox.wait(this.waitText);
         Ext.Ajax.request({
             url: app.sources.local.url,
-            method: "GET",
+            method: 'GET',
             params: {
-                service: "wfs",
-                request: "GetFeature",
-                typeName: "gore:" + this.getLayerName(),
-                outputFormat: "json",
+                service: 'WFS',
+                request: 'GetFeature',
+                typeName: 'gore:' + this.getLayerName(),
+                outputFormat: 'json',
                 srsName: map.projection,
-                cql_filter: "INTERSECTS(the_geom, POINT(" + point.lon + " " + point.lat + "))"
+                cql_filter: 'INTERSECTS(the_geom, POINT(' + point.lon + ' ' + point.lat + '))'
             },
 
             success: function(response) {
@@ -265,17 +265,17 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                     output = Ext.decode(response.responseText);
                 } catch (e) {
                     // If we can't decode the response's json then the server outputted
-                    // the error in xml.      
+                    // the error in xml.
                     Ext.MessageBox.updateProgress(1);
                     Ext.MessageBox.hide();
-                    Ext.MessageBox.alert("", this.errorText);
+                    Ext.MessageBox.alert('', this.errorText);
                     return;
                 }
                 Ext.MessageBox.updateProgress(1);
                 Ext.MessageBox.hide();
 
                 if (!output.features.length) {
-                    Ext.MessageBox.alert("", this.noParcelSelectedText)
+                    Ext.MessageBox.alert('', this.noParcelSelectedText);
                     return;
                 }
 
@@ -287,18 +287,18 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                 // Si la respuesta no es json válido hubo un fallo
                 Ext.MessageBox.updateProgress(1);
                 Ext.MessageBox.hide();
-                Ext.MessageBox.alert("", this.errorText);
+                Ext.MessageBox.alert('', this.errorText);
             },
             scope: this
         });
     },
     _getLayerProjection: function() {
         // FIXME: This should be retrieved from the server...
-        return "EPSG:32719";
+        return 'EPSG:32719';
     },
 
     createLocalCertificate: function(ruralData) {
-        var resultLabel = this.getCertificateLabel(ruralData, "_");
+        var resultLabel = this.getCertificateLabel(ruralData, '_');
 
 
         var localityName = this.getLocalityName(false);
@@ -329,14 +329,14 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
     _retrievePDFBlockData: function(ruralPropertyCentroid) {
         Ext.Ajax.request({
             url: app.sources.local.url,
-            method: "POST",
+            method: 'GET',
             params: {
-                service: "wfs",
-                request: "GetFeature",
-                typeName: "gore:" + this.getLayerName("MANZANAS"),
-                outputFormat: "json",
+                service: 'WFS',
+                request: 'GetFeature',
+                typeName: 'gore:' + this.getLayerName('MANZANAS'),
+                outputFormat: 'json',
                 srsName: Viewer.getMapPanel().map.projection,
-                cql_filter: "INTERSECTS(the_geom, POINT(" + ruralPropertyCentroid.x + " " + ruralPropertyCentroid.y + "))"
+                cql_filter: 'INTERSECTS(the_geom, POINT(' + ruralPropertyCentroid.x + ' ' + ruralPropertyCentroid.y + '))'
             },
 
             success: function(response) {
@@ -347,7 +347,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                     // Si la respuesta no es json válido hubo un fallo
                     Ext.MessageBox.updateProgress(1);
                     Ext.MessageBox.hide();
-                    Ext.MessageBox.alert("", this.errorText);
+                    Ext.MessageBox.alert('', this.errorText);
                     return;
                 }
 
@@ -357,7 +357,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                     };
                 } else {
                     this.pdfData.blockData = {
-                        blockNumber: output.features[0].properties["N°_MANZANA"]
+                        blockNumber: output.features[0].properties['N_MANZANA']
                     };
                 }
 
@@ -370,7 +370,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                 // Si la respuesta no es json válido hubo un fallo
                 Ext.MessageBox.updateProgress(1);
                 Ext.MessageBox.hide();
-                Ext.MessageBox.alert("", this.errorText);
+                Ext.MessageBox.alert('', this.errorText);
             },
             scope: this
         });
@@ -379,14 +379,14 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
     _retrievePDFZoneData: function(ruralPropertyCentroid) {
         Ext.Ajax.request({
             url: app.sources.local.url,
-            method: "POST",
+            method: 'GET',
             params: {
-                service: "wfs",
-                request: "GetFeature",
-                typeName: "gore:" + this.getLayerName("ZONIFICACION"),
-                outputFormat: "json",
+                service: 'WFS',
+                request: 'GetFeature',
+                typeName: 'gore:' + this.getLayerName('ZONIFICACION'),
+                outputFormat: 'json',
                 srsName: Viewer.getMapPanel().map.projection,
-                cql_filter: "INTERSECTS(the_geom, POINT(" + ruralPropertyCentroid.x + " " + ruralPropertyCentroid.y + "))"
+                cql_filter: 'INTERSECTS(the_geom, POINT(' + ruralPropertyCentroid.x + ' ' + ruralPropertyCentroid.y + '))'
             },
 
             success: function(response) {
@@ -397,7 +397,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                     // Si la respuesta no es json válido hubo un fallo
                     Ext.MessageBox.updateProgress(1);
                     Ext.MessageBox.hide();
-                    Ext.MessageBox.alert("", this.errorText);
+                    Ext.MessageBox.alert('', this.errorText);
                     return;
                 }
 
@@ -408,9 +408,9 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                     };
                 } else {
                     this.pdfData.zoneData = {
-                        zoneNumber: output.features[0].properties["ZONA"],
-                        zoneDescription: output.features[0].properties["DESCRIPCION"]
-                    }
+                        zoneNumber: output.features[0].properties['ZONA'],
+                        zoneDescription: output.features[0].properties['DESCRIPCION']
+                    };
                 }
 
 
@@ -422,7 +422,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                 // Si la respuesta no es json válido hubo un fallo
                 Ext.MessageBox.updateProgress(1);
                 Ext.MessageBox.hide();
-                Ext.MessageBox.alert("", this.errorText);
+                Ext.MessageBox.alert('', this.errorText);
             },
             scope: this
         });
@@ -436,15 +436,15 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
         }
 
         var params = {
-            size: "letter",
+            size: 'letter',
             margin: 30, // mm
-            title: "Certificado Municipal",
+            title: 'Certificado Municipal',
             items: this.createPDFDocument(this.pdfData),
-            outputFile: "certificado_municipal_" + this.pdfData.resultLabel.replace(/ /g, "_"),
+            outputFile: 'certificado_municipal_' + this.pdfData.resultLabel.replace(/ /g, '_'),
             keepFile: true
         };
 
-        var url = app.proxy + "http://localhost/phpPDF/phpPDF.php";
+        var url = app.proxy + 'http://localhost/phpPDF/phpPDF.php';
 
         Ext.Ajax.request({
             url: url,
@@ -463,17 +463,17 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                 app.downloadFile(url, {
                     params: Ext.encode({
                         downloadFile: result.downloadableFile,
-                        outputFormat: "PDF"
+                        outputFormat: 'PDF'
                     })
                 });
             },
             failure: function(response) {
                 Ext.MessageBox.updateProgress(1);
                 Ext.MessageBox.hide();
-                Ext.MessageBox.alert("", this.errorText)
+                Ext.MessageBox.alert('', this.errorText);
             },
             scope: this
-        })
+        });
 
 
     },
@@ -482,60 +482,60 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
     _createMapImageURLs: function(objectid, geometry) {
         var bounds = geometry.getBounds();
 
-        var bboundsW=  bounds.right-bounds.left;
+        var bboundsW = bounds.right - bounds.left;
         var bboundsH = bounds.top - bounds.bottom;
 
         var padding = 200;
         var proportion = 800 / 600;
 
-        var newBBoxW = proportion*bboundsH;
-        var bboxHCenter = (bounds.right+bounds.left)/2
+        var newBBoxW = proportion * bboundsH;
+        var bboxHCenter = (bounds.right + bounds.left) / 2;
 
-        var paddingH = padding*proportion + newBBoxW/2;
-        // We add a bit of padding to the bounds so we show a bit of 
+        var paddingH = padding * proportion + newBBoxW / 2;
+        // We add a bit of padding to the bounds so we show a bit of
         // context in the map.
-        bounds.top += padding ;
+        bounds.top += padding;
         bounds.left = bboxHCenter - paddingH;
         bounds.bottom -= padding;
         bounds.right = bboxHCenter + paddingH;
 
         var urls = {
             baseLayerUrl: this._createURL(
-                "http://localhost/osmWMS/osmWMS.php", {
-                REQUEST: "GetMap",
+                'http://localhost/osmWMS/osmWMS.php', {
+                REQUEST: 'GetMap',
                 WIDTH: 800,
                 HEIGHT: 600,
                 BBOX: bounds,
-                FORMAT: "image/png"
+                FORMAT: 'image/png'
             }),
             mapUrl: this._createURL(
-            app.sources.local.url.replace("ows", "wms"), {
-                service: "WMS",
-                version: "1.1.0",
-                request: "GetMap",
-                layers: "gore:" + this.getLayerName(),
+            app.sources.local.url.replace('ows', 'wms'), {
+                service: 'WMS',
+                version: '1.1.0',
+                request: 'GetMap',
+                layers: 'gore:' + this.getLayerName(),
                 width: 800,
                 height: 600,
                 bbox: bounds,
                 srs: Viewer.getMapPanel().map.projection,
-                format: "image/png",
+                format: 'image/png',
                 transparent: true,
-                styles: "Borde_comuna"
+                styles: 'Borde_comuna'
             }),
             parcelUrl: this._createURL(
-            app.sources.local.url.replace("ows", "wms"), {
-                service: "WMS",
-                version: "1.1.0",
-                request: "GetMap",
-                layers: "gore:" + this.getLayerName(),
+            app.sources.local.url.replace('ows', 'wms'), {
+                service: 'WMS',
+                version: '1.1.0',
+                request: 'GetMap',
+                layers: 'gore:' + this.getLayerName(),
                 width: 800,
                 height: 600,
                 bbox: bounds,
                 srs: Viewer.getMapPanel().map.projection,
-                format: "image/png",
+                format: 'image/png',
                 transparent: true,
                 opacity: 0.5,
-                cql_filter: encodeURIComponent("OBJECTID = " + objectid)
+                cql_filter: encodeURIComponent('OBJECTID = ' + objectid)
             })
 
         };
@@ -551,64 +551,64 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
         var leftColumnWidth = avalaibleWidth * 0.3;
         var rightColumnWidth = avalaibleWidth * 0.7;
 
-        var roleText = pdfData.ruralData.ROL ? pdfData.ruralData.ROL : "Falta en capa";
+        var roleText = pdfData.ruralData.ROL ? pdfData.ruralData.ROL : 'Falta en capa';
 
         var items = [{
             newFont: {
                 size: 10
             },
-            text: "LOGO DEL MUNICIPIO"
+            text: 'LOGO DEL MUNICIPIO'
         }, {
             newFont: {
                 size: 12,
-                style: "B"
+                style: 'B'
             },
-            text: "MUNICIPALIDAD DE " + pdfData.localityName.toUpperCase(),
-            align: "C",
+            text: 'MUNICIPALIDAD DE ' + pdfData.localityName.toUpperCase(),
+            align: 'C',
             dy: 7
         }, {
             newFont: {
                 size: 9
             },
-            text: "NOMBRE DEL CERTIFICADO (AÚN NO DEFINIDO)",
-            align: "C",
+            text: 'NOMBRE DEL CERTIFICADO (AÚN NO DEFINIDO)',
+            align: 'C',
             dy: 3
         }, {
             newFont: {
-                style: ""
+                style: ''
             },
             dy: 7,
-            text: "NOMBRE DEL DEPTO RESPONSABLE DE ESTA INFORMACIÓN (MUNICIPIO LO DEBE DEFINIR)"
+            text: 'NOMBRE DEL DEPTO RESPONSABLE DE ESTA INFORMACIÓN (MUNICIPIO LO DEBE DEFINIR)'
         }, {
             newFont: {
-                style: "B"
+                style: 'B'
             },
-            text: "RESULTADO DE LA BÚSQUEDA:",
+            text: 'RESULTADO DE LA BÚSQUEDA:',
             dy: 15
         }, {
             newFont: {
-                style: ""
+                style: ''
             },
             newLineWidth: 0.1,
-            type: "table",
+            type: 'table',
             rows: [
                 [{
-                    text: "ROL",
+                    text: 'ROL',
                     width: leftColumnWidth
                 }, {
                     text: roleText,
                     width: rightColumnWidth
                 }],
-                ["DIRECCIÓN", this._getPDFValue(pdfData.ruralData.DIRECCION)],
-                ["Nº MANZANA", this._getPDFValue(pdfData.blockData.blockNumber)],
-                ["SUPERFICIE", this._getPDFValue(pdfData.ruralData.SUPERFIFICE)]
+                ['DIRECCIÓN', this._getPDFValue(pdfData.ruralData.DIRECCION)],
+                ['Nº MANZANA', this._getPDFValue(pdfData.blockData.blockNumber)],
+                ['SUPERFICIE', this._getPDFValue(pdfData.ruralData.SUPERFIFICE)]
             ],
             dy: 5
         }, {
-            type: "table",
+            type: 'table',
             rows: [
                 [{
-                    text: "NOMBRE PROPIETARIO",
+                    text: 'NOMBRE PROPIETARIO',
                     width: leftColumnWidth
                 }, {
                     text: this._getPDFValue(pdfData.ruralData.PROPIETARI),
@@ -617,10 +617,10 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
             ],
             dy: 10
         }, {
-            type: "table",
+            type: 'table',
             rows: [
                 [{
-                    text: "ZONIFICACIÓN",
+                    text: 'ZONIFICACIÓN',
                     width: leftColumnWidth,
                     rowspan: 2
                 }, {
@@ -631,33 +631,34 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
             ],
             dy: 10
         }, {
-            type: "image",
+            type: 'image',
             url: pdfData.mapImageUrls.baseLayerUrl,
             width: avalaibleWidth * 0.7,
             dx: Math.floor(avalaibleWidth * 0.15), // So the image is centered.
             dy: 7,
-            keepPosition: true
+            keepPosition: true,
+            dpi: 300
         }, {
-            type: "image",
+            type: 'image',
             url: pdfData.mapImageUrls.mapUrl,
             width: avalaibleWidth * 0.7,
             keepPosition: true
         }, {
-            type: "image",
+            type: 'image',
             url: pdfData.mapImageUrls.parcelUrl,
             width: avalaibleWidth * 0.7
         }, {
             newFont: {
                 size: 7,
-                style: "B"
+                style: 'B'
             },
-            text: "AQUÍ DEBIERAN IR LOS DATOS DE CONTACTO DEL MUNCIPIO (DEPTO/FONO/CORREO/ETC)",
-            align: "C",
+            text: 'AQUÍ DEBIERAN IR LOS DATOS DE CONTACTO DEL MUNCIPIO (DEPTO/FONO/CORREO/ETC)',
+            align: 'C',
             x: margin,
             dy: 7
         }, {
-            text: "ADEMÁS DE DATOS DE LA PLATAFORMA DEL SIR",
-            align: "C",
+            text: 'ADEMÁS DE DATOS DE LA PLATAFORMA DEL SIR',
+            align: 'C',
             dy: 1
         }];
 
@@ -665,8 +666,8 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
     },
 
     _getPDFValue: function(value) {
-        if (typeof(value) == "undefined" || !value) {
-            return "Sin información";
+        if (typeof(value) == 'undefined' || !value) {
+            return 'Sin información';
         } else {
             return value;
         }
@@ -676,11 +677,11 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
     getLocalityName: function(tidy) {
 
         if (!app.persistenceGeoContext.userInfo) {
-            return "";
+            return '';
         }
 
         var authority = app.persistenceGeoContext.userInfo.authority;
-        var needle = "Municipalidad de";
+        var needle = 'Municipalidad de';
         var localityName = authority.substr(authority.indexOf(needle) + needle.length);
         if (tidy) {
             localityName = this._accentsTidy(localityName);
@@ -690,18 +691,18 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
 
     _accentsTidy: function(s) {
         var r = s.toLowerCase();
-        r = r.replace(new RegExp("\\s", 'g'), "");
-        r = r.replace(new RegExp("[àáâãäå]", 'g'), "a");
-        r = r.replace(new RegExp("æ", 'g'), "ae");
-        r = r.replace(new RegExp("ç", 'g'), "c");
-        r = r.replace(new RegExp("[èéêë]", 'g'), "e");
-        r = r.replace(new RegExp("[ìíîï]", 'g'), "i");
-        r = r.replace(new RegExp("ñ", 'g'), "n");
-        r = r.replace(new RegExp("[òóôõö]", 'g'), "o");
-        r = r.replace(new RegExp("œ", 'g'), "oe");
-        r = r.replace(new RegExp("[ùúûü]", 'g'), "u");
-        r = r.replace(new RegExp("[ýÿ]", 'g'), "y");
-        r = r.replace(new RegExp("\\W", 'g'), "");
+        r = r.replace(new RegExp('\\s', 'g'), '');
+        r = r.replace(new RegExp('[àáâãäå]', 'g'), 'a');
+        r = r.replace(new RegExp('æ', 'g'), 'ae');
+        r = r.replace(new RegExp('ç', 'g'), 'c');
+        r = r.replace(new RegExp('[èéêë]', 'g'), 'e');
+        r = r.replace(new RegExp('[ìíîï]', 'g'), 'i');
+        r = r.replace(new RegExp('ñ', 'g'), 'n');
+        r = r.replace(new RegExp('[òóôõö]', 'g'), 'o');
+        r = r.replace(new RegExp('œ', 'g'), 'oe');
+        r = r.replace(new RegExp('[ùúûü]', 'g'), 'u');
+        r = r.replace(new RegExp('[ýÿ]', 'g'), 'y');
+        r = r.replace(new RegExp('\\W', 'g'), '');
         return r;
     },
 
@@ -753,12 +754,12 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
     },
 
     _createURL: function(baseUrl, params) {
-        var url = baseUrl + "?";
+        var url = baseUrl + '?';
         var paramPieces = [];
         for (var key in params) {
-            paramPieces.push(key + "=" + params[key]);
+            paramPieces.push(key + '=' + params[key]);
         }
-        return url + paramPieces.join("&");
+        return url + paramPieces.join('&');
     }
 
 });
