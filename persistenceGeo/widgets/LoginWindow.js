@@ -1,16 +1,16 @@
 /*
  * LoginWindow.js Copyright (C) 2013 This file is part of PersistenceGeo project
- * 
+ *
  * This software is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -20,7 +20,7 @@
  * resulting executable to be covered by the GNU General Public License.
  * This exception does not however invalidate any other reasons why the
  * executable file might be covered by the GNU General Public License.
- * 
+ *
  * Authors: Alejandro Diaz Torres (mailto:adiaz@emergya.com)
  */
 
@@ -32,12 +32,12 @@ Ext.namespace("PersistenceGeo.widgets");
 
 /**
  * Class: PersistenceGeo.widgets.LoginWindow
- * 
+ *
  * Login window for persistence geo applications
- * 
+ *
  */
-PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
-    
+PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window, {
+
     /** ptype **/
     ptype: "pgeo_loginwindow",
 
@@ -65,7 +65,7 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
     logoutText: "Logout, {user}",
     loginErrorText: "Invalid username or password.",
     userFieldText: "User",
-    passwordFieldText: "Password", 
+    passwordFieldText: "Password",
     saveErrorText: "Trouble saving: ",
     loginUserErrorTitleText: 'Login error!',
     loginUserErrorText: 'Unknow user \'{0}\'.\n Please check username and password or contact with the system administrator',
@@ -92,9 +92,17 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
                     if (response.status === 200) {
                         success = true;
                     } else {
-                        records = [
-                            {data: {id: "j_username", msg: this.loginErrorText}},
-                            {data: {id: "j_password", msg: this.loginErrorText}}
+                        records = [{
+                                data: {
+                                    id: "j_username",
+                                    msg: this.loginErrorText
+                                }
+                            }, {
+                                data: {
+                                    id: "j_password",
+                                    msg: this.loginErrorText
+                                }
+                            }
                         ];
                     }
                     return {
@@ -104,31 +112,34 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
                 }
             },
             items: [{
-                fieldLabel: this.userFieldText,
-                name: "j_username",
-                allowBlank: false,
-                listeners: {
-                    render: function() {
-                        this.focus(true, 100);
+                    fieldLabel: this.userFieldText,
+                    name: "j_username",
+                    allowBlank: false,
+                    listeners: {
+                        render: function() {
+                            this.focus(true, 100);
+                        }
                     }
+                }, {
+                    fieldLabel: this.passwordFieldText,
+                    name: "j_password",
+                    inputType: "password",
+                    allowBlank: false
                 }
-            }, {
-                fieldLabel: this.passwordFieldText,
-                name: "j_password",
-                inputType: "password",
-                allowBlank: false
-            }],
+            ],
             buttons: [{
-                text: this.loginText,
-                formBind: true,
-                handler: submitLogin,
-                scope: this
-            }],
-            keys: [{ 
-                key: [Ext.EventObject.ENTER], 
-                handler: submitLogin,
-                scope: this
-            }]
+                    text: this.loginText,
+                    formBind: true,
+                    handler: submitLogin,
+                    scope: this
+                }
+            ],
+            keys: [{
+                    key: [Ext.EventObject.ENTER],
+                    handler: submitLogin,
+                    scope: this
+                }
+            ]
         });
 
         function submitLogin() {
@@ -141,16 +152,13 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
                     this.hide();
                 },
                 failure: function(form, action) {
-                    if (!!action.response.status 
-                            && (action.response.status == 200
-                                || action.response.status == 404
-                                || action.response.status == 405)){
+                    if ( !! action.response.status && (action.response.status == 200 || action.response.status == 404 || action.response.status == 405)) {
                         // debug return action.response.status == 404 || 405 || 200
                         this.postLoginFunction(form, action);
                         this.un("beforedestroy", this.cancelAuthentication, this);
                         this.hide();
                         Ext.Msg.alert('¡Cuidado!', 'Modo debug activo. Pueden producirse problemas con la sesi&oacute;n de usuario.');
-                    }else{
+                    } else {
                         this.authorizedRoles = [];
                         panel.buttons[0].enable();
                         form.markInvalid({
@@ -166,12 +174,12 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
         config.items = panel;
         this.panel = panel;
 
-        if(!!this.target){
-            if(this.target.loginText){
+        if ( !! this.target) {
+            if (this.target.loginText) {
                 config.title = this.target.loginText;
             }
 
-            if(this.target.authorizedRoles){
+            if (this.target.authorizedRoles) {
                 this.authorizedRoles = this.target.authorizedRoles;
             }
 
@@ -181,15 +189,15 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
         PersistenceGeo.widgets.LoginWindow.superclass.constructor.apply(this, arguments);
     },
 
-    initComponent: function(config){
+    initComponent: function(config) {
 
-        if(!!config){
-            config.listeners= {
+        if ( !! config) {
+            config.listeners = {
                 beforedestroy: this.cancelAuthentication,
                 scope: this
             };
         }
-        
+
         PersistenceGeo.widgets.LoginWindow.superclass.initComponent.apply(this, arguments);
     },
 
@@ -212,11 +220,11 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
      */
     getCookieValue: function(param) {
         var i, x, y, cookies = document.cookie.split(";");
-        for (i=0; i < cookies.length; i++) {
+        for (i = 0; i < cookies.length; i++) {
             x = cookies[i].substr(0, cookies[i].indexOf("="));
-            y = cookies[i].substr(cookies[i].indexOf("=")+1);
-            x=x.replace(/^\s+|\s+$/g,"");
-            if (x==param) {
+            y = cookies[i].substr(cookies[i].indexOf("=") + 1);
+            x = x.replace(/^\s+|\s+$/g, "");
+            if (x == param) {
                 return unescape(y);
             }
         }
@@ -227,28 +235,28 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
      *  Log out the current user from the application.
      */
     logout: function() {
-        Ext.Ajax.request ({ 
-            url: this.logoutUrl, 
-            method: 'GET',    
-            success: function(response) { 
-                this.confirmLogout(response);
-            }, 
-            failure: function(response) { 
+        Ext.Ajax.request({
+            url: this.logoutUrl,
+            method: 'GET',
+            success: function(response) {
                 this.confirmLogout(response);
             },
-            scope: this 
+            failure: function(response) {
+                this.confirmLogout(response);
+            },
+            scope: this
         });
     },
 
-    setAuthorizedRoles: function(authRoles){
-        if(!!this.target){
+    setAuthorizedRoles: function(authRoles) {
+        if ( !! this.target) {
             this.target.setAuthorizedRoles(authRoles);
         }
         this.authorizedRoles = this.target.authorizedRoles;
     },
 
     // confirm logout when logout call is handled
-    confirmLogout: function(response){
+    confirmLogout: function(response) {
         this.clearCookieValue("JSESSIONID");
         this.clearCookieValue(this.cookieParamName);
         this.setAuthorizedRoles([]);
@@ -257,7 +265,7 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
         this.showLogin();
     },
 
-    closePersistenceGeoContext: function (){
+    closePersistenceGeoContext: function() {
         // erase persistence context and save layer
         this.target.persistenceGeoContext.clearLayers();
         this.target.persistenceGeoContext.userLogin = null;
@@ -265,6 +273,9 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
         this.target.persistenceGeoContext.userInfo = null;
         this.target.persistenceGeoContext.activeStore = false;
         this.target.persistenceGeoContext.saveModeActive = this.target.persistenceGeoContext.SAVE_MODES.ANONYMOUS;
+
+         // We send an event to inform listeners that we have unlogged a user.
+        this.target.fireEvent("loginstatechange", this.target, null);
     },
 
     /** private: method[authenticate]
@@ -274,61 +285,59 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
         this.show();
     },
 
-    postLoginFunction: function(form, action){
-        try{
+    postLoginFunction: function(form, action) {
+        try {
             var user = form.findField('j_username').getValue();
             this.setCookieValue(this.cookieParamName, user);
             this.obtainUserInfo(action);
-        }catch (e){
+        } catch (e) {
             //TODO: handle
             console.log(e.stack);
         }
     },
 
     // obtain user info from action.response.responseText or another request
-    obtainUserInfo: function(action){
+    obtainUserInfo: function(action) {
         var userInfo;
-        if(!!action 
-            && action.response.status == 200
-            && !!action.response.responseText){
-            try{
+        if ( !! action && action.response.status == 200 && !! action.response.responseText) {
+            try {
                 userInfo = Ext.util.JSON.decode(action.response.responseText).data;
-            }catch(e){
+            } catch (e) {
                 // not json response, make a request to get userInfo again!!
                 userInfo = null;
             }
         }
-        if(!!userInfo){
+        if ( !! userInfo) {
             this.confirmUserInfo(userInfo);
-        }else{
-            Ext.Ajax.request ({ 
-                url: this.defaultRestUrl + '/persistenceGeo/getUserInfo', 
-                method: 'POST',    
-                success: function(response) { 
+        } else {
+            Ext.Ajax.request({
+                url: this.defaultRestUrl + '/persistenceGeo/getUserInfo',
+                method: 'POST',
+                success: function(response) {
                     var json = Ext.util.JSON.decode(response.responseText);
                     userInfo = json.data;
                     this.confirmUserInfo(userInfo);
-                }, 
-                failure: function(response) { 
+                },
+                failure: function(response) {
                     Ext.Msg.alert('¡Cuidado!', 'No se encuentra el servidor de autenticaci&oacute;n : ' + response.responseText);
                     this.cancelAuthentication();
                 },
-                scope: this 
+                scope: this
             });
         }
-        
+
     },
 
     // confirm user info loaded
-    confirmUserInfo: function(userInfo){
+    confirmUserInfo: function(userInfo) {
 
-         if(!!userInfo && !!userInfo.authorityId){
+        if ( !! userInfo && !! userInfo.authorityId) {
             // Authority login
             this.authorityLogin(userInfo);
-        }else if(!!userInfo && userInfo.admin){
+        } else if ( !! userInfo && userInfo.admin) {
             // Authority login
             this.adminLogin(userInfo);
-        }else{
+        } else {
             // Anonymous login
             this.anonymousLogin(userInfo);
             this.cancelAuthentication();
@@ -337,15 +346,14 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
     },
 
     // delegated to this.target.cancelAuthentication if exists
-    cancelAuthentication: function(){
-        if(!!this.target
-            && !!this.target.cancelAuthentication)
+    cancelAuthentication: function() {
+        if ( !! this.target && !! this.target.cancelAuthentication)
             this.target.cancelAuthentication();
     },
 
-    adminLogin: function(userInfo){
+    adminLogin: function(userInfo) {
         // show user info on log console.log(userInfo);
-        var roles = new Array();
+        var roles = [];
         roles.push("ROLE_ADMINISTRATOR");
         this.userLogin(userInfo, roles);
     },
@@ -353,24 +361,24 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
     /** Method: authorityLogin 
      * Login for an admin of an authorithy
      **/
-    authorityLogin: function(userInfo){
+    authorityLogin: function(userInfo) {
         // show user info on log console.log(userInfo);
-        var roles = new Array();
-        if(!!userInfo.authorityId){
+        var roles = [];
+        if ( !! userInfo.authorityId) {
             roles.push(userInfo.authorityId);
         }
-        if(userInfo.admin){
+        if (userInfo.admin) {
             roles.push("ROLE_ADMINISTRATOR");
         }
         this.userLogin(userInfo, roles);
     },
-    
+
     /** Method: userLogin 
      * Default login for an user.
      **/
-    userLogin: function(userInfo, roles){
+    userLogin: function(userInfo, roles) {
         this.userInfo = userInfo;
-        if(!!roles){
+        if ( !! roles) {
             this.setAuthorizedRoles(roles);
         }
         this.showLogout(userInfo.nombreCompleto);
@@ -380,9 +388,9 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
     },
 
     /** Method: isAuthorizedIn 
-     * Checks if authenticated user has permision for a role 
+     * Checks if authenticated user has permision for a role
      **/
-    anonymousLogin: function(userInfo){
+    anonymousLogin: function(userInfo) {
         this.userInfo = userInfo;
         this.target.persistenceGeoContext = new PersistenceGeo.Context({
             map: this.target.mapPanel.map,
@@ -397,12 +405,12 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
     },
 
     /** Method: isAuthorizedIn 
-     * Checks if authenticated user has permision for a role 
+     * Checks if authenticated user has permision for a role
      **/
-    isAuthorizedIn: function(role){
+    isAuthorizedIn: function(role) {
         var authorized = false;
-        for(var i = 0; i < this.authorizedRoles.length; i++){
-            if(this.authorizedRoles[i] == role){
+        for (var i = 0; i < this.authorizedRoles.length; i++) {
+            if (this.authorizedRoles[i] == role) {
                 authorized = true;
                 break;
             }
@@ -410,7 +418,7 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
         return authorized;
     },
 
-    loadPersistenceGeoContext: function (){
+    loadPersistenceGeoContext: function() {
         // init context and save layer
         this.target.persistenceGeoContext.userLogin = this.getCookieValue(this.cookieParamName);
         this.target.persistenceGeoContext.authUser = this.target.authorizedRoles[0];
@@ -418,7 +426,7 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
         this.target.persistenceGeoContext.activeStore = true;
         this.target.persistenceGeoContext.scope = this;
         this.target.persistenceGeoContext.saveModeActive = this.target.persistenceGeoContext.SAVE_MODES.GROUP;
-        this.target.persistenceGeoContext.load();  
+        this.target.persistenceGeoContext.load();
         // We send an event to inform listeners that we have logged a user.
         this.target.fireEvent("loginstatechange", this.target, this.userInfo);
     },
@@ -429,7 +437,7 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
      */
     applyLoginState: function(iconCls, text, handler, scope) {
         var loginButton = Ext.getCmp("loginbutton");
-        if(!!loginButton){
+        if ( !! loginButton) {
             loginButton.setIconClass(iconCls);
             loginButton.setText(text);
             loginButton.setHandler(handler, scope);
@@ -445,12 +453,7 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
         this.applyLoginState('login', text, handler, this);
         this.panel.buttons[0].enable();
         var form = this.panel.getForm();
-        if(this.buttonPressed
-            && !!form
-            && !!form.getFieldValues()["j_password"]
-            && !!form.getFieldValues()["j_username"]
-            && form.getFieldValues()["j_username"].length > 0
-            && form.getFieldValues()["j_password"].length > 0){
+        if (this.buttonPressed && !! form && !! form.getFieldValues()["j_password"] && !! form.getFieldValues()["j_username"] && form.getFieldValues()["j_username"].length > 0 && form.getFieldValues()["j_password"].length > 0) {
             form.markInvalid({
                 "j_username": this.loginErrorText,
                 "j_password": this.loginErrorText
@@ -466,28 +469,34 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window,{
      */
     showLogout: function(user) {
         this.buttonPressed = false;
-        var text = new Ext.Template(this.logoutText).applyTemplate({user: user});
+        var text = new Ext.Template(this.logoutText).applyTemplate({
+            user: user
+        });
         var handler = this.logout;
         this.applyLoginState('logout', text, handler, this);
     },
 
     doAuthorized: function(roles, callback, scope) {
-        if (this.userInfo && !!this.userInfo.id || !this.authenticate) {
-            window.setTimeout(function() { callback.call(scope); }, 0);
+        if (this.userInfo && !! this.userInfo.id || !this.authenticate) {
+            window.setTimeout(function() {
+                callback.call(scope);
+            }, 0);
         } else {
             this.authenticate();
             this._authFn = function authFn() {
                 delete this._authFn;
                 this.doAuthorized(roles, callback, scope, true);
             };
-            this.on("authorizationchange", this._authFn, this, {single: true});
+            this.on("authorizationchange", this._authFn, this, {
+                single: true
+            });
         }
     },
 
     /** private: method[handlePermissions]
      *  Handle user permissions.
      */
-    handlePermissions: function(){
+    handlePermissions: function() {
         new PersistenceGeo.permissions.PermissionHandler({
             target: this.target,
             userInfo: this.userInfo

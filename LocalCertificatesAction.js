@@ -157,7 +157,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
     },
 
     _checkHidden: function(userInfo) {
-        if (!userInfo || !userInfo.authority || userInfo.authority.indexOf('Municipalidad') == -1) {
+        if (!userInfo || userInfo.admin || !userInfo.authority || userInfo.authority.indexOf('Municipalidad') == -1) {
             return true;
         }
 
