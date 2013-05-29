@@ -41,6 +41,9 @@ PersistenceGeo.permissions.CssPermissionHandler = Ext.extend(PersistenceGeo.perm
     /** Exclude buttons hide!! **/
     excludes: {"loginbutton":{}, "login":{}, "logout":{}},
 
+    /** Use to debug tools are hidden and displayed **/
+    verbose: false,
+
     constructor: function(config) {
         Ext.apply(this, config);
 
@@ -59,25 +62,40 @@ PersistenceGeo.permissions.CssPermissionHandler = Ext.extend(PersistenceGeo.perm
     },
 
     showHideButtonTool: function(tool, hide){
-        var iconCls = [];
-        if(tool.iconCls){
-            iconCls[0] = tool.iconCls;
-        }
-        if(tool.actions 
-            && tool.actions.length > 0){
-            for (var i = 0; i< tool.actions.length; i++){
-                if(!!tool.actions[i].initialConfig
-                    && tool.actions[i].initialConfig.iconCls){
-                    iconCls[iconCls.length] = tool.actions[i].initialConfig.iconCls;
-                }
+        if (this.verbose){
+            if(hide){
+                console.log("hide --> ");
+                console.log(tool);
+            }else{
+                console.log("unhide --> ");
+                console.log(tool);
             }
         }
-        if(iconCls.length>0){
-            for (var iconIndex = 0; iconIndex< iconCls.length; iconIndex++){
-                if(!(iconCls[iconIndex] in this.excludes)){
-                    var buttons = $("."+iconCls[iconIndex]);
-                    for(var i = 0; i <buttons.length; i++){
-                       this.showHideButton(buttons[i], hide);
+        if(tool.actionTarget 
+            && tool.actionTarget == 'informationtbar'){
+            // #83511: Information toolbars actions mustn't be hidden
+            // TODO: Delete if when second level can be handled. 
+        }else{
+            var iconCls = [];
+            if(tool.iconCls){
+                iconCls[0] = tool.iconCls;
+            }
+            if(tool.actions 
+                && tool.actions.length > 0){
+                for (var i = 0; i< tool.actions.length; i++){
+                    if(!!tool.actions[i].initialConfig
+                        && tool.actions[i].initialConfig.iconCls){
+                        iconCls[iconCls.length] = tool.actions[i].initialConfig.iconCls;
+                    }
+                }
+            }
+            if(iconCls.length>0){
+                for (var iconIndex = 0; iconIndex< iconCls.length; iconIndex++){
+                    if(!(iconCls[iconIndex] in this.excludes)){
+                        var buttons = $("."+iconCls[iconIndex]);
+                        for(var i = 0; i <buttons.length; i++){
+                           this.showHideButton(buttons[i], hide);
+                        }
                     }
                 }
             }
