@@ -462,7 +462,24 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                 Ext.MessageBox.hide();
                 // We should have get a json text here
 
-                var result = Ext.decode(response.responseText);
+                var result="";
+                try {
+                    result = Ext.decode(response.responseText);
+                } catch(e) {
+                    // An error creating the file.
+                    Ext.MessageBox.updateProgress(1);
+                    Ext.MessageBox.hide();
+                    Ext.MessageBox.alert('', this.errorText);
+                    return;
+                }
+
+                if(result.error) {
+                    // An error creating the file.
+                    Ext.MessageBox.updateProgress(1);
+                    Ext.MessageBox.hide();
+                    Ext.MessageBox.alert('', this.errorText);
+                    return;
+                }
 
                 // We can use localhost this way because of the proxy
                 app.downloadFile(url, {
