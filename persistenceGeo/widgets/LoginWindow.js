@@ -461,6 +461,8 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window, {
             this.buttonPressed = false;
             this.show();
             Ext.Msg.alert(this.loginUserErrorTitleText, String.format(this.loginUserErrorText, form.getFieldValues()["j_username"]));
+        } else {
+            form.reset();
         }
     },
 
