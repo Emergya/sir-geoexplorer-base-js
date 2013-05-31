@@ -799,7 +799,7 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 			if ( !! layer.url && layer.params && layer.params.LAYERS) {
 
 				// Fix for some layer's legend url not being properly constructed.
-				var layerUrl = layerUrl;
+				var layerUrl = layer.url;
 				if(layerUrl.substr(-1)!="?") {
 					layerUrl += "?";
 				}
