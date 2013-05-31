@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2008-2011 The Open Planning Project
- * 
+ *
  * Published under the GPL license.
  * See https://github.com/opengeo/gxp/raw/master/license.txt for the full text
  * of the license.
@@ -29,7 +29,7 @@ Ext.namespace("gxp.plugins");
  *    Plugin providing a styles editing dialog for geoserver layers.
  */
 Viewer.plugins.Styler = Ext.extend(gxp.plugins.Styler, {
-    
+
     /** api: ptype = vw_styler */
     ptype: "vw_styler",
 
@@ -40,37 +40,38 @@ Viewer.plugins.Styler = Ext.extend(gxp.plugins.Styler, {
      *  Check user logged info to active this tool
      */
     checkUserInfo: true,
-    
+
     /** api: method[addActions]
      */
     addActions: function() {
         var layerProperties;
         var actions = gxp.plugins.Styler.superclass.addActions.apply(this, [{
-            menuText: this.menuText,
-            iconCls: "gxp-icon-palette",
-            disabled: true,
-            tooltip: this.tooltip,
-            handler: function() {
-                this.actionHandler();
-            },
-            scope: this
-        }]);
-        
+                menuText: this.menuText,
+                iconCls: "gxp-icon-palette",
+                disabled: true,
+                tooltip: this.tooltip,
+                handler: function() {
+                    this.actionHandler();
+                },
+                scope: this
+            }
+        ]);
+
         this.launchAction = actions[0];
         this.target.on({
             layerselectionchange: this.handleLayerChange,
             scope: this
         });
-        
+
         return actions;
     },
 
-    actionHandler: function(){
+    actionHandler: function() {
         //Not need always!!
         //this.target.doAuthorized(this.roles, this.addOutput, this);
         this.addOutput();
     },
-    
+
     /** private: method[handleLayerChange]
      *  :arg record: ``GeoExt.data.LayerRecord``
      *
@@ -78,15 +79,15 @@ Viewer.plugins.Styler = Ext.extend(gxp.plugins.Styler, {
      */
     handleLayerChange: function(record) {
         // first check if is disabled!!
-        if(!this.checkIfDisable(record)){
+        if (!this.checkIfDisable(record)) {
             Viewer.plugins.Styler.superclass.handleLayerChange.apply(this, arguments);
             // #83263: Seems not be effect otherwise
-            setTimeout(function(){
+            setTimeout(function() {
                 app.tools.styler.launchAction.setDisabled(false);
             }, 1);
-        }else{
+        } else {
             // #83263: Seems not be effect otherwise
-            setTimeout(function(){
+            setTimeout(function() {
                 app.tools.styler.launchAction.setDisabled(true);
             }, 1);
         }
@@ -95,22 +96,22 @@ Viewer.plugins.Styler = Ext.extend(gxp.plugins.Styler, {
     /** private: method[checkIfDisable]
      *  :arg layerRec: ``GeoExt.data.LayerRecord``
      *
-     *  Enable this.launchAction if the layer can be management by 
+     *  Enable this.launchAction if the layer can be management by
      *  the user logged or disable this.launchAction otherwise (if this.checkUserInfo flag is active)
      */
     checkIfDisable: function(record) {
 
         var disable = true;
-        
-        if(!!record){
+
+        if ( !! record) {
             var layer = record.getLayer();
             var userInfo = app.persistenceGeoContext.userInfo;
             disable = false;
-            
-            if(layer.isBaseLayer){
+
+            if (layer.isBaseLayer) {
                 disable = true;
             }
-            if(!disable && this.checkUserInfo){
+            if (!disable && this.checkUserInfo) {
                 /*
                  * only postgis layers for no admin users:
                     sir-admin_db=> select * from gis_layer_type;
@@ -127,32 +128,38 @@ Viewer.plugins.Styler = Ext.extend(gxp.plugins.Styler, {
                       9 | imagemosaic | Raster
                      10 | imageworld  | Raster
                 */
-                disable = !app.persistenceGeoContext.isOwner(layer) 
-                    || (userInfo.admin 
-                        && (layer.metadata.layerTypeId != 7         // postgis layers
-                            && layer.metadata.layerTypeId != 4))    // WMS layers
-                    || (!userInfo.admin 
-                        && (layer.metadata.layerTypeId != 7));      // postgis layers
+
+                // Enable this code when 
+                // disable = !app.persistenceGeoContext.isOwner(layer) 
+                // || (userInfo.admin 
+                //     && (layer.metadata.layerTypeId != 7         // postgis layers
+                //         && layer.metadata.layerTypeId != 4))    // WMS layers
+                // || (!userInfo.admin 
+                //     && (layer.metadata.layerTypeId != 7));      // postgis layers
+
+                // TODO: Disable this code when the previous block is enabled.
+                var isVectorial = layer.metadata.layerTypeId == 7 || layer.metadata.layerTypeId==4; // vectorial layers
+                disable = !app.persistenceGeoContext.isOwner(layer) || !isVectorial;
             }
         }
 
-        this.launchAction.setDisabled(disable); 
+        this.launchAction.setDisabled(disable);
 
         return disable;
     },
 
     /** private: method[checkIfStyleable]
      *  :arg layerRec: ``GeoExt.data.LayerRecord``
-     *  :arg describeRec: ``Ext.data.Record`` Record from a 
+     *  :arg describeRec: ``Ext.data.Record`` Record from a
      *      `GeoExt.data.DescribeLayerStore``.
      *
-     *  Given a layer record and the corresponding describe layer record, 
-     *  determine if the target layer can be styled.  If so, enable the launch 
+     *  Given a layer record and the corresponding describe layer record,
+     *  determine if the target layer can be styled.  If so, enable the launch
      *  action.
      */
     checkIfStyleable: function(layerRec, describeRec) {
         // first check if is disabled!!
-        if(!this.checkIfDisable(record)){
+        if (!this.checkIfDisable(record)) {
             if (describeRec) {
                 var owsTypes = ["WFS"];
                 if (this.rasterStyling === true) {
@@ -195,15 +202,15 @@ Viewer.plugins.Styler = Ext.extend(gxp.plugins.Styler, {
             }
         }
     },
-    
+
     /** private: method[enableActionIfAvailable]
      *  :arg url: ``String`` URL of style service
-     * 
+     *
      *  Enable the launch action if the service is available.
      */
     enableActionIfAvailable: function(url) {
         // ovewrite url with app.proxy
-        if(url.indexOf(app.proxy) < 0){
+        if (url.indexOf(app.proxy) < 0) {
             url = app.proxy + url;
         }
         Ext.Ajax.request({
@@ -215,7 +222,7 @@ Viewer.plugins.Styler = Ext.extend(gxp.plugins.Styler, {
             scope: this
         });
     },
-    
+
     addOutput: function(config) {
         config = config || {};
         var record = this.target.selectedLayer;
@@ -235,8 +242,10 @@ Viewer.plugins.Styler = Ext.extend(gxp.plugins.Styler, {
                 ptype: "gxp_wmsrasterstylesdialog"
             });
         }
-        Ext.applyIf(config, {style: "padding: 10px"});
-        
+        Ext.applyIf(config, {
+            style: "padding: 10px"
+        });
+
         var output = gxp.plugins.Styler.superclass.addOutput.call(this, config);
         if (!(output.ownerCt.ownerCt instanceof Ext.Window)) {
             output.dialogCls = Ext.Panel;
@@ -253,16 +262,14 @@ Viewer.plugins.Styler = Ext.extend(gxp.plugins.Styler, {
         });
     },
 
-    repairRecord: function(record){
+    repairRecord: function(record) {
         var layerName = record.get("name");
-        if(!layerName 
-                && !!record.get('layer') 
-                && !!record.get('layer').name){
+        if (!layerName && !! record.get('layer') && !! record.get('layer').name) {
             record.set('name', record.get('layer').name);
         }
         return record;
     }
-        
+
 });
 
 Ext.preg(Viewer.plugins.Styler.prototype.ptype, Viewer.plugins.Styler);
