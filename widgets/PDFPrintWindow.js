@@ -141,10 +141,6 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 
 
 
-		this._previewMapPanel.layers = new GeoExt.data.LayerStore({
-			map: this._previewMapPanel,
-			layers: layers
-		});
 		this._previewMapPanel.map.zoomToExtent(mapPanel.map.getExtent());
 
 		this._graticuleControl.deactivate();
@@ -801,6 +797,14 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 
 		Ext.each(this._previewMapPanel.map.layers, function(layer) {
 			if ( !! layer.url && layer.params && layer.params.LAYERS) {
+
+				// Fix for some layer's legend url not being properly constructed.
+				var layerUrl = layerUrl;
+				if(layerUrl.substr(-1)!="?") {
+					layerUrl += "?";
+				}
+
+
 				// Its viewable, so we add an title element...			
 				items.push({
 					newFont: {
@@ -815,7 +819,7 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 				items.push({
 					"type": "image",
 					"url": urlTpl.apply({
-						"url" : layer.url,
+						"url" : layerUrl,
 						"name": layer.params.LAYERS
 					}),
 					"dx":2,
