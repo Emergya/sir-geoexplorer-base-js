@@ -621,12 +621,12 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 		var pageWidth = this.pageWidths[pageSize];
 		var outputFormat = this._downloadImage ? "PNG" : "PDF";
 		// We can use localhost in la url because the request is made by the proxy.
-		var url = app.proxy + "http://localhost/phpPDF/phpPDF.php";
+		var url =app.proxy + "http://localhost/phpPDF/phpPDF.php";
 		var params = {
 			size: pageSize,
 			margin: {
-				"top": margin+5,
-				"bottom": margin+10,
+				"top": margin + 5,
+				"bottom": margin + 10,
 				"left": margin,
 				"right": margin
 			}, // mm
@@ -640,18 +640,19 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 			outputFormat: outputFormat
 		};
 
-		if(this.pdfFooterText) {
+		if (this.pdfFooterText) {
 			// We add a footer only if avalaible.
 			params.footer = {
 				items: [{
-					type: "par",
-					newFont:{
-						size: 9
-					},
-					text: this.pdfFooterText,
-					align: "C"
-				}],
-				margin:20
+						type: "par",
+						newFont: {
+							size: 9
+						},
+						text: this.pdfFooterText,
+						align: "C"
+					}
+				],
+				margin: 20
 			};
 		}
 
@@ -671,7 +672,7 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 				var result;
 				try {
 					result = Ext.decode(response.responseText);
-				} catch(e) {
+				} catch (e) {
 					console.debug(response.responseText);
 					Ext.MessageBox.updateProgress(1);
 					Ext.MessageBox.hide();
@@ -700,11 +701,12 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 	_createPDFHeaderContents: function(margin, pageWidth) {
 		var items = [];
 
-		if(this.pdfLogoUri) {
+		if (this.pdfLogoUri) {
 			items.push({
 				type: "image",
 				width: 22,
-				url: this.pdfLogoUri
+				url: this.pdfLogoUri,
+				keepPosition: true
 			});
 		}
 
@@ -713,7 +715,6 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 				type: "image",
 				fileInputName: "logo",
 				width: 22,
-				y: margin,
 				x: pageWidth - margin - 22
 			});
 		}
