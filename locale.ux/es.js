@@ -312,7 +312,10 @@ GeoExt.Lang.add(
         buttonText: 'Imprimir',
         menuText: 'Imprimir',
         tooltip: 'Herramienta de impresi\u00f3n de la vista actual del mapa',
-        errorText: 'Ocurri\u00f3 un error, vuelva a intentarlo en unos instantes.'
+        errorText: 'Ocurri\u00f3 un error, vuelva a intentarlo en unos instantes.',
+        googleBaseLayerConfirmationText:"<p>La capa base seleccionada usa imágenes de Google, por lo que no es posible incluirla en la salida generada ya que se infringirían los términos de servicio (vea <a href=\"https://developers.google.com/maps/faq#tos_tiles\">este enlace</a> para más información), por lo que un rectángulo en blanco aparecerá bajo las capas seleccionadas.</p><p>Para mejores resultados elija otra capa base.</p>",
+        continueAndUseGoogleBaseLayerText: "Continuar de todos modos",
+        cancelText: "Cancelar"
     },
     /* Vista inicial */
     'gxp.plugins.ZoomToInitialValues.prototype': {

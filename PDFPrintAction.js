@@ -74,6 +74,9 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
     menuText: 'Print',
     errorText:"An error was found. Please try again later.",
 
+    googleBaseLayerConfirmationText: "<p>A Google base layer is currently selected, and won't be printed because of Google Maps terms of use (see <a href=\"https://developers.google.com/maps/faq#tos_tiles\">this link</a>), so a white background will appear under the selected layers.</p><p>For better results please select a non Google base layer.",
+    continueAndUseGoogleBaseLayerText: "Continue anyway",
+    cancelText: "Cancel",
 
     /** api: config[tooltip]
      *  ``String``
@@ -120,7 +123,7 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                 var ds = Viewer.getComponent('PDFPrintWindow');
                 if (ds === undefined) {
 
-                    var printProvider = new GeoExt.data.PrintProvider({
+                    this.printProvider = new GeoExt.data.PrintProvider({
                         url : app.sources.local.url.replace("ows","pdf"),
                         listeners: {
                             scope: this,
@@ -128,25 +131,28 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                                 Ext.MessageBox.updateProgress(1);
                                 Ext.MessageBox.hide();
                                 // We modifiy the service urls so they actually work.
-                                printProvider.capabilities.createURL = app.sources.local.url.replace("ows","pdf/create.json");
-                                printProvider.capabilities.printURL = app.sources.local.url.replace("ows","pdf/print.pdf");
+                                this.printProvider.capabilities.createURL = app.sources.local.url.replace("ows","pdf/create.json");
+                                this.printProvider.capabilities.printURL = app.sources.local.url.replace("ows","pdf/print.pdf");
 
-                                ds = new Viewer.dialog.PDFPrintWindow({
-                                    persistenceGeoContext: this.target.persistenceGeoContext,
-                                    printProvider : printProvider,
-                                    target: this.target,
-                                    action: this,
-                                    pdfFooterText: this.pdfFooterText,
-                                    pdfLogoUri: this.pdfLogoUri
-                                });
-                                Viewer.registerComponent('PDFPrintWindow', ds);
-                                ds.show();
-                                  ds.on("hide", function() {
-                                    // We deactivate the tool if we close the window.
-                                    if(this.actions[0].items[0].pressed){
-                                        this.actions[0].items[0].toggle();
-                                    }
-                                },this);
+                                if(app.mapPanel.map.baseLayer.CLASS_NAME=="OpenLayers.Layer.Google") {
+                                    // We cannot print Google base layers so we need to ask the user what to do.
+                                    Ext.Msg.show({
+                                        msg: this.googleBaseLayerConfirmationText,
+                                        buttons: {
+                                            ok: this.continueAndUseGoogleBaseLayerText,
+                                            cancel: this.cancelText
+                                        },
+                                        minWidth: 400,
+                                        fn: function(buttonId) {
+                                            if(buttonId == "ok") {
+                                                ds = this._createAndShowWindow();
+                                            }
+                                        },
+                                        scope: this
+                                    });
+                                } else {
+                                    ds = this._createAndShowWindow();
+                                }
                             },
 
                             printexception : function(printProvider, response) {
@@ -163,9 +169,9 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                             }
                         }
                     });
-                    printProvider.customParams.imageName = "";
+                    this.printProvider.customParams.imageName = "";
                     Ext.Msg.wait("Por favor, espere...");
-                    printProvider.loadCapabilities();
+                    this.printProvider.loadCapabilities();
                 } else {
                     if (ds.isVisible()) {
                         ds.hide();
@@ -191,6 +197,25 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
         }, this);
 
         return actions;
+    },
+
+    _createAndShowWindow : function() {
+        var ds = new Viewer.dialog.PDFPrintWindow({
+            persistenceGeoContext: this.target.persistenceGeoContext,
+            printProvider : this.printProvider,
+            target: this.target,
+            action: this,
+            pdfFooterText: this.pdfFooterText,
+            pdfLogoUri: this.pdfLogoUri
+        });
+        Viewer.registerComponent('PDFPrintWindow', ds);
+        ds.show();
+          ds.on("hide", function() {
+            // We deactivate the tool if we close the window.
+            if(this.actions[0].items[0].pressed){
+                this.actions[0].items[0].toggle();
+            }
+        },this);
     }
 });
 
