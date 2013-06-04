@@ -62,6 +62,16 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
      */
     menuText: 'Local Certificates',
 
+    /** api: config[pdfLogoUri]
+     * The url or data uri containing the logo shown in the local certificate pdf.
+     */
+    pdfLogoUri : null,
+
+    /** api: config[selectedParcelStyleName]
+     * The style of the parcel the certificate is made for.
+     */
+    selectedParcelStyleName : "polygon",
+
     searchFormText: 'Show search form',
     selectInMapText: 'Select in map',
     selectPropertyInMapText: 'Select a property in the map, please.',
@@ -106,6 +116,8 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
 
         app.on('loginstatechange', this._onLoginStateChanged, this);
 
+        app.on("ready", this._composerReady, this);
+
         var hidden = this._checkHidden(app.persistenceGeoContext.userInfo);
         return this._toolItems = gxp.plugins.LocalCertificatesAction.superclass.addActions.apply(this, [{
             buttonText: this.showButtonText ? this.buttonText : '',
@@ -113,6 +125,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
             iconCls: this.iconCls,
             tooltip: this.tooltip,
             hidden: hidden,
+            disabled: true,
             menu: new Ext.menu.Menu({
                 items: [
                 new Ext.menu.Item({
@@ -132,6 +145,10 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
         }]);
 
 
+    },
+
+    _composerReady : function() {
+        this._toolItems[0].enable();
     },
 
     _onLoginStateChanged: function(sender, userInfo) {
@@ -442,7 +459,12 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
 
         var params = {
             size: 'letter',
-            margin: 30, // mm
+            margin: {
+                top: 20, // mm
+                bottom: 30,
+                left: 30,
+                right: 30
+            },
             title: 'Certificado Municipal',
             items: this.createPDFDocument(this.pdfData),
             outputFile: 'certificado_municipal_' + this.pdfData.resultLabel.replace(/ /g, '_'),
@@ -557,6 +579,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
                 format: 'image/png',
                 transparent: true,
                 opacity: 0.5,
+                styles: this.selectedParcelStyleName,
                 cql_filter: encodeURIComponent('OBJECTID = ' + objectid)
             })
 
@@ -575,19 +598,22 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
 
         var roleText = pdfData.ruralData.ROL ? pdfData.ruralData.ROL : 'Falta en capa';
 
-        var items = [{
-            newFont: {
-                size: 10
-            },
-            text: 'LOGO DEL MUNICIPIO'
-        }, {
+        var items = [];
+        if(this.pdfLogoUri) {
+            items.push({
+            type: "image",
+            width: 22,
+            url: this.pdfLogoUri
+         });
+        }
+        items.push({
             newFont: {
                 size: 12,
                 style: 'B'
             },
             text: 'MUNICIPALIDAD DE ' + pdfData.localityName.toUpperCase(),
             align: 'C',
-            dy: 7
+            dy: 1
         }, {
             newFont: {
                 size: 9
@@ -682,7 +708,7 @@ gxp.plugins.LocalCertificatesAction = Ext.extend(gxp.plugins.Tool, {
             text: this.footerLine2Text,
             align: 'C',
             dy: 1
-        }];
+        });
 
         return items;
     },
