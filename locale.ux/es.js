@@ -322,8 +322,9 @@ GeoExt.Lang.add(
     'gxp.plugins.Zoom.prototype': {
         zoomInMenuText: 'Zoom m\u00e1s',
         zoomOutMenuText: 'Zoom menos',
-        zoomInTooltip: 'Acercar: acercar el zoom del mapa',
-        zoomOutTooltip: 'Alejar: alejar el zoom del mapa'
+        zoomTooltip: "Acercar dibujando un recudado",
+        zoomInTooltip: 'Acercar el zoom del mapa',
+        zoomOutTooltip: 'Alejar el zoom del mapa'
     },
     /* Vista anterior/siguiente */
     'gxp.plugins.NavigationHistory.prototype': {
