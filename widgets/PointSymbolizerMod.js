@@ -377,7 +377,7 @@ Viewer.PointSymbolizerMod = Ext.extend(gxp.PointSymbolizer, {
     /** private: method[getUploadUrl]
      */
     getUploadUrl: function() {
-        return OpenLayers.ProxyHost + this.defaultRestUrl + '/'  + this.url;
+        return this.defaultRestUrl + '/'  + this.url;
     }
         
 });
