@@ -112,34 +112,34 @@ Viewer.plugins.Styler = Ext.extend(gxp.plugins.Styler, {
                 disable = true;
             }
             if (!disable && this.checkUserInfo) {
-                /*
-                 * only postgis layers for no admin users:
-                    sir-admin_db=> select * from gis_layer_type;
-                     id |    name     |   tipo    
-                    ----+-------------+-----------
-                      1 | WMS         | Raster
-                      2 | WFS         | Raster
-                      3 | KML         | Raster
-                      4 | WMS         | Vectorial
-                      5 | WFS         | Vectorial
-                      6 | KML         | Vectorial
-                      7 | postgis     | Vectorial
-                      8 | geotiff     | Raster
-                      9 | imagemosaic | Raster
-                     10 | imageworld  | Raster
-                */
 
-                // Enable this code when 
-                // disable = !app.persistenceGeoContext.isOwner(layer) 
-                // || (userInfo.admin 
-                //     && (layer.metadata.layerTypeId != 7         // postgis layers
-                //         && layer.metadata.layerTypeId != 4))    // WMS layers
-                // || (!userInfo.admin 
-                //     && (layer.metadata.layerTypeId != 7));      // postgis layers
+                if(!userInfo || !userInfo.id){
+                    disable = true;
+                } else {
+                     /*
+                     * only postgis layers for no admin users:
+                        sir-admin_db=> select * from gis_layer_type;
+                         id |    name     |   tipo    
+                        ----+-------------+-----------
+                          1 | WMS         | Raster
+                          2 | WFS         | Raster
+                          3 | KML         | Raster
+                          4 | WMS         | Vectorial
+                          5 | WFS         | Vectorial
+                          6 | KML         | Vectorial
+                          7 | postgis     | Vectorial
+                          8 | geotiff     | Raster
+                          9 | imagemosaic | Raster
+                         10 | imageworld  | Raster
+                    */
 
-                // TODO: Disable this code when the previous block is enabled.
-                var isVectorial = layer.metadata.layerTypeId == 7 || layer.metadata.layerTypeId==4; // vectorial layers
-                disable = !app.persistenceGeoContext.isOwner(layer) || !isVectorial;
+                    // Admin is allowed to edit vectorial postgis and wms layers.
+                    var adminAllowed = userInfo.admin && (layer.metadata.layerTypeId == 7 || layer.metadata.layerTypeId == 4);
+                    // Normal users just postgis ones.
+                    var userAllowed = !userInfo.admin && layer.metadata.layerTypeId==7;
+
+                    disable = !app.persistenceGeoContext.isOwner(layer) ||  !(userAllowed || adminAllowed);
+                }
             }
         }
 
