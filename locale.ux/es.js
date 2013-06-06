@@ -63,10 +63,10 @@ GeoExt.Lang.add(
         tempLayerCreateButtonText: 'Crear',
         tempLayerCancelButtonText: 'Cancelar',
         tempLayerDescriptionText: 'Crea una capa temporal del tipo de geometría indicado.',
-        removeText: 'Borrar',
+        removeText: 'Eliminar',
         removeTitleText: 'Borra el servidor para todos los usuarios de la plataforma',
         removeSourceWindowTitleText: 'Aviso: Borrar servidor',
-        removeSourceWindowText: "¿Desea borrar el servidor'{0}' (id = {1}) para todos los usuarios de la plataforma?",
+        removeSourceWindowText: "¿Desea borrar el servidor '{0}' (id = {1}) para todos los usuarios de la plataforma?",
         nameBlankText: 'El nombre de capa no puede estar vacío',
         waitText: 'Por favor, espere...'
     },

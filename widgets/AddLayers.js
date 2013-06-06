@@ -110,6 +110,9 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
     /**  If when adding layers the make persist window will be shown **/
     showPersistWindowOnAdd: false,
 
+    /** The button used by the addmin to remove a persisted source*/
+    deleteWMSSourceBtn: null,
+
     /** api: method[addActions]
      */
     addActions: function() {
@@ -228,7 +231,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             }
             actions[0].enable();
         }, this);
-
+    
         return actions;
     },
 
@@ -289,6 +292,31 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
         }
         this.uploadKmlImporterWindow.show();
 
+    },
+
+      /** api: method[showCapabilitiesGrid]
+     * Shows the window with a capabilities grid.
+     */
+    showCapabilitiesGrid: function() {
+        if(!this.capGrid) {
+            this.initCapGrid();
+        } else if (!(this.capGrid instanceof Ext.Window)) {
+            this.addOutput(this.capGrid);
+        }
+
+
+        var userInfo = this.target.persistenceGeoContext.userInfo;
+        var showDeleteWMSSourceBtn = userInfo && userInfo.admin;
+
+
+        this.capGrid.show();
+
+
+        if(showDeleteWMSSourceBtn) {
+            this.deleteWMSSourceBtn.show();
+        } else {
+            this.deleteWMSSourceBtn.hide();
+        }
     },
 
     /**
@@ -679,8 +707,12 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             data: []
         });
 
+        Ext.Msg.wait(this.waitText);
+
         //old init
         this.initCapGridFromSourceAndData(data, sources, target);
+
+
 
         //restore layer sources
         var tmpSources = {};
@@ -688,6 +720,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             url: this.target.defaultRestUrl + '/persistenceGeo/loadAllSourceTools',
             method: 'POST',
             success: function(response) {
+
                 var json = Ext.util.JSON.decode(response.responseText);
                 var sources2 = json.data;
 
@@ -726,8 +759,13 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                         });
                     }
                 }
+                Ext.Msg.updateProgress(1);
+                Ext.Msg.hide();
             },
             failure: function(response) {
+                Ext.Msg.updateProgress(1);
+                Ext.Msg.hide();
+
                 //TODO
                 console.error("Error loading sources!!");
             },
@@ -875,7 +913,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                             // add to combo and select
                             var record = new sources.recordType({
                                 id: id,
-                                title: this.target.layerSources[id].title || this.untitledText
+                                title: newSourceDialog.nameTextField.getValue() || this.target.layerSources[id].title || this.untitledText
                             });
                             sources.insert(0, [record]);
                             sourceComboBox.onSelect(record, 0);
@@ -964,6 +1002,35 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
 
     },
 
+    /**
+     * Overriden method so it doesn't change the set name.
+     */
+    setSelectedSource: function(source, callback) {
+        this.selectedSource = source;
+        var store = source.store;
+        this.fireEvent("sourceselected", this, source);
+        if (this.capGrid && source.lazy) {
+            source.store.load({
+                callback: (function() {
+                    var sourceComboBox = this.capGrid.sourceComboBox,
+                        store = sourceComboBox.store,
+                        valueField = sourceComboBox.valueField,
+                        index = store.findExact(valueField, sourceComboBox.getValue()),
+                        rec = store.getAt(index),
+                        source = this.target.layerSources[rec.get("id")];
+                    if (source) {
+                        if (rec.get("title") == this.untitledText && !Ext.isEmpty(source.title)) {
+                            rec.set("title", source.title);
+                            sourceComboBox.setValue(rec.get(valueField));
+                        }
+                    } else {
+                        store.remove(rec);
+                    }
+                }).createDelegate(this)
+            });
+        }
+    },
+
     showNewSourceDialog: function() {
         if (this.outputTarget) {
             this.addOutput(this.newSourceDialog);
@@ -972,7 +1039,8 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 title: gxp.NewSourceDialog.prototype.title,
                 modal: true,
                 hideBorders: true,
-                width: 300,
+                resizable: false,
+                width: 350,
                 items: this.newSourceDialog
             }).show();
         }
@@ -1024,13 +1092,11 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 scope: this
             })
         ];
-        var isAuthorized = this.target.isAuthorizedIn("ROLE_ADMINISTRATOR");
-        if (isAuthorized) {
-            defaultBbar.push(this.obtainAdminBbar());
-            return defaultBbar;
-        } else {
-            return defaultBbar;
-        }
+        
+        // We always add the admin bar, but we won't show anything unless the user is admin.
+        defaultBbar.push(this.obtainAdminBbar());
+
+        return defaultBbar;
     },
 
     /**
@@ -1057,6 +1123,8 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 },
                 scope: this
             });
+            this.deleteWMSSourceBtn = deleteButton;
+
             this.sourceComboBox.addListener('select', function(combo, record, index) {
                 var id = null;
                 var name = null;
