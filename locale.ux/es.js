@@ -325,7 +325,7 @@ GeoExt.Lang.add(
     'gxp.plugins.Zoom.prototype': {
         zoomInMenuText: 'Zoom m\u00e1s',
         zoomOutMenuText: 'Zoom menos',
-        zoomTooltip: "Acercar dibujando un recudado",
+        zoomTooltip: "Acercar dibujando un recuadro",
         zoomInTooltip: 'Acercar el zoom del mapa',
         zoomOutTooltip: 'Alejar el zoom del mapa'
     },
