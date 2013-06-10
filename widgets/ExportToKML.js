@@ -111,7 +111,12 @@ Viewer.plugins.ExportToKML = Ext.extend(gxp.plugins.Tool, {
                     disableCaching: false,
                     success: function(o, r, n) {
                         var elemIF = document.createElement('iframe');
-                        elemIF.src = app.proxy + encodeURIComponent(this.prepareUrlToDownload(r));
+                        elemIF.src = 
+                            //TODO: Fix kml export in proxy #82664: app.proxy + 
+                            //encodeURIComponent(
+                                this.prepareUrlToDownload(r)
+                                // )
+                        ;
                         elemIF.style.display = 'none';
                         document.body.appendChild(elemIF);
                         Ext.MessageBox.updateProgress(1);
