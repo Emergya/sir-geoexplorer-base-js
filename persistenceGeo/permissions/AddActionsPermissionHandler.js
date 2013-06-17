@@ -64,7 +64,7 @@ PersistenceGeo.permissions.AddActionsPermissionHandler = Ext.extend(PersistenceG
         // tool.addActions = this.defaultAddActionsFunction.createDelegate(tool);
         tool.addActionsOld = tool.addActions;
         tool.addActions = this.defaultAddActionsFunction2.createDelegate(tool);
-    }
+    },
 
     defaultSetDisabledFunction: function(disabled, keyTool){
         var me = this;
