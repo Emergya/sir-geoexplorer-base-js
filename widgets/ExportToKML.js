@@ -73,69 +73,14 @@ Viewer.plugins.ExportToKML = Ext.extend(gxp.plugins.Tool, {
 
 
         var actions = PersistenceGeo.tree.MakeLayerPersistent.superclass.addActions.apply(this, [{
-            menuText: this.exportToKMLText,
-            iconCls: 'gxp-icon-export-kml',
-            disabled: true,
-            tooltip: this.exportToKMLTooltipText,
-            handler: function() {
-                var urlToExport = null;
-                var paramsToExport = null;
-                var urlLocalGeoServer = app.sources.local.url.replace('/ows', '');
-                if (this.selectedLayer && this.selectedLayer.url) {
-                    if (this.selectedLayer.url.indexOf(urlLocalGeoServer) != -1) {
-                        urlToExport = urlLocalGeoServer;
-                    }
-                }
-                var contextLayer = null;
-                if (this.selectedLayer.params && this.selectedLayer.params.LAYERS) {
-                    if (this.selectedLayer.params.LAYERS.indexOf(':') != -1) {
-                        contextLayer = this.selectedLayer.params.LAYERS.split(':')[0];
-                    }
-                }
-                if (contextLayer != null) {
-                    urlToExport += '/' + contextLayer + '/wms/kml';
-                }
-
-                paramsToExport = {
-                    'layers': this.selectedLayer.params.LAYERS,
-                    'DOWNLOAD': true,
-                    'FILENAME': this.selectedLayer.params.LAYERS + '.kml'
-                };
-
-                Ext.MessageBox.wait(this.exportToKMLMsg);
-
-                Ext.Ajax.request({
-                    url: urlToExport,
-                    params: paramsToExport,
-                    method: 'GET',
-                    disableCaching: false,
-                    success: function(o, r, n) {
-                        var elemIF = document.createElement('iframe');
-                        elemIF.src = 
-                            //TODO: Fix kml export in proxy #82664: app.proxy + 
-                            //encodeURIComponent(
-                                this.prepareUrlToDownload(r)
-                                // )
-                        ;
-                        elemIF.style.display = 'none';
-                        document.body.appendChild(elemIF);
-                        Ext.MessageBox.updateProgress(1);
-                        Ext.MessageBox.hide();
-                    },
-                    failure: function(o, r, n) {
-                        Ext.MessageBox.updateProgress(1);
-                        Ext.MessageBox.hide();
-                        Ext.Msg.show({
-                            title: this.exportToKMLErrorTitle,
-                            msg: this.exportToKMLErrorContent,
-                            buttons: Ext.Msg.OK
-                        });
-                    },
-                    scope: this
-                });
-            },
-            scope: this
-        }]);
+                menuText: this.exportToKMLText,
+                iconCls: 'gxp-icon-export-kml',
+                disabled: true,
+                tooltip: this.exportToKMLTooltipText,
+                handler: this.downloadActionHandler,
+                scope: this
+            }
+        ]);
 
         var owner = this.target;
         if (this.objectOwner === 'toolbar') {
@@ -146,13 +91,86 @@ Viewer.plugins.ExportToKML = Ext.extend(gxp.plugins.Tool, {
             if (record && record.data) {
                 this.selectedLayer = record.data.layer;
 
-               // if(this.objectOwner === 'toolbar') {
-                    this.enableOrDisableAction();
+                // if(this.objectOwner === 'toolbar') {
+                this.enableOrDisableAction();
                 //}
             }
         }, this);
 
         this.enableOrDisableAction();
+    },
+
+    downloadActionHandler: function() {
+        var urlLocalGeoServer = app.sources.local.url.replace('/ows', '');
+        var requestedLayers = null;
+        var requestedBbox = '-180.0,-90.0,180.0,90.0';
+
+
+
+        if (this.selectedLayer.params && this.selectedLayer.params.LAYERS) {
+            requestedLayers = this.selectedLayer.params.LAYERS;
+        } else {
+            console.error('Cannot export layer to KML. There is no selectedLayer.params ' +
+                'or selectedLayers.params.LAYERS is undefined');
+            // TODO show messagebox
+        }
+        
+        var params = {
+            layers: requestedLayers,
+            DOWNLOAD: 'true',
+            FILENAME: this.selectedLayer.params.LAYERS.replace(':', '-') + '.kml'
+        };
+
+        if (!this.isRasterLayer(this.selectedLayer.metadata.layerTypeId)) {
+           params.bbox = requestedBbox;
+           params.mode = 'download';
+        }
+
+
+
+        var urlParams = Ext.urlEncode(params);
+
+        console.debug(urlParams);
+
+        var proxiedUrl = urlLocalGeoServer + '/wms/kml?' + urlParams;
+        var requestUrl = app.proxy + encodeURIComponent(proxiedUrl);
+        console.debug('ProxiedUrl = ' + proxiedUrl);
+        console.debug('RequestUrl = ' + requestUrl);
+
+        try {
+            // Cleanup previous download iframes
+             Ext.destroy(Ext.get('downloadKmlIframe'));
+        }
+        catch (e) {}
+
+        Ext.DomHelper.append(document.body, {
+            tag: 'iframe',
+            id: 'downloadKmlIframe',
+            frameBorder: 0,
+            width: 0,
+            height: 0,
+            css: 'display:none;visibility:hidden;height:0;',
+            src: requestUrl
+        });
+    },
+
+    isRasterLayer: function(layerType) {
+        /*
+         id |    name     |   tipo    
+        ----+-------------+-----------
+          1 | WMS         | Raster
+          2 | WFS         | Raster
+          3 | KML         | Raster
+          4 | WMS         | Vectorial
+          5 | WFS         | Vectorial
+          6 | KML         | Vectorial
+          7 | postgis     | Vectorial
+          8 | geotiff     | Raster
+          9 | imagemosaic | Raster
+         10 | imageworld  | Raster
+        */
+        return layerType == 1 || layerType == 2 || layerType == 3 ||
+            layerType == 8 || layerType == 9 || layerType == 10;
     },
 
     prepareUrlToDownload: function(data) {
@@ -189,10 +207,10 @@ Viewer.plugins.ExportToKML = Ext.extend(gxp.plugins.Tool, {
         if (this.selectedLayer && this.isLocalGeoserver(this.selectedLayer.url)) {
             Ext.each(this.actions, function(item) {
                 item.enable();
-                    }, this);
+            }, this);
         } else {
             Ext.each(this.actions, function(item) {
-               item.disable();
+                item.disable();
             }, this);
         }
 
