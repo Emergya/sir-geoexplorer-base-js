@@ -287,7 +287,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
         var newTools = this.defaultTools;
         if(!!config.tools){
             for(var i = 0 ; i< config.tools.length ; i++){
-                if(!config.tools[i].behind){
+                if(!config.tools[i].before){
                     newTools.push(config.tools[i]);
                 }else{
                     newTools = this.reOrderConfig(config.tools[i], newTools);
@@ -298,10 +298,10 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
     },
 
     /** private: method[reOrderConfig]
-     *  Reorder tools config with 'behind' config
+     *  Reorder tools config with 'before' config
      */
     reOrderConfig: function (newTool, newTools){
-        var beforeConfig = newTool.behind;
+        var beforeConfig = newTool.before;
         var newToolIndex = newTools.length;
         for(var i = 0 ; i< newTools.length ; i++){
             var found = true;
@@ -316,7 +316,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             }
         }
         var previousTool = newTool;
-        delete previousTool.behind; // not used in final config.
+        delete previousTool.before; // not used in final config.
         for(;newToolIndex < newTools.length ; newToolIndex++){
             var tmpPreviousTool = newTools[newToolIndex];
             newTools[newToolIndex] = previousTool;

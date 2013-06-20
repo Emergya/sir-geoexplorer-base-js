@@ -695,6 +695,10 @@ GeoExt.Lang.add(
     'Viewer.plugins.FichaInversion.prototype' : {
         waitText: "Por favor, espere...",
         errorText: "Ocurrió un error, pruebe de nuevo en unos instantes."
+    },
+
+    'PersistenceGeo.widgets.style.StyleSelector.prototype' : {
+        menuText: "Selecci\u00f3n de estilo"
     }
 
 });
