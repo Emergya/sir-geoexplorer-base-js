@@ -1204,7 +1204,14 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             collapseMode: 'mini',
             hideCollapseTool: true,
             header: false,
-            baseCls: 'sidebar-left'
+            baseCls: 'sidebar-left',
+            listeners: {
+                collapse: function() {
+                    // We need to add the tooltip for the expand button here as the button is not created until collapse happens
+                    Ext.query('#tree-xcollapsed .x-layout-mini')[0].title = 'Mostrar árbol de capas';
+                },
+                scope: this
+            }
         });
         var southPanel = new Ext.Panel({
             region: 'south',
@@ -1302,8 +1309,22 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 
         PersistenceGeo.Composer.superclass.initPortal.apply(this, arguments);
 
+        this.on("ready",this.onPortalReady, this);
 
+    },
 
+    onPortalReady: function(){
+        //TODO: Translate this texts
+        // We add tooltips to the expander of the feature grid
+        Ext.query("#south-xsplit .x-layout-mini")[0].title = "Ocultar tabla de atributos";
+        Ext.query("#south-xcollapsed .x-layout-mini")[0].title = "Mostrar tabla de atributos";
+
+        // We add tooltips to the expander of the layers tree       
+        Ext.query("#tree-xsplit .x-layout-mini")[0].title = "Ocultar árbol de capas";
+
+        // We add tooltips to the overview map minimize button collaps olControlOverviewMapMaximizeButton olButton
+        Ext.query(".olControlOverviewMapMaximizeButton.olButton")[0].title = "Mostrar vista general";
+        Ext.query(".olControlOverviewMapMinimizeButton.olButton")[0].title = "Ocultar vista general";
     },
 
     getNorthPanel: function(){
@@ -1402,6 +1423,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 
         var iconCls = !header.collapsed ? 'x-tool-restore' : 'x-tool-maximize';
         var tooltip = !header.collapsed ? 'Click para mostrar la cabecera' : 'Click para ocultar la cabecera';
+        console.log(tooltip);
         button.setTooltip(tooltip);
         button.setIconClass('x-tool ' + iconCls);
     },
