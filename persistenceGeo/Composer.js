@@ -155,9 +155,9 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             ptype: "gxp_zoomtoinitialvalues",
             id: "zoomToInitialValues"
         }, {
-            ptype: "gxp_zoom",
-            toggleGroup: "navigation",
-            showZoomBoxAction: false,
+            ptype: 'gxp_customzoom',
+            toggleGroup: 'globalToggle',
+            showZoomBoxAction: true,
             controlOptions: {
                 zoomOnClick: false
             }
