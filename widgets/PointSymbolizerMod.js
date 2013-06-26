@@ -62,7 +62,8 @@ Viewer.PointSymbolizerMod = Ext.extend(gxp.PointSymbolizer, {
      *  Return URL for load a temp file to persistencegeo.
      */
     getLoadFileUrl: function(idFile){
-        return this.defaultRestUrl + '/' + String.format(this.loadFileUrl, idFile);
+        var host = document.URL.substring(0,document.URL.indexOf(this.defaultRestUrl.replace("/rest", "")));
+        return host + this.defaultRestUrl + '/' + String.format(this.loadFileUrl, idFile);
     },
 
 
