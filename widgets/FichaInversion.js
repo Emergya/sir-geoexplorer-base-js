@@ -37,7 +37,7 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
 			tipoProyecto: this.feature.attributes.tipoProyecto
 		});
 		url = Ext.urlAppend(url, params);
-		window.open(url, "Ficha del proyecto " + this.feature.attributes.codBip);
+		window.open(url, "Ficha_" + this.feature.attributes.codBip);
 	},
 
 	/** private: method[constructor]
