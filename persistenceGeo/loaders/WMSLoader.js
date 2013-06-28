@@ -65,10 +65,7 @@ PersistenceGeo.loaders.AbstractLoader, {
             }
         }
 
-           var options = {
-            layers: layers,
-            transparent: transparent
-        };
+
 
         if ( !! layerData.properties) {
             visibility = this.toBoolean(layerData.properties.visibility) || false;
@@ -84,6 +81,10 @@ PersistenceGeo.loaders.AbstractLoader, {
                 options.tiled = this.toBoolean(layerData.properties.tiled) || false;
             }
         }
+           var options = {
+            layers: layers,
+            transparent: transparent
+        };
 
         var layer = new OpenLayers.Layer.WMS(layerTitle,
         layerData.server_resource, options, {
