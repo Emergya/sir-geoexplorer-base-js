@@ -71,6 +71,12 @@ GeoExt.Lang.add(
         waitText: 'Por favor, espere...'
     },
 
+
+    'Viewer.plugins.GraticuleTool.prototype': {
+        graticuleButtonText: "Mostrar grilla",
+        graticuleTooltip: "Mostrar grilla de coordenadas"
+    },
+
     'OpenLayers.Control.LoadLayerWizard.prototype': {
         loadText: 'Cargar',
         uploadingText: 'Cargando...',
@@ -397,6 +403,8 @@ GeoExt.Lang.add(
         tooltipLengthMeasure: 'Permite obtener la longitud de  una l\u00ednea en el mapa, selecionándola o dibujándola',
         /* Medir \u00e1rea */
         tooltipAreaMeasure: 'Permite obtener el área de un polígono, selecionándolo o dibujándolo',
+        /* Medir perimetro */
+        tooltipPerimeterMeasure:'Permite obtener el perímetro de un polígono, selecionándolo o dibujándolo', 
         /* Consultar la capa seleccionada */
         tooltipQueryLayer: 'Permite realizar una consulta sobre la capa seleccionada',
         /* Consultar coordenadas */

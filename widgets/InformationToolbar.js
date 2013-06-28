@@ -32,7 +32,7 @@ Viewer.widgets.InformationToolbar = Ext.extend(Ext.Toolbar, {
 	tooltipDefaultSearches: "Default Searches",
 	tooltipLengthMeasure: "Measure length selection or drawing a polyline",
 	tooltipAreaMeasure: "Measure area drawing or selecting a polygon",
-    tooltipPermiterMeasure:"Measure perimeter drawing or selecting a polygon",
+  tooltipPerimeterMeasure:"Measure perimeter drawing or selecting a polygon", 
 	tooltipQueryLayer: "Query Layer",
 	tooltipPointInformation: "Point Information",
 	tooltipMetadataLayer: "Show metadata information",
