@@ -64,7 +64,7 @@ Viewer.controller.ProyectosSEACombustiblePotenciaStoredSearch = Ext.extend(Viewe
             { property: 'REGION', label: 'Región', valueReader: this.RegionStore },
             { property: 'COMUNA', label: 'Comuna', valueReader: this.ComunaStore },
             { property: 'COMBUSTIBL', label: 'Tipo de combustible', valueReader: this.CombustibleStore },
-            { property: 'POT_BR_MW', label: 'Potencia Central', filters: this.defaultFilters },
+            { property: 'POT_BR_MW', label: 'Potencia Central (MW)', filters: this.defaultFilters },
             { property: 'ESTADO', label: 'Estado', filters: ['=='], value: 'Aprobado', hidden: true }
         ];
 
