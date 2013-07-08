@@ -821,7 +821,8 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 					"type": "image",
 					"url": urlTpl.apply({
 						"url" : layerUrl,
-						"name": layer.params.LAYERS
+						"name": layer.params.LAYERS,
+                        "style": layer.params.STYLE
 					}),
 					"dx":2,
 					"dpi": 120 // So the leyends are downscaled
