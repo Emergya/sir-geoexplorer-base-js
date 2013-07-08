@@ -57,7 +57,7 @@ Viewer.widgets.StoredSearchesToolbar = Ext.extend(Ext.Toolbar, {
 
         this.plugins = [{
             ptype: 'viewer_storedSearchAction',
-            tooltip: 'Proyectos aprobados en SEA por ámbito',
+            tooltip: 'Proyectos aprobados en SEIA por ámbito',
             controller: 'ProyectosSEAStoredSearch',
             actionTarget: 'storedsearchestbar',
             iconCls: 'vw-icon-ProyectosSEAStoredSearch',
