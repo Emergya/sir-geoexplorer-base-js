@@ -140,7 +140,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             outputTarget: null,
             showButtonText: true
         }, {
-            ptype: "gxp_zoomtolayerextent",
+            ptype: "pgeo_zoomtolayerextent",
             actionTarget: {
                 target: "layers.contextMenu",
                 index: 0
