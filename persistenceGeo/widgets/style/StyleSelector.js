@@ -66,7 +66,7 @@ PersistenceGeo.widgets.style.StyleSelector = Ext.extend(Viewer.plugins.Styler, {
      *  Handle changes to the target viewer's selected layer.
      */
     handleLayerChange: function(record) {
-        console.log(record);
+        //console.log(record);
         // only check if is disabled!!
         this.checkIfDisable(record);
     },

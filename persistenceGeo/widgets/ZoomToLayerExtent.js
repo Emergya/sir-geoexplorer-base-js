@@ -52,6 +52,8 @@ PersistenceGeo.plugins.ZoomToLayerExtent = Ext.extend(gxp.plugins.ZoomToLayerExt
     closest: false,
 
     readedServers: {},
+
+    readedFeatureTypes:{},
     
     /**
      * private: bboxReadr
@@ -83,8 +85,16 @@ PersistenceGeo.plugins.ZoomToLayerExtent = Ext.extend(gxp.plugins.ZoomToLayerExt
             layer.getDataExtent();
         if(layer instanceof OpenLayers.Layer.WMS){
             if(!layer.boundCalculated){
-                this.getCapabilitiesWMS(layer);
-                return null;
+                var nameLayer = layer.params["LAYERS"];
+                var url = layer.url;
+                if(!!this.readedFeatureTypes[url]
+                    && this.readedFeatureTypes[url][nameLayer]){
+                    layer.boundCalculated = this.readedFeatureTypes[url][nameLayer];
+                    return layer.boundCalculated;
+                }else{
+                    this.getCapabilitiesWMS(layer);
+                    return null;   
+                }
             }else{
                 return layer.boundCalculated;
             }
@@ -139,10 +149,14 @@ PersistenceGeo.plugins.ZoomToLayerExtent = Ext.extend(gxp.plugins.ZoomToLayerExt
      * read bbox from capabilities
      */
     handleWMSCapabilitiesResult: function(result, layer, url, cached){
-        var format = new OpenLayers.Format.WMSCapabilities();
-        var capabilities = format.read(result.responseText);
-        var layers = capabilities.capability.layers;
         var nameLayer = layer.params["LAYERS"];
+        var capabilities = result.capabilities;
+        if(!capabilities){
+            var format = new OpenLayers.Format.WMSCapabilities();
+            capabilities = format.read(result.responseText);
+            result.capabilities = capabilities;
+        }
+        var layers = capabilities.capability.layers;
         var layerFound = null;
         for(var i=0; i<layers.length; i++){
             if(nameLayer == layers[i].name){
@@ -151,11 +165,26 @@ PersistenceGeo.plugins.ZoomToLayerExtent = Ext.extend(gxp.plugins.ZoomToLayerExt
             }
         }
         if(layerFound){
-            layer.boundCalculated = this.getBounds(layerFound, layer);
+            layer.boundCalculated = this.getBounds(layerFound, layer.projection.projCode);
             app.mapPanel.map.zoomToExtent(layer.boundCalculated, this.closest);
         }else if(!!cached){
             this.readedServers[url] = null;
             this.getCapabilitiesWMS(layer);
+        }
+        this.readAllFeatureTypeBBox(url, capabilities);
+    },
+    
+    /**
+     * Method: readAllFeatureTypeBBox
+     *  
+     * read all bbox from capabilities
+     */
+    readAllFeatureTypeBBox: function(url, capabilities){
+        var format = new OpenLayers.Format.WMSCapabilities();
+        this.readedFeatureTypes[url] = {};
+        var layers = capabilities.capability.layers;
+        for(var i=0; i<layers.length; i++){
+            this.readedFeatureTypes[url][layers[i].name] = this.getBounds(layers[i], app.mapPanel.map.projection);
         }
     },
 
@@ -164,13 +193,13 @@ PersistenceGeo.plugins.ZoomToLayerExtent = Ext.extend(gxp.plugins.ZoomToLayerExt
      *  
      * read bbox from capabilities
      */
-    getBounds: function(layerFound, layer){
+    getBounds: function(layerFound, projCode){
         var bounds = null;
         for (var proj in layerFound.bbox){
             try{
                 var tmpBbox = layerFound.bbox[proj];
                 var originProj =  new OpenLayers.Projection(tmpBbox.srs);
-                var mapProj =  new OpenLayers.Projection(layer.projection.projCode);
+                var mapProj =  new OpenLayers.Projection(projCode);
                 bounds = new OpenLayers.Bounds(tmpBbox.bbox[0], tmpBbox.bbox[1], tmpBbox.bbox[2], tmpBbox.bbox[3]).transform(originProj, mapProj);
                 break;
             }catch (e){

@@ -28,7 +28,7 @@
 
 (function () {
 
-    var ADDITIONAL_LAYERS_URL = '{0}/persistenceGeo/treeServiceMap';
+    var ADDITIONAL_LAYERS_URL = '{0}/persistenceGeo/tree/treeServiceMap';
 
     var NODE_TYPES = {
         FOLDER: 'FolderDto',

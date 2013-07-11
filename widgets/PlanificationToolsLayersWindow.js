@@ -31,8 +31,10 @@
 //var TREE_SERVICE_URL = 'http://localhost/ptools-layers.php';
 //var TREE_SERVICE_URL = 'rest/persistenceGeo/treeService';
 
-var TREE_SERVICE_URL = '{0}/persistenceGeo/treeService';
-var TREE_IPT_URL = '{0}/persistenceGeo/getNodeTypes';
+var TREE_SERVICE_URL = '{0}/persistenceGeo/tree/treeService';
+// #84294: IPT type is 8
+var TREE_IPT_URL = '{0}/persistenceGeo/tree/getNodeTypes/8';
+
 
 
 Viewer.dialog.PlanificationToolsLayersWindow = Ext.extend(Ext.Window, {

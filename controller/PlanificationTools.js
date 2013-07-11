@@ -180,7 +180,11 @@ Viewer.controller.PlanificationTools = Ext.extend(Viewer.controller.Controller, 
 
     removeLayersFromMap: function(layers) {
         for (var i = 0, l = layers.length; i < l; i++) {
-            this.map.removeLayer(layers[i]);
+            try{
+                this.map.removeLayer(this.map.getLayersByName(layers[i].name)[0]);
+            }catch (e){
+                console.error("error cleaning layers!");
+            }
             this.rulesWindow.removeTab(layers[i]);
         }
     },
