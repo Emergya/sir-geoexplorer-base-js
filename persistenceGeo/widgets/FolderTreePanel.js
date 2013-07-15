@@ -81,7 +81,7 @@ PersistenceGeo.widgets.FolderTreePanel = Ext.extend(Ext.tree.TreePanel, {
         CHANNEL_TYPE: 1,
         FOLDER_TYPE: 7,
         IPT_TYPE: 8,
-        DAFAULT_TYPE: 9
+        DEFAULT_TYPE: 9
     },
 
     /** api: config[recursive]
