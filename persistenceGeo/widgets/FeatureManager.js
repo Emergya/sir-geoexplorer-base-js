@@ -258,6 +258,36 @@ PersistenceGeo.widgets.FeatureManager = Ext.extend(gxp.plugins.FeatureManager, {
             this.clearFeatureStore();
             this.fireEvent("layerchange", this, record, false);
         }        
+    },
+    
+    /** api: method[refreshSchemaInUse]
+     * 
+     *  Refresh schema of the layer selected
+     */
+    refreshSchemaInUse: function(){
+        this.refreshSchema(this.layerRecord.getLayer().params.LAYERS);
+    },
+
+    
+    /** api: method[refreshSchema]
+     *  :arg schema: ``String`` schema to be refreshed
+     * 
+     *  Refresh the schema
+     */
+    refreshSchema: function(schema){
+        delete this.schemaCache[schema];
+        this.setFeatureStore();
+    },
+    
+    /** api: method[refreshAllSchemas]
+     * 
+     *  Refresh all schemas known
+     */
+    refreshAllSchemas: function(){
+      for (var schema in this.schemaCache){
+        delete this.schemaCache[schema];
+      }
+      this.setFeatureStore();
     }
     
 });

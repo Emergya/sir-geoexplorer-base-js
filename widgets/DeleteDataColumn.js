@@ -352,6 +352,7 @@ Viewer.dialog.DeleteDataColumn = Ext.extend(Ext.Window, {
                     } else {
                         Ext.Msg.alert('Error', "Se ha producido un error eliminando las columnas.");
                     }
+                    app.tools["featuremanager"].refreshSchemaInUse();
                 }, 
                 failure: function(form, action) {
                     Ext.Msg.alert('Error', "Se ha producido un error al enviar los datos al servidor");
