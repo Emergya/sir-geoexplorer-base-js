@@ -184,8 +184,8 @@ GeoExt.Lang.add(
         coordinateXLabel: 'Coordenada X ',
         coordinateYLabel: 'Coordenada Y ',
         columsEmpty: '* Las columnas con cabecera vacía no serán importadas.',
-        descriptionTextXLS1: 'Escriba el nombre para la nueva capa y seleccione un archivo XLS para subir.',
-        descriptionTextXLS2: 'Seleccione el sistema de referencia y las columnas en las que se almacenan las coordenadas X e Y dentro del fichero.'
+        descriptionTextXLS1: 'Escriba el nombre para la nueva capa y seleccione un archivo XLS con coordenadas UTM para subir.',
+        descriptionTextXLS2: 'Seleccione el sistema de referencia y las columnas en las que se almacenan las coordenadas X e Y en formato UTM dentro del fichero. '
     },
 
     'Viewer.plugins.RasterUploadPanel.prototype': {

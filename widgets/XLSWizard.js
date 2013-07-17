@@ -89,8 +89,8 @@ Viewer.plugins.XLSWizard = Ext.extend(Ext.Window, {
     columnX: null,
     columnY: null,
     columsEmpty: '* Columns with empty header will not be imported.',
-    descriptionTextXLS1: 'Enter the name for the new layer and select a XLS file to upload.',
-    descriptionTextXLS2: 'Select the reference system and the columns in which are stored the coordinates X and Y in the file.',
+    descriptionTextXLS1: 'Enter the name for the new layer and select a XLS file with UTM coordinates to upload.',
+    descriptionTextXLS2: 'Select the reference system and the columns in which are stored the coordinates X and Y in UTM format in the file.',
     columnNamesStore: new Ext.data.ArrayStore({
         fields: [
            {name: 'column', type: 'String'},
