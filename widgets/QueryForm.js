@@ -39,6 +39,14 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
 
     resultCountText: "{0} results were found.",
     
+    /** api: config[autoExpandAlternative]
+     *  ``String`` If set to the id of a container, the container will be
+     *  expanded when the Query Form is enabled, and collapsed when it is
+     *  disabled.Once the user manually expands/collapses the container, the
+     *  user setting will NOT stick for the current session.
+     */
+    autoExpandAlternative: null,
+    
     /** private: method[constructor]
      */
     constructor: function(config) {
@@ -83,8 +91,8 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
                 enableToggle: true,
                 allowDepress: true,
                 toggleHandler: function(button, pressed) {
-                    if (this.autoExpand && this.output.length > 0) {
-                        var expandContainer = Ext.getCmp(this.autoExpand);
+                    if (this.autoExpandAlternative && this.output.length > 0) {
+                        var expandContainer = Ext.getCmp(this.autoExpandAlternative);
                         expandContainer[pressed ? 'expand' : 'collapse']();
                         if (pressed) {
                             expandContainer.expand();
@@ -95,8 +103,6 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
                             this.target.tools[this.featureManager].loadFeatures();
                         }
                     }
-
-
                 },
                 scope: this
             }];

@@ -73,7 +73,8 @@ Viewer.widgets.InformationToolbar = Ext.extend(Ext.Toolbar, {
         },{
             ptype: "vw_queryform",
             featureManager: "querymanager",
-            autoExpand: "query",
+            autoExpandAlternative: "query",
+            toggleGroup: 'globalToggle',
             actionTarget: "informationtbar",
             outputTarget: "query",
             target: this,
