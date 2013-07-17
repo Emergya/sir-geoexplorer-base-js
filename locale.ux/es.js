@@ -575,7 +575,7 @@ GeoExt.Lang.add(
         typeString: 'String',
         typeNumber: 'Number',
         typeDate: 'Date',
-        newColumnTitle: 'Nueva volumna'
+        newColumnTitle: 'Nueva columna'
     },
 
     'Viewer.dialog.DeleteDataColumn.prototype': {
