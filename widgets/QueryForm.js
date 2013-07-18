@@ -1,6 +1,6 @@
 /**
  * Copyright (c) 2008-2011 The Open Planning Project
- * 
+ *
  * Published under the GPL license.
  * See https://github.com/opengeo/gxp/raw/master/license.txt for the full text
  * of the license.
@@ -28,7 +28,7 @@ Ext.namespace("Viewer.widgets");
  *    more like filtering.
  */
 Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
-    
+
     /** api: ptype = vw_queryform */
     ptype: "vw_queryform",
 
@@ -38,7 +38,7 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
     showMenuText: false,
 
     resultCountText: "{0} results were found.",
-    
+
     /** api: config[autoExpandAlternative]
      *  ``String`` If set to the id of a container, the container will be
      *  expanded when the Query Form is enabled, and collapsed when it is
@@ -46,19 +46,19 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
      *  user setting will NOT stick for the current session.
      */
     autoExpandAlternative: null,
-    
+
     /** private: [isExpanded]
      *  ``Boolean``
      *  Flag to show info boxes only when toogle is enabled
      */
     isExpanded: false,
-    
+
     /** private: [autoHideParent]
      *  ``Boolean``
      *  Flag to hide parent panel when toogle is disabled
      */
     autoHideParent: false,
-    
+
     /** private: method[constructor]
      */
     constructor: function(config) {
@@ -78,11 +78,11 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
     /** api: method[addActions]
      */
     addActions: function(actions) {
-        if (!this.initialConfig.actions 
+        if (!this.initialConfig.actions
             // && !actions
-            ) {
+        ) {
             actions = [{
-                text: this.showMenuText ? this.queryActionText: '',
+                text: this.showMenuText ? this.queryActionText : '',
                 menuText: this.showMenuText ? this.queryMenuText : '',
                 iconCls: "vw_queryform",
                 tooltip: this.queryActionTip,
@@ -99,14 +99,12 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
 
         var featureManager = this.target.tools[this.featureManager];
 
-        if(!featureManager
-            && !!this.target.target
-            && !!this.target.target.tools[this.featureManager]){
+        if (!featureManager && !! this.target.target && !! this.target.target.tools[this.featureManager]) {
             var tmpTarget = this.target;
             this.target = this.target.target;
             featureManager = this.target.tools[this.featureManager];
-            
-           
+
+
             //this.target = tmpTarget;
         }
 
@@ -116,9 +114,9 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
         if (this.actionTarget !== null && this.actions) {
             this.target.tools[this.featureManager].on("layerchange", function(mgr, rec, schema) {
                 //if(! schema){
-                    //TODO: Solo capas KML y WMS con varias 'LAYERS', desactiva la consulta
+                //TODO: Solo capas KML y WMS con varias 'LAYERS', desactiva la consulta
                 //}
-                for (var i=this.actions.length-1; i>=0; --i) {
+                for (var i = this.actions.length - 1; i >= 0; --i) {
                     this.actions[i].setDisabled(!schema);
                 }
             }, this);
@@ -128,8 +126,8 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
     /** api: method[actionToogleHandler]
      */
     actionToogleHandler: function(button, pressed) {
-        if (this.autoExpandAlternative){
-            if(this.output.length > 0){
+        if (this.autoExpandAlternative) {
+            if (this.output.length > 0) {
                 var expandContainer = Ext.getCmp(this.autoExpandAlternative);
                 expandContainer[pressed ? 'expand' : 'collapse']();
                 if (pressed) {
@@ -141,14 +139,14 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
                 } else {
                     this.isExpanded = false;
                     expandContainer.collapse();
-                    if(this.autoHideParent){
+                    if (this.autoHideParent) {
                         if (expandContainer.ownerCt && expandContainer.ownerCt instanceof Ext.Panel) {
                             expandContainer.ownerCt.collapse();
                         }
                     }
                     this.target.tools[this.featureManager].loadFeatures();
                 }
-            }else{
+            } else {
                 var this_ = this;
                 setTimeout(function() {
                     this_.actionToogleHandler(button, pressed);
@@ -159,15 +157,15 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
 
     /** api: method[addOutput]
      */
-    addOutput : function(config) {
+    addOutput: function(config) {
         //var form = Viewer.widgets.QueryForm.superclass.addOutput.apply(this, config);
         // #85695: Only show message box when toogle is pressed
         var form = this.addOutputModified(config);
         var queryButton = form.toolbars[0].items.items[2];
-        queryButton.on("click", function(){
+        queryButton.on("click", function() {
             // We only need to show the results count msg if the query form started the query.
             this._queryFormQuery = true;
-         }, this);
+        }, this);
 
         this.form = form;
 
@@ -248,10 +246,12 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
         var queryForm = gxp.plugins.QueryForm.superclass.addOutput.call(this, config);
 
         this.form = queryForm;
-        
-        var expandContainer = null, userExpand = true;
+
+        var expandContainer = null,
+            userExpand = true;
         if (this.autoExpand) {
             expandContainer = Ext.getCmp(this.autoExpand);
+
             function stopAutoExpand() {
                 if (userExpand) {
                     expandContainer.un('expand', stopAutoExpand);
@@ -271,7 +271,7 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
         this.addFilterBuilder(featureManager,
             featureManager.layerRecord, featureManager.schema
         );
-        
+
         featureManager.on({
             "beforequery": function() {
                 this.beforeQueryHandle();
@@ -281,7 +281,7 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
             },
             scope: this
         });
-        
+
         return queryForm;
     },
 
@@ -291,7 +291,7 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
     addFilterBuilder: function(mgr, rec, schema) {
         queryForm = this.form;
         // #85695: Only remove fieldset when has layout
-        if(queryForm.attributeFieldset.getEl()){
+        if (queryForm.attributeFieldset.getEl()) {
             queryForm.attributeFieldset.removeAll();
         }
         queryForm.setDisabled(!schema);
@@ -305,7 +305,7 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
             });
             queryForm.spatialFieldset.expand();
             queryForm.attributeFieldset.expand();
-        } else if(queryForm.attributeFieldset.getEl()){
+        } else if (queryForm.attributeFieldset.getEl()) {
             queryForm.attributeFieldset.rendered && queryForm.attributeFieldset.collapse();
             queryForm.spatialFieldset.rendered && queryForm.spatialFieldset.collapse();
         }
@@ -316,11 +316,12 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
      * #85695: Only remove fieldset when has layout
      */
     queryHandle: function(tool, store) {
+        var featureManager = this.target.tools[this.featureManager];
         if (store) {
-            if (this.target.tools[this.featureManager].featureStore !== null) {
+            if (featureManager.featureStore !== null) {
 
                 // #85695: Only show message box when toogle is pressed
-                if (this.isExpanded){ 
+                if (this.isExpanded) {
                     store.getCount() || Ext.Msg.show({
                         title: this.noFeaturesTitle,
                         msg: this.noFeaturesMessage,
@@ -336,27 +337,27 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
                 }
             }
         }
-        if (this.isExpanded  // #85695: Only show message box when toogle is pressed
+        if (this.isExpanded // #85695: Only show message box when toogle is pressed
             && this._queryFormQuery && store && store.getCount()) {
-            this._queryFormQuery = false;                        
-            Ext.Msg.alert("", this.resultCountText.replace("{0}",featureManager.numberOfFeatures));                    
+            this._queryFormQuery = false;
+            Ext.Msg.alert("", this.resultCountText.replace("{0}", featureManager.numberOfFeatures));
         }
-    }, 
+    },
 
     /** private: method[beforeQueryHandle]
      * #85695: Only remove fieldset when has layout
      */
     beforeQueryHandle: function() {
+        var featureManager = this.target.tools[this.featureManager];
         // #85695: Only show message box when toogle is pressed
-        if (this.isExpanded
-            && !!this.form.getEl()){ 
+        if (this.isExpanded && !! this.form.getEl()) {
             new Ext.LoadMask(this.form.getEl(), {
-                store: this.featureManager.featureStore,
+                store: featureManager.featureStore,
                 msg: this.queryMsg
             }).show();
         }
     }
-        
+
 });
 
 Ext.preg(Viewer.widgets.QueryForm.prototype.ptype, Viewer.widgets.QueryForm);
