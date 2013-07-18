@@ -219,20 +219,20 @@ GeoExt.Lang.add(
         invalidCrsText: 'El identificador CRS debe ser un c\u00f3digo EPSG (ej. EPSG:4326)'
     },
 
-    'Viewer.plugins.ExportToSHP.prototype': {
-        exportToSHPText: 'Exportar a SHP',
-        exportToSHPTooltipText: 'Exportar capa a un fichero shape',
-        exportToSHPMsg: 'Generando el fichero ZIP ...',
-        exportToSHPErrorTitle: 'Error',
-        exportToSHPErrorContent: 'Error al exportar la capa'
+    'PersistenceGeo.widgets.ExportToSHP.prototype': {
+        exportText: 'Exportar a SHP',
+        exportTooltipText: 'Exportar capa a un fichero shape',
+        exportMsg: 'Generando el fichero ZIP ...',
+        exportErrorTitle: 'Error',
+        exportErrorContent: 'Error al exportar la capa'
     },
 
-    'Viewer.plugins.ExportToKML.prototype': {
-        exportToKMLText: 'Exportar a KML',
-        exportToKMLTooltipText: 'Exportar capa a un fichero kml',
-        exportToKMLMsg: 'Generando el fichero KML ...',
-        exportToKMLErrorTitle: 'Error',
-        exportToKMLErrorContent: 'Error al exportar la capa'
+    'PersistenceGeo.widgets.ExportToKML.prototype': {
+        exportText: 'Exportar a KML',
+        exportTooltipText: 'Exportar capa a un fichero kml',
+        exportMsg: 'Generando el fichero KML ...',
+        exportErrorTitle: 'Error',
+        exportErrorContent: 'Error al exportar la capa'
     },
 
     'PersistenceGeo.Context.prototype': {
