@@ -24,6 +24,7 @@
  * by the GNU General Public License.
  *
  * Author: Antonio Hernández <ahernandez@emergya.com>
+ * Author: Alejandro Díaz Torres <adiaz@emergya.com>
  */
 
 /**
@@ -43,8 +44,7 @@ Ext.namespace("gxp.plugins");
 /** api: constructor
  *  .. class:: ExtendedToolbar(config)
  *
- *    Provides an action for zooming and centering to initial values.  If not configured with a 
- *    specific zoom and center, the action will zoom to the map's current zoom and current center.
+ *    Provides an action to include a known Ext.Toolbar as default action. 
  */
 gxp.plugins.ExtendedToolbar = Ext.extend(gxp.plugins.Tool, {
     
@@ -93,6 +93,21 @@ gxp.plugins.ExtendedToolbar = Ext.extend(gxp.plugins.Tool, {
      *  Config to copy to the toolbar. Ussually parameters needed in actions.
      */
     config: null,
+
+    /** api: config[extentedToolbarToogleGroup]
+     *  ``String``
+     *  Toogle group of the extended toolbar.
+     *  Default is 'extendedToolbars'.
+     */
+    extentedToolbarToogleGroup: 'extendedToolbars',
+
+
+    /** api: config[needsInit]
+     *  ``Boolean``
+     *  The tools cointaned in this toolbar need initialization when load.
+     *  Default is true.
+     */
+    needsInit: true,
     
     /** private: method[constructor]
      */
@@ -103,47 +118,63 @@ gxp.plugins.ExtendedToolbar = Ext.extend(gxp.plugins.Tool, {
     /** api: method[addActions]
      */
     addActions: function() {
+        if(this.needsInit){
+            this.initToolbar();
+        }
         return gxp.plugins.ExtendedToolbar.superclass.addActions.apply(this, [{
         	buttonText: this.showButtonText ? this.buttonText : '',
             menuText: this.menuText,
             iconCls: this.iconCls,
             tooltip: this.tooltip,
             enableToggle: true,
-            toggleGroup: 'extendedToolbars',
+            toggleGroup: this.extentedToolbarToogleGroup,
             toggleHandler: function(button, state) {
-
-                if (!Viewer.widgets[this.toolbar]) {
-                    console.warn('TypeError: Viewer.widgets.%s is not a constructor.', this.toolbar);
-                    return;
-                }
-
-                var toolbarInstance = Viewer.getComponent(this.toolbar);
-
-                if (toolbarInstance === undefined) {
-
-                    var mapPanel = Viewer.getMapPanel();
-                    var toolbarClass = Viewer.widgets[this.toolbar];
-
-                    var config = {
-                        mapPanel: mapPanel,
-                        target: this.targetParent
-                    };
-
-                    if(!!this.config){ // extends config
-                        Ext.apply(config, this.config);
-                    }
-                    
-                    toolbarInstance = new toolbarClass(config);
-
-                    Viewer.registerComponent(this.toolbar, toolbarInstance);
-                    this.target.mapPanel.add(toolbarInstance);
-                    this.target.mapPanel.doLayout();
-                }
-
-                toolbarInstance.setVisible(state);
+                this.getToolbarInstance().setVisible(state);
             },
             scope: this
         }]);
+    },
+
+    /** api: method[initToolbar]
+     *  Init toolbar components
+     */
+    initToolbar: function(){
+        this.getToolbarInstance().setVisible(true);
+        this.getToolbarInstance().setVisible(false);
+    },
+
+    /** api: method[getToolbarInstance]
+     *  Obtain toolbar instance of this instance
+     */
+    getToolbarInstance: function(){
+        if (!Viewer.widgets[this.toolbar]) {
+            console.warn('TypeError: Viewer.widgets.%s is not a constructor.', this.toolbar);
+            return;
+        }
+
+        var toolbarInstance = Viewer.getComponent(this.toolbar);
+
+        if (toolbarInstance === undefined) {
+
+            var mapPanel = Viewer.getMapPanel();
+            var toolbarClass = Viewer.widgets[this.toolbar];
+
+            var config = {
+                mapPanel: mapPanel,
+                target: this.targetParent
+            };
+
+            if(!!this.config){ // extends config
+                Ext.apply(config, this.config);
+            }
+            
+            toolbarInstance = new toolbarClass(config);
+
+            Viewer.registerComponent(this.toolbar, toolbarInstance);
+            this.target.mapPanel.add(toolbarInstance);
+            this.target.mapPanel.doLayout();
+        }
+        return toolbarInstance;
     }
         
 });

@@ -49,6 +49,8 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
     loginUrl: "/sig-minen/j_spring_security_check",
     logoutUrl: "/sig-minen/logout",
     adminUrl: '../../controlUsuarioLogado',
+    pdfFooterText: "",
+    logoDataUri: "",
 
     /** 
      * Base layers names: May be the same than defined in composer.html!!
@@ -150,7 +152,8 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             showButtonText: false,
             actionTarget: "map.tbar",
             toggleGroup: "globalToggle",
-            pdfLogoUri: "http://sig.minenergia.cl/sig-minen/moduloCartografico/theme/app/img/logo_ministerio.png"
+            pdfFooterText: this.pdfFooterText,
+            pdfLogoUri: this.logoDataUri
         }, {
             ptype: "gxp_zoomtoinitialvalues",
             id: "zoomToInitialValues"
@@ -194,7 +197,8 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             menuText: 'Exportar',
             tooltip: 'Exportar',
             iconCls: 'vw-icon-importexport-toolbar',
-            toolbar: 'ImportExportToolbar'
+            toolbar: 'ImportExportToolbar',
+            needsInit: false
         },{
             ptype: 'vw_wmsgetfeatureinfo',
             format: 'grid',
@@ -1327,18 +1331,26 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
         Ext.query(".olControlOverviewMapMinimizeButton.olButton")[0].title = "Ocultar vista general";
     },
 
+    /**
+     * api: method[getNorthPanel]
+     * Obtain header panel of the app. Must be overwritten.
+     */
     getNorthPanel: function(){
-        return {
+        return  {
             region: 'north',
             id: 'viewer-header',
             cls: 'viewer-header',
             //collapsible: true,
             height: 100,
             layout: 'fit',
-            html: '<div id="responsive-wrap">' + '<div id="logo" class="span-4">' + '<a href="' + this.adminUrl + '" title="Inicio" class="logo-chile">' + '<img src="../theme/app/img/logo-gobierno_de_chile.jpg" alt="Logo Gobierno de Chile" height="100" />' + '</a>' + '</div>' + '<img src="../theme/app/img/back-header.jpg" alt="Imagen de fondo de la cabecera" class="banner" />' + '</div><!-- /#responsive-wrap -->'
+            html: '<div id="responsive-wrap">' + '<div id="logo" class="span-4">' + '<a href="' + this.adminUrl + '" title="Inicio" class="logo-chile">' + '<img src="../theme/app/img/logo.png" alt="sir-admin logo" height="100" />' + '</a>' + '</div>' + '<img src="../theme/app/img/back-header.jpg" alt="Header image" class="banner" />' + '</div><!-- /#responsive-wrap -->'
         };
     },
 
+    /**
+     * api: method[getFooterPanel]
+     * Obtain footer panel of the app. Must be overwritten.
+     */
     getFooterPanel: function(){
         return {
             region: 'south',
@@ -1346,7 +1358,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             cls: 'viewer-footer',
             height: 60,
             layout: 'fit',
-            html: '<div id="footer">' + '<div class="span-24">' + '<a href="../../contacto/nuevoContacto" target="_blank" style="text-decoration: none;cursor:pointer;">Contacto</a>' + ' | <a href="../../faq/faqs/cartografico" target="_blank" style="text-decoration: none;cursor:pointer;">Preguntas frecuentes</a>' + '</div>' + '<div class="span-24" style="padding-bottom: 30px">' + '<p><strong>Gobierno Regional Región del Libertador General Bernardo O&#39;Higgins</strong></p>' + '</div>' + '</div>'
+            html: '<div id="footer">' + '<div class="span-24">' + '<a href="../../contacto/nuevoContacto" target="_blank" style="text-decoration: none;cursor:pointer;">Contacto</a>' + ' | <a href="../../faq/faqs/cartogr%C3%A1fico" target="_blank" style="text-decoration: none;cursor:pointer;">FAQ</a>' + '</div>' + '<div class="span-24" style="padding-bottom: 30px">' + '<p><strong>sir-admin demo viewer</strong></p>' + '</div>' + '</div>'
         };
     },
 
