@@ -312,6 +312,26 @@ GeoExt.Lang.add(
         exchangeChartsText: 'Intercambiar'
     },
 
+    'Viewer.dialog.ChileIndicaChartWindow.prototype': {
+        title: 'Iniciativas de Inversi\u00f3n',
+        topTitleText: 'CRITERIOS DE B\u00daSQUEDA',
+        stageText: 'Financiamiento',
+        yearText: 'A\u00f1o',
+        financingLineText: 'Item Presupuestario',
+        territorialLevelText: 'Nivel Territorial',
+        groupByText: 'Agrupar por',
+        proyectosPreinversionText: 'Gobierno Regional',
+        proyectosEjecucionText: 'Servicios P\u00fablicos',
+        graphicButtonText: 'Graficar',
+        centerTitleText: 'Gr\u00e1fico',
+        eastTitleText: 'Gr\u00e1fico',
+        xAxisTitle: 'Monto (M$)',
+        porcionOtrosText: 'Otros',
+       geoButtonText: 'Buscar Iniciativas Georreferenciadas',
+    },
+
+
+
     /** Herramientas de la barra de Herramientas principal **/
     /* Imprimir en pdf */
     'gxp.plugins.PDFPrintAction.prototype': {
