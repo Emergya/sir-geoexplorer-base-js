@@ -280,10 +280,10 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
 
 
 
-            _createProjectStore: function() {
+            _createFuentesStore: function() {
                 return new Ext.data.Store({
                     reader: new Ext.data.JsonReader({
-                        fields: ['tipoProyecto'],
+                        fields: ['nombreFinanciamiento'],
                         root: 'data'
                     }),
                     proxy: new Ext.data.HttpProxy({
@@ -302,7 +302,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
 
                             if (records.length !== 0) {
                                 projectCombo.setValue(records[0]
-                                    .get('tipoProyecto'));
+                                    .get('nombreFinanciamiento'));
                                 projectCombo.fireEvent('select',
                                     projectCombo, records[0], 0);
                             }
@@ -350,7 +350,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
 
             _createSearchForm: function() {
 
-                var projectsStore = this._createProjectStore();
+                var projectsStore = this._createFuentesStore();
 
                 var yearsStore = this._createYearStore();
                 var lineStore = this._createLineStore();
@@ -373,7 +373,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                     items: [{
                             id: 'tipoProyectoId',
                             fieldLabel: this.stageText,
-                            hiddenName: 'tipoProyecto',
+                            hiddenName: 'financiamiento',
 
                             //mode : 'local',
                             triggerAction: 'all',
@@ -386,8 +386,8 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                                                 [
                                                         'EJECUCION',
                                                         this.proyectosEjecucionText ] ],*/
-                            valueField: 'tipoProyecto',
-                            displayField: 'tipoProyecto',
+                            valueField: 'nombreFinanciamiento',
+                            displayField: 'nombreFinanciamiento',
                             forceSelection: true,
                             editable: false,
 
@@ -443,10 +443,10 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         {
                             id: 'lineaId',
                             fieldLabel: this.financingLineText,
-                            hiddenName: 'lineaFinanciera',
+                            hiddenName: 'itemPresupuestario',
                             store: lineStore,
-                            valueField: 'linea',
-                            displayField: 'linea',
+                            valueField: 'itemPresupuestario',
+                            displayField: 'itemPresupuestario',
                             forceSelection: true,
                             editable: false,
                             triggerAction: 'all',
@@ -567,7 +567,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
             _createLineStore: function() {
                 return new Ext.data.Store({
                     reader: new Ext.data.JsonReader({
-                        fields: ['linea'],
+                        fields: ['itemPresupuestario'],
                         root: 'data'
                     }),
                     proxy: new Ext.data.HttpProxy({
@@ -581,7 +581,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                             var lineaCombo = Ext.getCmp('lineaId');
                             if (records.length !== 0) {
                                 lineaCombo.setValue(records[0]
-                                    .get('linea'));
+                                    .get('itemPresupuestario'));
                                 lineaCombo.fireEvent('select',
                                     lineaCombo, records[0], 0);
                             }
@@ -676,6 +676,11 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                 var baseUrl = this.baseUrl;
 
                 investmentLayer.removeAllFeatures();
+
+                 // We add false geometry info as we don't have georreferenced data.
+                // This must be removed once #86191 is fixed
+                this._addRandomGeometry(responseJson.data);
+
                 var featureCollection = {
                     type: 'FeatureCollection',
                     features: responseJson.data
@@ -696,6 +701,48 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                 }
 
             },
+
+            _addRandomGeometry : function(data) {
+                // Some random points across Arica and Paranicota
+                var falseCoordinates = [
+                    [398859, 7936271],
+                    [424088, 7934995],
+                    [398128, 7962205],
+                    [424088, 7934995],
+                    [435899, 8031977],
+                    [472855, 7938398],
+                    [449684, 7961676]
+                ];
+
+
+                Ext.each(data,function(datum){
+                    var baseCoords = falseCoordinates[Math.floor((Math.random()*falseCoordinates.length))];
+
+                    var coordinates = [
+                        baseCoords[0],
+                        baseCoords[1]
+                    ];
+
+
+
+                    // we randomize each coordinate a max of 'maxDeviation' meters.
+                    var maxDeviation = 30000;
+                    coordinates[0] = coordinates[0] + Math.floor((Math.random()*maxDeviation*2)) - maxDeviation;
+                    coordinates[1] = coordinates[1] + Math.floor((Math.random()*maxDeviation*2)) - maxDeviation;
+
+                    datum.geometry = {
+                        coordinates: coordinates,
+                        crs: {
+                            properties: {
+                                name: "EPSG:32719"    
+                            },
+                            type: "name"
+                        },
+                        type:"Point"
+                    }
+                });
+            },
+
             georeferenceInitiativesFailure: function(response, options) {
                 var button = Ext.getCmp('iniciatiavasGeoId');
                 button.enable();
