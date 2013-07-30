@@ -32,7 +32,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
             LAYER_NAME: 'Iniciativas de Inversión',
             map: null,
             selectControl: null,
-            baseUrl: '../..',
+            baseUrl: '../../chileIndicaInversion',
             layerController: null,
             vectorLayer: null,
             _barStore: null,
@@ -81,7 +81,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
 
                 var context = this;
                 this._barStore = new Ext.data.JsonStore({
-                    url: context.baseUrl + '/chileIndicaInversion/getMontosGroupBy',
+                    url: context.baseUrl + '/getMontosGroupBy',
                     storeId: 'barStoreId',
                     root: 'data',
                     idProperty: 'groupBy',
@@ -287,7 +287,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         root: 'data'
                     }),
                     proxy: new Ext.data.HttpProxy({
-                        url: this.baseUrl + '/chileIndicaInversion/getFuentes'
+                        url: this.baseUrl + '/getFuentes'
                     }),
                     remoteSort: true,
                     autoLoad: true,
@@ -321,7 +321,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         root: 'data'
                     }),
                     proxy: new Ext.data.HttpProxy({
-                        url: this.baseUrl + '/chileIndicaInversion/getAnyos'
+                        url: this.baseUrl + '/getAnyos'
                     }),
                     remoteSort: true,
                     autoLoad: true,
@@ -536,7 +536,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         root: 'data'
                     }),
                     proxy: new Ext.data.HttpProxy({
-                        url: this.baseUrl + '/chileIndicaInversion/getNivelesTerritoriales'
+                        url: this.baseUrl + '/getNivelesTerritoriales'
                     }),
                     remoteSort: true
 
@@ -571,7 +571,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         root: 'data'
                     }),
                     proxy: new Ext.data.HttpProxy({
-                        url: this.baseUrl + '/chileIndicaInversion/getItemsPresupuestarios'
+                        url: this.baseUrl + '/getItemsPresupuestarios'
                     }),
                     remotSort: true,
                     autoLoad: false,
@@ -657,7 +657,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                 button.setDisabled(true);
 
                 Ext.Ajax.request({
-                    url: this.baseUrl + '/chileIndicaInversion/getProyectosGeo',
+                    url: this.baseUrl + '/getProyectosGeo',
                     success: this.georeferenceInitiativesSuccess,
                     failure: this.georeferenceInitiativesFailure,
                     params: values,
@@ -705,11 +705,11 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
             _addRandomGeometry : function(data) {
                 // Some random points across Arica and Paranicota
                 var falseCoordinates = [
-                    [398859, 7936271],
+                    [408859, 7936271],
                     [424088, 7934995],
                     [398128, 7962205],
                     [424088, 7934995],
-                    [435899, 8031977],
+                    [445899, 8001977],
                     [472855, 7938398],
                     [449684, 7961676]
                 ];
@@ -758,7 +758,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                 var investmentLayer =null;
                 if (investmentLayers.length === 0) {
                     var defaultStyle = new OpenLayers.Style({
-                        externalGraphic: this.baseUrl + '/img/marker-blue.png',
+                        externalGraphic: this.baseUrl + '/../img/marker-blue.png',
                         fill: false,
                         stroke: false,
                         pointRadius: 0,
@@ -771,7 +771,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         graphicZIndex: 1
                     });
                     var selectedStyle = new OpenLayers.Style({
-                        externalGraphic: this.baseUrl + '/img/marker-red.png',
+                        externalGraphic: this.baseUrl + '/../img/marker-red.png',
                         fill: false,
                         stroke: false,
                         pointRadius: 0,
@@ -808,7 +808,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                                     var feature = evt.feature;
                                     // create the select feature
                                     // control
-                                    var popupWindow = new Viewer.plugins.FichaInversion({
+                                    var popupWindow = new Viewer.plugins.ChileIndicaFichaInversion({
                                         feature: feature,
                                         location: feature,
                                         baseUrl: this.baseUrl,

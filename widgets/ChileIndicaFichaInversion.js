@@ -9,7 +9,7 @@
 
 Ext.namespace("Viewer.plugins");
 
-Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
+Viewer.plugins.ChileIndicaFichaInversion = Ext.extend(GeoExt.Popup, {
 
 	title: 'Antecedentes consultados',
 	width: 500,
@@ -21,20 +21,17 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
 	item1: null,
 	item2: null,
 	item3: null,
-	item4: null,
 	window: null,
 
 	waitText: "Please wait...",
 	errorText: "An error ocurred, please try again in a few moments.",
 
 	imprimirFicha: function() {
-		var url = this.baseUrl + "/fichaInversion/ficha";
+		var url = this.baseUrl + "/fichaImprimir";
 		var params = Ext.urlEncode({
 			codBip: this.feature.attributes.codBip,
-			etapa: this.feature.attributes.etapa,
-			serRes: this.feature.attributes.serRes,
-			anyo: this.feature.attributes.anyo,
-			tipoProyecto: this.feature.attributes.tipoProyecto
+			etapa: this.feature.attributes.etapa,			
+			anyo: this.feature.attributes.anyo
 		});
 		url = Ext.urlAppend(url, params);
 		window.open(url, "Ficha_" + this.feature.attributes.codBip);
@@ -43,7 +40,7 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
 	/** private: method[constructor]
 	 */
 	constructor: function(config) {
-		Viewer.plugins.FichaInversion.superclass.constructor.call(this, Ext.apply({
+		Viewer.plugins.ChileIndicaFichaInversion.superclass.constructor.call(this, Ext.apply({
 			cls: "vw_fichainversion",
 			width: 487 * 1.5
 		}, config));
@@ -58,27 +55,21 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
 		});
 
 		this.item1 = new Ext.Panel({
-			title: 'Postulación iniciativa',
+			title: 'Detalles',
 			autoScroll: true,
-			cls: 'item postini'
+			cls: 'item details'
 		});
 
 		this.item2 = new Ext.Panel({
-			title: 'Evaluación Técnico Económica',
+			title: 'Aprobación de Fecursos Financieros',
 			autoScroll: true,
-			cls: 'item evteec'
+			cls: 'item labelsInFinancingSources'
 		});
 
 		this.item3 = new Ext.Panel({
-			title: 'Aprobación Recursos Financieros',
-			autoScroll: true,
-			cls: 'item aprefi'
-		});
-
-		this.item4 = new Ext.Panel({
 			title: 'Proceso Ejecución Inversión',
 			autoScroll: true,
-			cls: 'item prejin'
+			cls: 'item executionProcess'
 		});
 
 		var accordion = new Ext.Panel({
@@ -87,13 +78,13 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
 			split: true,
 			height: 250,
 			layout: 'accordion',
-			items: [this.item1, this.item2, this.item3, this.item4]
+			items: [this.item1, this.item2, this.item3]
 		});
 
 		this.items = [this.iniItem, accordion];
 
 
-		Viewer.plugins.FichaInversion.superclass.initComponent.call(this);
+		Viewer.plugins.ChileIndicaFichaInversion.superclass.initComponent.call(this);
 		this.addButton({
 				text: 'Imprimir'
 			},
@@ -105,21 +96,17 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
 
 		// Parametros del punto
 		var codBip = this.feature.attributes.codBip;
-		var etapa = this.feature.attributes.etapa;
-		var serRes = this.feature.attributes.serRes;
+		var etapa = this.feature.attributes.etapa;		
 		var anyo = this.feature.attributes.anyo;
-		var tipoProyecto = this.feature.attributes.tipoProyecto;
 
 		Ext.Msg.wait(this.waitText);
 
 		Ext.Ajax.request({
-			url: this.baseUrl + "/fichaInversion/fichaPopup",
+			url: this.baseUrl + "/fichaPopup",
 			params: {
 				codBip: codBip,
-				etapa: etapa,
-				serRes: serRes,
-				anyo: anyo,
-				tipoProyecto: tipoProyecto
+				etapa: etapa,				
+				anyo: anyo
 			},
 			scope: this,
 			success: function(response) {
@@ -136,24 +123,19 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
 					this.iniItem.html = bloqueIni.innerHTML;
 				}
 
-				var bloque1 = Ext.DomQuery.selectNode("div[id=postulacionIniciativa]", html);
+				var bloque1 = Ext.DomQuery.selectNode("div[id=details]", html);
 				if (bloque1) {
 					this.item1.html = bloque1.innerHTML;
 				}
 
-				var bloque2 = Ext.DomQuery.selectNode("div[id=evalTecEco]", html);
+				var bloque2 = Ext.DomQuery.selectNode("div[id=financingSources]", html);
 				if (bloque2) {
 					this.item2.html = bloque2.innerHTML;
 				}
 
-				var bloque3 = Ext.DomQuery.selectNode("div[id=aproRecFin]", html);
+				var bloque3 = Ext.DomQuery.selectNode("div[id=executionProcess]", html);
 				if (bloque3) {
 					this.item3.html = bloque3.innerHTML;
-				}
-
-				var bloque4 = Ext.DomQuery.selectNode("div[id=procEjeInv]", html);
-				if (bloque4) {
-					this.item4.html = bloque4.innerHTML;
 				}
 
 				this.show();
@@ -163,7 +145,7 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
 				Ext.Msg.updateProgress(1),
 				Ext.Msg.hide();
 
-				Ext.Msg.alert("",this.errorText);
+				Ext.Msg.alert("", this.errorText);
 			}
 		});
 
@@ -171,4 +153,4 @@ Viewer.plugins.FichaInversion = Ext.extend(GeoExt.Popup, {
 
 });
 
-Ext.reg("vw_fichainversion", Viewer.plugins.FichaInversion);
+Ext.reg("vw_chileindicafichainversion", Viewer.plugins.ChileIndicaFichaInversion);
