@@ -51,6 +51,9 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
     adminUrl: '../../controlUsuarioLogado',
     pdfFooterText: "",
     logoDataUri: "",
+    initialCenter: null,
+    initialZoom: null,
+
 
     /** 
      * Base layers names: May be the same than defined in composer.html!!
@@ -156,7 +159,9 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             pdfLogoUri: this.logoDataUri
         }, {
             ptype: "gxp_zoomtoinitialvalues",
-            id: "zoomToInitialValues"
+            id: "zoomToInitialValues",
+            center: this.initialCenter,
+            zoom: this.initialZoom
         }, {
             ptype: 'gxp_customzoom',
             toggleGroup: 'globalToggle',
@@ -417,8 +422,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
         // if can obtain user info, must be logged
         this.obtainUserInfo();
 
-        // window costumization
-        this._applyWindowCustomizations();
+   
         // To prevent window sizes to become bigger than the viewable area
         // when the browser size is changed.
         Ext.EventManager.onWindowResize(function() {
@@ -429,6 +433,9 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 
         // TODO: Need the correct base layer for the Overview map
         this.mapPanel.map.addControls(this.getAditionalControls());
+
+             // window costumization
+        this._applyWindowCustomizations();
     },
 
     getAditionalControls: function(){
