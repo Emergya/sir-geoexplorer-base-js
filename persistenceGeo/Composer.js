@@ -436,6 +436,8 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 
              // window costumization
         this._applyWindowCustomizations();
+
+        this._applyZoomBoxFix();
     },
 
     getAditionalControls: function(){
@@ -1548,6 +1550,68 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             isUpload: true,
             scope: this
         });
+    },
+
+
+
+
+      _applyZoomBoxFix: function() {
+        OpenLayers.Control.ZoomBox.prototype.zoomBox = function(position) {
+            if (position instanceof OpenLayers.Bounds) {
+                var bounds,
+                    targetCenterPx = position.getCenterPixel();
+                if (!this.out) {
+                    var minXY = this.map.getLonLatFromPixel({
+                        x: position.left,
+                        y: position.bottom
+                    });
+                    var maxXY = this.map.getLonLatFromPixel({
+                        x: position.right,
+                        y: position.top
+                    });
+                    bounds = new OpenLayers.Bounds(minXY.lon, minXY.lat,
+                        maxXY.lon, maxXY.lat);
+                } else {
+                    var pixWidth = position.right - position.left;
+                    var pixHeight = position.bottom - position.top;
+                    var zoomFactor = Math.min((this.map.size.h / pixHeight), (this.map.size.w / pixWidth));
+                    var extent = this.map.getExtent();
+                    var center = this.map.getLonLatFromPixel(targetCenterPx);
+                    var xmin = center.lon - (extent.getWidth() / 2) * zoomFactor;
+                    var xmax = center.lon + (extent.getWidth() / 2) * zoomFactor;
+                    var ymin = center.lat - (extent.getHeight() / 2) * zoomFactor;
+                    var ymax = center.lat + (extent.getHeight() / 2) * zoomFactor;
+                    bounds = new OpenLayers.Bounds(xmin, ymin, xmax, ymax);
+                }
+                // always zoom in/out
+                var lastZoom = this.map.getZoom(),
+                    size = this.map.getSize(),
+                    centerPx = {
+                        x: size.w / 2,
+                        y: size.h / 2
+                    },
+                    zoom = this.map.getZoomForExtent(bounds),
+                    oldRes = this.map.getResolution(),
+                    newRes = this.map.getResolutionForZoom(zoom),
+                    zoomOriginPx = {
+                        x: (oldRes * targetCenterPx.x - newRes * centerPx.x) /
+                            (oldRes - newRes + 1),
+                        y: (oldRes * targetCenterPx.y - newRes * centerPx.y) /
+                            (oldRes - newRes + 1)
+                    };
+                this.map.zoomTo(zoom, zoomOriginPx);
+                if (lastZoom == this.map.getZoom() && this.alwaysZoom === true) {
+                    this.map.zoomTo(lastZoom + (this.out ? -1 : 1));
+                }
+            } else if (this.zoomOnClick) { // it's a pixel
+                if (!this.out) {
+                    this.map.zoomTo(this.map.getZoom() + 1, position);
+                } else {
+                    this.map.zoomTo(this.map.getZoom() - 1, position);
+                }
+            }
+        };
+
     }
 
 });
