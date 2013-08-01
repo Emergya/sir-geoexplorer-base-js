@@ -147,6 +147,11 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                                             if(buttonId == "ok") {
                                                 ds = this._createAndShowWindow();
                                             }
+                                            if(buttonId == "cancel") {
+                                                if(this.actions[0].items[0].pressed){
+                                                    this.actions[0].items[0].toggle();
+                                                }
+                                            }
                                         },
                                         scope: this
                                     });
