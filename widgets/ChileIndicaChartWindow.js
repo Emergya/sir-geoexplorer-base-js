@@ -677,9 +677,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
 
                 investmentLayer.removeAllFeatures();
 
-                 // We add false geometry info as we don't have georreferenced data.
-                // This must be removed once #86191 is fixed
-                this._addRandomGeometry(responseJson.data);
+                
 
                 var featureCollection = {
                     type: 'FeatureCollection',
@@ -692,6 +690,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
 
                 var geojsonFormat = new OpenLayers.Format.GeoJSON();
                 var features = geojsonFormat.read(featureCollection);
+                this._transformGeometry(features);
                 investmentLayer.addFeatures(features);
 
                 if (responseJson.results > 0) {
@@ -702,44 +701,15 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
 
             },
 
-            _addRandomGeometry : function(data) {
-                // Some random points across Arica and Paranicota
-                var falseCoordinates = [
-                    [408859, 7936271],
-                    [424088, 7934995],
-                    [398128, 7962205],
-                    [424088, 7934995],
-                    [445899, 8001977],
-                    [472855, 7938398],
-                    [449684, 7961676]
-                ];
+            _transformGeometry : function(features) {
+                // The web service stores the geometry data in 4326 format, and we need it
+                // in google's.
+                var targetProjection = new OpenLayers.Projection('EPSG:32719');
+                var sourceProjection   = new OpenLayers.Projection('EPSG:4326');
 
 
-                Ext.each(data,function(datum){
-                    var baseCoords = falseCoordinates[Math.floor((Math.random()*falseCoordinates.length))];
-
-                    var coordinates = [
-                        baseCoords[0],
-                        baseCoords[1]
-                    ];
-
-
-
-                    // we randomize each coordinate a max of 'maxDeviation' meters.
-                    var maxDeviation = 30000;
-                    coordinates[0] = coordinates[0] + Math.floor((Math.random()*maxDeviation*2)) - maxDeviation;
-                    coordinates[1] = coordinates[1] + Math.floor((Math.random()*maxDeviation*2)) - maxDeviation;
-
-                    datum.geometry = {
-                        coordinates: coordinates,
-                        crs: {
-                            properties: {
-                                name: "EPSG:32719"    
-                            },
-                            type: "name"
-                        },
-                        type:"Point"
-                    }
+                Ext.each(features,function(feature){
+                    feature.geometry.transform(sourceProjection,targetProjection);
                 });
             },
 
