@@ -181,6 +181,8 @@ OpenLayers.Control.CustomOverviewMap = OpenLayers.Class(OpenLayers.Control, {
      */ 
     fixedZoomLevel : 7,
 
+
+    customCenter: null,
     /**
      * Constructor: OpenLayers.Control.OverviewMap
      * Create a new overview map
@@ -531,12 +533,16 @@ OpenLayers.Control.CustomOverviewMap = OpenLayers.Class(OpenLayers.Control, {
             targetRes = this.maxRatio * mapRes;
         }
         var center;
+        if (this.customCenter!=null){
+            center= new OpenLayers.Geometry.Point(customCenter);
+        } else{
         if (this.ovmap.getProjection() != this.map.getProjection()) {
             center = this.map.center.clone();
             center.transform(this.map.getProjectionObject(),
                 this.ovmap.getProjectionObject() );
         } else {
             center = this.map.center;
+        }
         }
         this.ovmap.setCenter(center, this.ovmap.getZoomForResolution(
             targetRes * this.resolutionFactor));
@@ -551,6 +557,7 @@ OpenLayers.Control.CustomOverviewMap = OpenLayers.Class(OpenLayers.Control, {
         // create the overview map
         var options = OpenLayers.Util.extend(
                         {controls: [], maxResolution: 'auto', 
+                        projection: app.mapPanel.map.getProjection(),
                          fallThrough: false}, this.mapOptions);
         this.ovmap = new OpenLayers.Map(this.mapDiv, options);
         this.ovmap.viewPortDiv.appendChild(this.extentRectangle);
