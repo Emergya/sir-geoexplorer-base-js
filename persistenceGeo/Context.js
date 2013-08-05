@@ -625,7 +625,11 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
         layer.groupLayers = groupLayers;
 
         layer.metadata = {
-            layerTypeId: json.typeId
+            layerTypeId: json.typeId,
+            // Authority of the layer
+            authId: json.authId,
+            // All json formated
+            json: json
         };
 
 
@@ -645,9 +649,9 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
         } else if (this.saveModeActive == this.SAVE_MODES.USER && !! this.userInfo && !! this.userInfo.id) {
             isOwner = layer.layerID && layer.userID && layer.userID == this.userInfo.id;
         } else if (this.saveModeActive == this.SAVE_MODES.GROUP && !! this.userInfo && !! this.userInfo.id) {
-            isOwner = layer.layerID && layer.groupID && layer.groupID == this.userInfo.authorityId;
+            isOwner = layer.layerID && layer.metadata && layer.metadata.authId && layer.metadata.authId == this.userInfo.authorityId;
         } else if (this.saveModeActive == this.SAVE_MODES.ANONYMOUS) {
-            isOwner = layer.layerID && !layer.folderID && !layer.userID && !layer.groupID;
+            isOwner = layer.layerID && !layer.folderID && !layer.userID && !(layer.metadata && layer.metadata.authId);
         }
         return isOwner;
     }
