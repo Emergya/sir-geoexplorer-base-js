@@ -527,23 +527,23 @@ OpenLayers.Control.CustomOverviewMap = OpenLayers.Class(OpenLayers.Control, {
         var resRatio = targetRes / mapRes;
         if(resRatio > this.maxRatio) {
             // zoom in overview map
-            targetRes = this.minRatio * mapRes;            
+            targetRes = this.minRatio * mapRes;
         } else if(resRatio <= this.minRatio) {
             // zoom out overview map
             targetRes = this.maxRatio * mapRes;
         }
         var center;
-        if (this.customCenter!=null){
-            center= new OpenLayers.Geometry.Point(customCenter);
+        if (this.customCenter){
+            center= new OpenLayers.LonLat(this.customCenter);
         } else{
-        if (this.ovmap.getProjection() != this.map.getProjection()) {
             center = this.map.center.clone();
+        }
+
+        if (this.ovmap.getProjection() != this.map.getProjection()) {
             center.transform(this.map.getProjectionObject(),
                 this.ovmap.getProjectionObject() );
-        } else {
-            center = this.map.center;
-        }
-        }
+        } 
+
         this.ovmap.setCenter(center, this.ovmap.getZoomForResolution(
             targetRes * this.resolutionFactor));
         this.updateRectToMap();

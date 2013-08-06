@@ -922,9 +922,11 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
                 }
             }
 
+            var map = this.mapPanel.map;
+
             // We handle layer adding after the initial layers are added to the composer.
             // Layers added after this are always removable from the TOC.
-            this.mapPanel.map.events.register('addlayer', this, function(event) {
+            map.events.register('addlayer', this, function(event) {
                 var layer = event.layer;
                 layer.metadata.removable = true;
             });
