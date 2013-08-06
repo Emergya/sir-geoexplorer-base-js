@@ -733,12 +733,12 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
                     this.dd.unlock();
                 }
 
+                this.removeClass('x-window-minimized');
+
                 this.center();
                 this.ensureHeightFits();
 
                 this._removeFromMinimized();
-
-                this.removeClass('x-window-minimized');
             },
 
             _removeFromMinimized: function() {
