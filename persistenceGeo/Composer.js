@@ -211,7 +211,8 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             infoActionTip: 'Información de elementos',
             popupTitle: 'Información de elementos',
             buttonText: 'Información de elementos',
-            actionTarget: "map.tbar"
+            actionTarget: "map.tbar",
+            toggleGroup: "globalToggle"
         }, {
             ptype: "gxp_channeltools",
             actionTarget: "layers.tbar",

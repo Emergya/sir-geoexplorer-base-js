@@ -84,6 +84,13 @@ Viewer.plugins.WMSGetFeatureInfoAction = Ext.extend(gxp.plugins.WMSGetFeatureInf
         }]);
 
         var infoButton = this.actions[0].items[0];
+
+        infoButton.setDisabled(true);
+
+        app.on('ready',function(){
+            infoButton.setDisabled(false);
+        });
+
         var info = {controls: []};
 
         var updateInfo = function() {

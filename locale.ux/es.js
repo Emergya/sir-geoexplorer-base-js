@@ -503,6 +503,17 @@ GeoExt.Lang.add(
         buttonText: 'Identificar'
     },
 
+    'Viewer.dialog.WMSGetFeatureInfo.prototype': {
+        defaultGroupTitleText: "Datos generales",
+        featureFieldLabelText: "Elemento",
+        featureTitlePrefixText: "Elemento",
+        noInfoForLayerLabelText: 'No hay información disponible para esta capa.',
+        numberFormat: "0.000,00/i",
+        layerFieldLabelText:  'Capa',
+        linkTemplate: '<a href="{0}" target="_new" title="Click para abrir en nueva pestaña/ventana">{0}</a>',
+        windowTitle: 'Información de elementos',
+    },
+
 
     'Viewer.PointSymbolizerMod.prototype': {
         uploadFileEmptyText: 'Selecciona un icono...',

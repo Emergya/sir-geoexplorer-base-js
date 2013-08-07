@@ -34,18 +34,30 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
             'OpenLayers.Layer.WFS'
     ],
 
+    GROUP_PREFIX: "SIRGRUPO",
+
     layersWithInfo: null,
     visibleLayers: null,
 
     accordion: null,
+
     cmbLayers: null,
+    cmbFeatures: null,
+
     layersStore: null,
+    featuresStore: null,
     featuresContainer: null,
     featureInfo: null,
     lastQueriedPoint: null,
 
-    numberFormat: "0.000,00/i",
-    linkTemplate: '<a href="{0}" target="_new" title="Click para abrir en nueva pestaña/ventana">{0}</a>',
+    defaultGroupTitleText: "Common data",
+    featureFieldLabelText: "Feature",
+    featureTitlePrefixText: "Feature",
+    noInfoForLayerLabelText: 'No info is avalaible for the selected layer.',
+    numberFormat: "0,000.00",
+    layerFieldLabelText:  'Layer',
+    linkTemplate: '<a href="{0}" target="_new" title="Clicking opens the link a new tab/window>{0}</a>',
+    windowTitle: 'Feature Info',
 
     constructor: function(config) {
 
@@ -55,7 +67,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
         Viewer.dialog.WMSGetFeatureInfo.superclass.constructor.call(this, Ext.apply({
             cls: 'vw_wmsgetfeatureinfo_window',
             closeAction: 'hide',
-            title: 'Información de elementos',
+            title: this.windowTitle,
             width: 300,
             height: 400,
             layout: 'fit'
@@ -105,16 +117,16 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
             }
         });
 
+        this.featuresStore = new Ext.data.JsonStore({
+            fields: ["fid","title"]
+        });
+
         this.on({
             beforerender: this.onBeforeRender,
             beforedestroy: this.onBeforeDestroy,
             show: this._onShow,
             scope: this
         });
-
-        //this.mapPanel.layers.on("update", this.onLayerChanged, this);
-        //this.mapPanel.layers.on('add', this, this.onLayerChanged);
-        //this.mapPanel.layers.on('remove', this, this.onLayerChanged);
     },
 
     _onShow: function() {
@@ -197,62 +209,46 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
         }
 
         var features = info.evt.features;
-        var fields = info.featureInfo ? info.featureInfo.fields : null;
-        var propertyNames = info.featureInfo ? info.featureInfo.propertyNames : null;
-        var config = [];
+        this._selectedLayerFeatures = {};
 
         if (!info.text && features) {
-
+            var featuresData = [];
+            
             for (var i = 0, ii = features.length; i < ii; ++i) {
                 var feature = features[i];
 
-                // We set default custom renderers so we intercept urls and show'em as links.
-                var customRenderers = {};
-                var self = this;
-                for (var field in feature.attributes) {
-                    customRenderers[field] = function(value) {
-                        if (Ext.form.VTypes.url(value)) {
-                            return (new Ext.Template(self.linkTemplate).apply([value]));
-                        } else if (Ext.isNumber(+value)) {
-                            return Ext.util.Format.number(+value, self.numberFormat);
-                        }
-                        return value;
-                    }
-                }
+                this._selectedLayerFeatures[feature.fid] = feature;
 
                 var featureIdLbl = feature.fid;
                 if (featureIdLbl) {
-                    featureIdLbl = "Elemento  " + featureIdLbl.substring(featureIdLbl.lastIndexOf('.') + 1);
+                    featureIdLbl = this.featureTitlePrefixText + " "+featureIdLbl.substring(featureIdLbl.lastIndexOf('.') + 1);
                 } else {
                     featureIdLbl = info.title;
                 }
 
-                config.push(Ext.apply({
-                    xtype: 'gxp_editorgrid',
-                    readOnly: true,
-                    title: featureIdLbl,
-                    feature: feature,
-                    fields: fields,
-                    propertyNames: propertyNames,
-                    customRenderers: customRenderers,
-                    listeners: {
-                        'beforeedit': function(e) {
-                            return false;
-                        }
-                    }
-                }, {}));
+                featuresData.push({
+                    "fid": feature.fid,
+                    "title": featureIdLbl
+                });
             }
 
-        } else if (info.text) {
+            this.featuresStore.removeAll();
+            this.featuresStore.loadData(featuresData);
 
+            this.cmbFeatures.setValue(featuresData[0].fid);
+            this.cmbFeatures.setVisible(true);
+
+            this.onCmbFeaturesSelected();
+
+        } else if (info.text) {
+            this.cmbFeatures.setVisible(false);
             config.push(Ext.apply({
                 title: info.title,
                 html: info.text
             }, {}));
         }
 
-        this.featuresContainer.add(config);
-        this.featuresContainer.doLayout();
+
     },
 
     addNotAvailableInfo: function() {
@@ -261,7 +257,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
             layout: 'fit',
             items: {
                 xtype: 'label',
-                text: 'No hay información disponible para esta capa.'
+                text: this.noInfoForLayerLabelText
             }
         });
         this.featuresContainer.doLayout();
@@ -280,42 +276,7 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
         this.layersWithInfo[layer.name] = info;
     },
 
-    // TODO: Implement the group of attributes in an accordion
-    //addTab: function(group) {
-    //    var tab = {
-    //        xtype: 'panel',
-    //        layout: 'fit',
-    //        title: group.title,
-    //        items: {
-    //            xtype: 'panel',
-    //            layout: 'fit',
-    //            items: [{
-    //                xtype: 'panel',
-    //                border: false,
-    //                autoScroll: true,
-    //                items: {html: group.html}
-    //            }]
-    //        }
-    //    };
-    //    this.accordion.add(tab);
-    //	this.accordion.doLayout();
-    //},
-    // TODO: Implement the group of attributes in an accordion
-
     onBeforeRender: function() {
-
-        // TODO: Implement the group of attributes in an accordion
-        //this.accordion = new Ext.Panel({
-        //    layout: 'accordion',
-        //    title: 'Accordion Layout',
-        //    defaults: {
-        //        bodyStyle: padding + border
-        //    },
-        //    layoutConfig: {
-        //        animate: true
-        //    }
-        //});
-        // TODO: Implement the group of attributes in an accordion
 
         this.cmbLayers = new Ext.form.ComboBox({
             editable: false,
@@ -327,9 +288,25 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
             valueField: 'title',
             displayField: 'title',
             anchor: '0',
-            fieldLabel: 'Capa',
+            fieldLabel: this.layerFieldLabelText,
             listeners: {
                 select: this.onCmbLayersSelected,
+                scope: this
+            }
+        });
+
+        this.cmbFeatures = new Ext.form.ComboBox({
+            editable: false,
+            triggerAction: 'all',
+            lastQuery:'',
+            store: this.featuresStore,
+            mode: 'local',
+            valueField: 'fid',
+            displayField: 'title',
+            anchor: '0',
+            fieldLabel: this.featureFieldLabelText,
+            listeners: {
+                select: this.onCmbFeaturesSelected,
                 scope: this
             }
         });
@@ -350,7 +327,8 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
                     labelWidth: 50,
                     labelAlign: 'left',
                     items: [
-                        this.cmbLayers
+                        this.cmbLayers,
+                        this.cmbFeatures
                     ]
                 },
                 this.featuresContainer = new Ext.Panel({
@@ -373,5 +351,77 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
         };
 
         this.add(c);
+    },
+
+    onCmbFeaturesSelected : function() {
+
+        this.featuresContainer.removeAll();
+       
+
+        var feature = this._selectedLayerFeatures[this.cmbFeatures.getValue()];
+
+
+        var groups = [{
+            title: this.defaultGroupTitleText,
+            fields: []
+        }];
+
+        var currentGroup = groups[0];
+         var self = this;
+        Ext.iterate(feature.data,function(fieldName,fieldValue) {
+
+            if(fieldName.indexOf(self.GROUP_PREFIX)===0) {
+                // We start a new group.
+                currentGroup = {
+                    title: fieldValue,
+                    fields: []
+                };
+
+                groups.push(currentGroup);
+            } else {
+                // We add the field to the current group.
+                currentGroup.fields.push(fieldName);
+            }
+        });
+
+       
+        var config = [];
+
+        Ext.each(groups,function(group){
+
+          // We set default custom renderers so we intercept urls and show'em as links.
+                var customRenderers = {};
+               
+                for (var field in group.fields) {
+                    customRenderers[field] = function(value) {
+                        if (Ext.form.VTypes.url(value)) {
+                            return (new Ext.Template(self.linkTemplate).apply([value]));
+                        } else if (Ext.isNumber(+value)) {
+                            return Ext.util.Format.number(+value, self.numberFormat);
+                        }
+                        return value;
+                    };
+                }
+
+                config.push(Ext.apply({
+                    xtype: 'gxp_editorgrid',
+                    readOnly: true,
+                    title: group.title,
+                    feature: feature,
+                    fields: group.fields,
+                    customRenderers: customRenderers,
+                    listeners: {
+                        'beforeedit': function(e) {
+                            return false;
+                        }
+                    }
+                }, {}));
+        });
+
+        
+
+        this.featuresContainer.add(config);
+        this.featuresContainer.doLayout();
+
     }
 });
