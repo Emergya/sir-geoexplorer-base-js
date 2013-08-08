@@ -116,7 +116,7 @@ Viewer.controller.PlanificationTools = Ext.extend(Viewer.controller.Controller, 
         }
 
         if (checked === false) {
-            var layer = this.addedLayers.get(node.id+this.magicNumber);
+            var layer = this.addedLayers.get(node.id);
             if (layer !== null) {
                 this.removeLayersFromMap([layer]);
                 this.addedLayers.remove(node.id);
