@@ -28,17 +28,17 @@
 
 // Definimos un tipo para reconocer los nombresconacentos
 Ext.apply(Ext.form.VTypes, {
-	/**
-	 * 
-	 * @param {String} value The name.
-	 * @return {Boolean} true if the RegExp test passed, and false if not.
-	 */
-	'alphaNumAccents': function(v) {
-		var alphaNumAccentsRegExp = /^[\.a-zA-Z_0-9\'\u00e1\u00e9\u00ed\u00f3\u00fa\u00c1\u00c9\u00cd\u00d3\u00da\u00f1\u00d1\u00FC\u00DC]+$/;
-		return alphaNumAccentsRegExp.test(v);
-	},
-	'alphaNumAccentsText': 'El nombre solo puede contener números, letras, _ y .',
-	'alphaNumAccentsMask': /[\.a-zA-Z_0-9\'\u00e1\u00e9\u00ed\u00f3\u00fa\u00c1\u00c9\u00cd\u00d3\u00da\u00f1\u00d1\u00FC\u00DC]/i
+    /**
+     *
+     * @param {String} value The name.
+     * @return {Boolean} true if the RegExp test passed, and false if not.
+     */
+    'alphaNumAccents': function(v) {
+        var alphaNumAccentsRegExp = /^[\.a-zA-Z_0-9\'\u00e1\u00e9\u00ed\u00f3\u00fa\u00c1\u00c9\u00cd\u00d3\u00da\u00f1\u00d1\u00FC\u00DC]+$/;
+        return alphaNumAccentsRegExp.test(v);
+    },
+    'alphaNumAccentsText': 'El nombre solo puede contener números, letras, _ y .',
+    'alphaNumAccentsMask': /[\.a-zA-Z_0-9\'\u00e1\u00e9\u00ed\u00f3\u00fa\u00c1\u00c9\u00cd\u00d3\u00da\u00f1\u00d1\u00FC\u00DC]/i
 
 });
 
@@ -46,7 +46,7 @@ Viewer.dialog.AddDataColumn = Ext.extend(Ext.Window, {
 
     TOOL_POINT: 'Point',
     TOOL_LINE: 'Line',
-    TOOL_POLYGON: 'Polygon',   
+    TOOL_POLYGON: 'Polygon',
 
     action: null,
 
@@ -59,15 +59,23 @@ Viewer.dialog.AddDataColumn = Ext.extend(Ext.Window, {
     descriptionTextColumn: 'Enter the name for the new column.',
     columnTypeEmpty: "Column Type",
     columnTypeLabel: "Column type",
+
+    errorSendingDataText: "An error was found while sending data to the server, please try again.",
+    errorCreatingColumnText: "An error was found while creating the column, please try again.",
+    columnCreationSuccessText: "The column creation was successful.",
+    columnCreatedSuccessTitleText: 'Column Created',
+
     typeString: "String",
     typeNumber: "Number",
     typeDate: "Date",
+    
     columnType: null,
     newColumnTitle: "New column",
     columnTypeStore: new Ext.data.ArrayStore({
-        fields: [
-           {name: 'column', type: 'String'},
-        ]
+        fields: [{
+            name: 'column',
+            type: 'String'
+        }, ]
     }),
 
 
@@ -113,7 +121,7 @@ Viewer.dialog.AddDataColumn = Ext.extend(Ext.Window, {
      * the previous data.
      */
     _onShow: function() {
-     
+
         this.changeActiveLayer();
         this.currentState = this.STATE_NONE;
     },
@@ -156,8 +164,10 @@ Viewer.dialog.AddDataColumn = Ext.extend(Ext.Window, {
      * Stores the features the new layer currently has.
      */
     changeActiveLayer: function() {
-        if(!this.activeLayer) {
-            this.activeLayer = new OpenLayers.Layer.Vector("tmp layer",{displayInLayerSwitcher:false});
+        if (!this.activeLayer) {
+            this.activeLayer = new OpenLayers.Layer.Vector("tmp layer", {
+                displayInLayerSwitcher: false
+            });
             Viewer.getMapPanel().map.addLayer(this.activeLayer);
         }
 
@@ -173,100 +183,93 @@ Viewer.dialog.AddDataColumn = Ext.extend(Ext.Window, {
                 align: 'stretch'
             },
             bbar: [
-   	    		
-          			'->', // greedy spacer so that the buttons are aligned to each side
-           		{
-   		            id: 'move-next',
-   		            text: this.buttonSaveText,
-   		            handler: this.navHandler.createDelegate(this, [1])
-           		}
-       		],
+
+                '->', // greedy spacer so that the buttons are aligned to each side
+                {
+                    id: 'move-next',
+                    text: this.buttonSaveText,
+                    handler: this.navHandler.createDelegate(this, [1])
+                }
+            ],
             items: [{
-				xtype: 'form',
+                xtype: 'form',
                 id: 'addColumnForm',
                 frame: true,
                 autoHeight: true,
                 height: 200,
                 labelWidth: 100,
-				defaults: {
-					anchor: '90%',
+                defaults: {
+                    anchor: '90%',
                     allowBlank: false,
                     msgTarget: 'side'
-				},
-                items:[
-					{
-					    xtype: 'label',
-					    cls: 'toolDescription',
-					    text: this.descriptionTextColumn
-					}, 
-                    {
-                    	xtype: 'textfield',
-                    	id: 'columnName',
-                    	emptyText: this.columnNameEmptyText,
-                    	name: 'columnName',
-                    	fieldLabel: this.columnNameLabelText
-                    }, 
-                    {
-                    	//tipo columna
-                        xtype: 'combo',
-                        id: 'columnType',
-                        forceSelection: true,
-                        emptyText: this.columnTypeEmpty,
-                        getListParent: function() {
-                            return this.el.up('.x-menu');
+                },
+                items: [{
+                    xtype: 'label',
+                    cls: 'toolDescription',
+                    text: this.descriptionTextColumn
+                }, {
+                    xtype: 'textfield',
+                    id: 'columnName',
+                    emptyText: this.columnNameEmptyText,
+                    name: 'columnName',
+                    fieldLabel: this.columnNameLabelText
+                }, {
+                    //tipo columna
+                    xtype: 'combo',
+                    id: 'columnType',
+                    forceSelection: true,
+                    emptyText: this.columnTypeEmpty,
+                    getListParent: function() {
+                        return this.el.up('.x-menu');
+                    },
+                    store: [
+                            this.typeString,
+                            this.typeNumber,
+                            this.typeDate
+                        ],
+                    mode: 'local',
+                    triggerAction: 'all',
+                    listeners: {
+                        "select": function(combo) {
+                            this.columnType = combo.getValue();
                         },
-                        store: [
-                                    this.typeString,
-                                    this.typeNumber,
-                                    this.typeDate
-                                ],
-                        mode: 'local',
-                        triggerAction: 'all',
-                        listeners: {
-                            "select": function(combo) {
-                                this.columnType =  combo.getValue();
-                            },
-                            scope: this
-                        },
-                        displayField: "column", 
-                        valueField: "column", 
-                        fieldLabel: this.columnTypeLabel
-                    }, 
-                    {
-                        xtype: 'textfield',
-                        hidden: true,
-                        id: 'layerSelectedId',
-                        value: '0'
-                    }
-                    , 
-                    {
-                        xtype: 'textfield',
-                        hidden: true,
-                        id: 'layerSelectedTemporal',
-                        value: 'false'
-                    }
-                ]
-			},{
-				xtype: 'form',
-				autoHeight: true,
-				frame: true,
-				labelWidth: 100,    				
-				defaults: {
-					emptyText: this.fieldNameEmptyText,
-					anchor: '90%',
+                        scope: this
+                    },
+                    displayField: "label",
+                    valueField: "value",
+                    fieldLabel: this.columnTypeLabel
+                }, {
+                    xtype: 'textfield',
+                    hidden: true,
+                    id: 'layerSelectedId',
+                    value: '0'
+                }, {
+                    xtype: 'textfield',
+                    hidden: true,
+                    id: 'layerSelectedTemporal',
+                    value: 'false'
+                }]
+            }, {
+                xtype: 'form',
+                autoHeight: true,
+                frame: true,
+                labelWidth: 100,
+                defaults: {
+                    emptyText: this.fieldNameEmptyText,
+                    anchor: '90%',
                     allowBlank: false,
                     msgTarget: 'side',
                     vtype: 'alphaNumAccents'
-				}
-			}]
+                }
+            }]
         };
 
         this.add(c);
     },
 
-    navHandler: function (direction) {
+    navHandler: function(direction) {
 
-       this.addColumnCall();
+        this.addColumnCall();
 
     },
 
@@ -274,7 +277,7 @@ Viewer.dialog.AddDataColumn = Ext.extend(Ext.Window, {
 
         var fp = Ext.ComponentMgr.get('addColumnForm');
 
-        if(app.tools["featuremanager"].layerRecord.data.layer.metadata.temporal) {
+        if (app.tools["featuremanager"].layerRecord.data.layer.metadata.temporal) {
 
             fp.getForm().findField('layerSelectedTemporal').setValue('true');
             fp.getForm().findField('layerSelectedId').setValue(app.tools["featuremanager"].layerRecord.data.layer.metadata.layerResourceId);
@@ -292,20 +295,22 @@ Viewer.dialog.AddDataColumn = Ext.extend(Ext.Window, {
                 waitTitle: this.createColumnWaitMsgText,
                 success: function(fp, o) {
                     var resp = Ext.util.JSON.decode(o.response.responseText);
-                    if(resp && resp.success && resp.data && resp.data.status === "error") {
+                    if (resp && resp.success && resp.data && resp.data.status === "error") {
                         Ext.Msg.alert('Error', resp.data.message);
                     } else if (resp && resp.success) {
                         this.close();
-                        Ext.Msg.alert('Columna creada', "La columna se ha creado correctamente.");
-                    }  else {
-                        Ext.Msg.alert('Error', "Se ha producido un error creando la columna.");
+                        Ext.Msg.alert(this.columnCreatedSuccessTitleText, this.columnCreationSuccessText);
+                    } else {
+                        Ext.Msg.alert('Error', this.errorCreatingColumnText);
                     }
                     app.tools["featuremanager"].refreshSchemaInUse();
-                }, 
-                failure: function(form, action) {
-                    Ext.Msg.alert('Error', "Se ha producido un error al enviar los datos al servidor");
+                    // Fixes #83776, it wasn't enough
+                    app.tools["querymanager"].refreshSchemaInUse();
                 },
-                
+                failure: function(form, action) {
+                    Ext.Msg.alert('Error', this.errorSendingDataText);
+                },
+
                 scope: this
             });
         }

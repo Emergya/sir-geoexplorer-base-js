@@ -449,9 +449,9 @@ GeoExt.Lang.add(
         /* Crear nuevo elemento */
         tooltipAddNewElement: 'Permite crear un nuevo elemento sobre una capa',
         /* Añadir columna a la capa seleccionada */
-        tooltipAddColumn: 'Añadir columna a la capa seleccionada.',
+        tooltipAddColumn: 'Añadir columna a la capa seleccionada',
         /* Eliminar columna de la capa seleccionada */
-        tooltipDeleteColumn: 'Eliminar columna de la capa seleccionada.'
+        tooltipDeleteColumn: 'Eliminar columna de la capa seleccionada'
     },
     /** Barra de herramientas de exportaci\u00f3n **/
     'Viewer.widgets.ImportExportToolbar.prototype': {
@@ -600,23 +600,34 @@ GeoExt.Lang.add(
         createColumnWaitMsgText: 'Creando columna. Por favor espere.',
         createColumnWaitMsgTitleText: 'Procesando...',
         fieldNameEmptyText: 'Escriba un nombre para el campo (letras, números, . y _)',
-        descriptionTextColumn: 'Introduzca un nombre para la nueva columna.',
+        descriptionTextColumn: 'Introduzca un nombre para la nueva columna',
         columnTypeEmpty: 'Introduzca tipo de dato',
         columnTypeLabel: 'Tipo de dato',
         typeString: 'String',
         typeNumber: 'Number',
         typeDate: 'Date',
-        newColumnTitle: 'Nueva columna'
+        newColumnTitle: 'Nueva columna',
+        errorSendingDataText: "Se ha producido un error al enviar los datos al servidor",
+        errorCreatingColumnText: "Se ha producido un error creando la columna.",
+        columnCreationSuccessText: "La columna se ha creado correctamente.",
+        columnCreatedSuccessTitleText: 'Columna creada'
     },
 
     'Viewer.dialog.DeleteDataColumn.prototype': {
         descriptionTextColumn: 'Seleccione las columnas que desea eliminar y pulse el botón Guardar.',
         columnNameLabelText: 'Columnas disponibles',
-        deleteColumnWaitMsgText: 'Eliminar columnas.',
+        deleteColumnWaitMsgText: 'Eliminar columnas',
         loadingDataText: 'Cargando datos. Por favor espere.',
         deleteColumnWaitMsgTitleText: 'Procesando...',
-        deleteColumnTitle: 'Eliminar columnas.',
-        buttonSaveText: 'Guardar'
+        deleteColumnTitle: 'Eliminar columnas',
+        buttonSaveText: 'Guardar',
+        singleSuccessText : "La columna seleccionada se ha eliminado correctamente.",
+        manySuccessText: "Las columnas seleccionadas se han eliminado correctamente.",
+        successTitleText: 'Columnas eliminadas',
+        errorRemovingText: "Se ha producido un error eliminando las columnas.",
+        errorSendingText: "Se ha producido un error al enviar los datos al servidor",
+        aColumnMustBeSelectedText: "Debe seleccionar al menos una columna a eliminar.",
+        errorRetrievingColumnsText: "Se ha producido un error al recuperar las columnas disponibles.",
     },
 
     'Viewer.plugins.WMSStylesDialogMod.prototype': {

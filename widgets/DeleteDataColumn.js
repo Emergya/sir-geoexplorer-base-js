@@ -46,17 +46,26 @@ Viewer.dialog.DeleteDataColumn = Ext.extend(Ext.Window, {
 
     TOOL_POINT: 'Point',
     TOOL_LINE: 'Line',
-    TOOL_POLYGON: 'Polygon',   
+    TOOL_POLYGON: 'Polygon',
 
     action: null,
 
     descriptionTextColumn: "Select the columns you want to delete and then click Save.",
     columnNameLabelText: "Columns avaible",
-    deleteColumnWaitMsgText: "Delete columns.",
+    deleteColumnWaitMsgText: "Delete columns",
     loadingDataText: "Loading data. Please Wait",
     deleteColumnWaitMsgTitleText: "Processing...",
     deleteColumnTitle: "Delete columns",
     buttonSaveText: "Save",
+
+    singleSuccessText : "The selected column was removed successfully.",
+    manySuccessText: "The selected columns were removed successfully-",
+    successTitleText: 'Columns Removed',
+    errorRemovingText: "An error was found while removing the columns. Please try again.",
+    errorSendingText: "An error was found while sending data to the server, please try again.",
+    aColumnMustBeSelectedText: "At least one column must be marked to be deleted.",
+    errorRetrievingColumnsText: "An error was found while retrieving avalaible column information, please try again.",
+
     columnNamesCheckBoxes: [],
 
 
@@ -224,7 +233,7 @@ Viewer.dialog.DeleteDataColumn = Ext.extend(Ext.Window, {
                     Ext.Msg.alert('Error', resp.data.message);
                     return false;
                 } else if (!resp || !resp.success || !resp.data) {
-                    Ext.Msg.alert('Error', "Se ha producido un error al recuperar las columnas disponibles.");
+                    Ext.Msg.alert('Error', this.errorRetrievingColumnsText);
                     return false;
                 }
 
@@ -316,7 +325,7 @@ Viewer.dialog.DeleteDataColumn = Ext.extend(Ext.Window, {
                 
             }, 
             failure: function(form, action) {
-                Ext.Msg.alert('Error', "Se ha producido un error al enviar los datos al servidor");
+                Ext.Msg.alert('Error', this.errorSendingText);
             }
         });
     },
@@ -329,14 +338,16 @@ Viewer.dialog.DeleteDataColumn = Ext.extend(Ext.Window, {
 
         var itemsSelected = "";
 
+        var selectedCount = 0;
         for(i = 0; i < cks.items.length; i++) {
             if (cks.items.get(i).checked) {
+                selectedCount++;
                 itemsSelected += cks.items.get(i).inputValue + ',';
             }
         }
         itemsTextField.setValue(itemsSelected);
 
-        if (fp.getForm().isValid() && itemsSelected != "") {
+        if (fp.getForm().isValid() && itemsSelected !== "") {
             fp.getForm().submit({
                 scope: this,
                 url: '../../deleteDataColumn/step1',
@@ -348,20 +359,21 @@ Viewer.dialog.DeleteDataColumn = Ext.extend(Ext.Window, {
                         Ext.Msg.alert('Error', resp.data.message);
                     } else if (resp && resp.success) {
                         this.close();
-                        Ext.Msg.alert('Columnas eliminadas', "Las columnas se han eliminado correctamente");
+                        Ext.Msg.alert(this.successTitleText, selectedCount==1?this.singleSuccessText:this.manySuccessText);
                     } else {
-                        Ext.Msg.alert('Error', "Se ha producido un error eliminando las columnas.");
+                        Ext.Msg.alert('Error', this.errorRemovingText);
                     }
                     app.tools["featuremanager"].refreshSchemaInUse();
-                }, 
-                failure: function(form, action) {
-                    Ext.Msg.alert('Error', "Se ha producido un error al enviar los datos al servidor");
-                },
 
-                scope: this
+                    // #83776: query results grid columns are updated when a column is deleted.
+                    app.tools["featuremanager"].refreshSchemaInUse();
+                },
+                failure: function(form, action) {
+                    Ext.Msg.alert('Error', this.errorSendingText);
+                }
             });
         } else {
-            Ext.Msg.alert('Error', "Debe seleccionar al menos un elemento a eliminar.");
+            Ext.Msg.alert('Error', this.aColumnMustBeSelectedText);
         }
     }
 });
