@@ -754,6 +754,13 @@ GeoExt.Lang.add(
 
     'PersistenceGeo.widgets.style.StyleSelector.prototype' : {
         menuText: "Selecci\u00f3n de estilo"
+    },
+
+    'PersistenceGeo.tree.RemoveLayer.prototype' : {
+        persistentDeletionConfirmTitleText: 'Borrar Capa',
+        persistentDeletionConfirmQuestionText: 'La capa se eliminará permanentemente del servidor.<br><br>¿Realmente desea borrar la capa?',
+        persistentDeletionContinueBtnText: "Borrar capa",
+        persistentDeletionCancelBtnText: "No borrar capa",
     }
 
 });

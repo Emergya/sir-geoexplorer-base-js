@@ -31,10 +31,21 @@ PersistenceGeo.tree.RemoveLayer = Ext.extend(gxp.plugins.RemoveLayer, {
     /** api: ptype = pgeo_removelayer */
     ptype: "pgeo_removelayer",
 
+    /** api: field[publicRemovalPersistent] 
+     * If true, public layers are removed from the server if removed by an admin user.
+     * In any other case are just removed from the layer tree.
+     */
+    publicRemovalPersistent: true,
+
+    persistentDeletionConfirmTitleText: 'Delete Layer',
+    persistentDeletionConfirmQuestionText: 'The layer will be permanently removed from the server.<br><br>Do you really wish to continue?',
+    persistentDeletionContinueBtnText: "Delete layer",
+    persistentDeletionCancelBtnText: "Don't delete layer",
+
     /** api: method[addActions]
      */
-    addActions: function() {       
-        var actions = gxp.plugins.RemoveLayer.superclass.addActions.apply(this, [{
+    addActions: function() {
+            var actions = gxp.plugins.RemoveLayer.superclass.addActions.apply(this, [{
             menuText: this.removeMenuText,
             iconCls: "gxp-icon-removelayers",
             disabled: true,
@@ -51,7 +62,7 @@ PersistenceGeo.tree.RemoveLayer = Ext.extend(gxp.plugins.RemoveLayer, {
                 var layer = record.getLayer();
 
                 // We cannot remove the layers marked as not removable.
-                var removable = layer.metadata && !!layer.metadata.removable;;
+                var removable = layer.metadata && !!layer.metadata.removable;
                 // Nor initial layers.
                 var initialLayer = typeof(layer.authId) == "undefined" && typeof(layer.layerID) == "undefined";
                 cannotDelete = !removable && initialLayer;
@@ -80,23 +91,16 @@ PersistenceGeo.tree.RemoveLayer = Ext.extend(gxp.plugins.RemoveLayer, {
         var layer = record.getLayer();
         var userInfo = app.persistenceGeoContext.userInfo;
        
-        // We only delete from the server if the layer is persisted (has layerID), the user is logged
-        // (userInfo exists) and the user can delete the layer (because is admin and layer is public or the layer's is
-        // owned by the user's authority.)            
-        if ( !! layer.layerID && userInfo && userInfo.authorityId  
-            && (userInfo.admin && layer.authId === null || userInfo.authorityId == layer.authId)) { 
-
-
+        if (this._canRemoveLayer(userInfo,layer)) {
             // We confirm the deletion.
             Ext.Msg.show({
-                title: '',
-                msg: 'La capa se eliminará permanentemente del servidor.<br><br>¿Realmente desea borrar la capa?',
-                buttons: Ext.Msg.YESNO,
+                title: this.persistentDeletionConfirmTitleText,
+                msg: this.persistentDeletionConfirmQuestionText,
                 animEl: 'elId',
                 width: 350,
-                buttons:{
-                    yes: "Borrar capa",
-                    no: "No borrar capa"
+                buttons: {
+                    yes: this.persistentDeletionContinueBtnText,
+                    no: this.persistentDeletionCancelBtnText
                 },
                 fn: function(result) {
                     if (result == 'yes') {
@@ -114,6 +118,21 @@ PersistenceGeo.tree.RemoveLayer = Ext.extend(gxp.plugins.RemoveLayer, {
         }
     },
 
+    _canRemoveLayer : function(userInfo, layer) {
+        /* Must be a persisted layer and loged user*/
+        if(!layer || ! layer.layerID || ! userInfo) {
+            return false;
+        }
+
+        if(this.publicRemovalPersistent && userInfo.admin && layer.metadata && layer.metadata.publicLayer) {
+             /* Admin and public layer*/
+            return true;
+        } else if(!!userInfo.authorityId  && userInfo.authorityId == layer.authId) {
+            /** User of institution that owns the layer*/
+            return true;
+        }
+    },
+
     _doLayerRemoval: function(record) {
         var layer = record.getLayer();
         if (layer.metadata && layer.metadata.labelLayer) {
@@ -121,10 +140,10 @@ PersistenceGeo.tree.RemoveLayer = Ext.extend(gxp.plugins.RemoveLayer, {
             var editiontbar = Ext.getCmp("editiontbar");
             var addtagtomaptool = editiontbar.getPlugin("addtagtomap");
             var controlfromtool = null;
-            if (addtagtomaptool.getActionFromTool() != null) {
+            if (addtagtomaptool.getActionFromTool() !== null) {
                 controlfromtool = addtagtomaptool.getActionFromTool().control;
             }
-            if (editiontbar != null && addtagtomaptool != null && controlfromtool != null) {
+            if (editiontbar !== null && addtagtomaptool !== null && controlfromtool !== null) {
                 if (controlfromtool.active) {
                     controlfromtool.deactivate();
                     var controlsFromMap = Viewer.getMapPanel().map.controls;

@@ -147,15 +147,16 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
                 // The user admin views public and pending layers.
                 this.parser.loadPendingLayerRequests(this.userInfo.id, function(layers, layerTree) {
                     this_.onLoadLayers(layers, layerTree, {
-                        groupName: this_.publishRequestsGroupText,
-                        removable: false
+                        "groupName": this_.publishRequestsGroupText,
+                        "removable": false
                     });
                 });
 
                 this.parser.loadPublicLayers(this.userInfo.id, function(layers, layerTree) {
                     this_.onLoadLayers(layers, layerTree, {
-                        groupName: this_.publicLayersGroupText,
-                        visible: false
+                        "groupName": this_.publicLayersGroupText,
+                        "visible": false,
+                        "publicLayers": true
                     });
                 });
 
@@ -351,6 +352,11 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
             removable = layersOptions.removable;
         }
 
+        var publicLayers = false;
+        if (typeof(layersOptions.publicLayers) != "undefined") {
+            publicLayers = layersOptions.publicLayers;
+        }
+
         this.loadedLayers[this._groupIndexes] = [];
 
         this.treeManager.addGroup({
@@ -367,6 +373,7 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
                     layer.setVisibility(visible);
                     this.map.addLayer(layer);
                     layer.metadata.removable = removable;
+                    layer.metadata.publicLayer = publicLayers;
                     this.loadedLayers[this._groupIndexes].push(layer);
                 } catch (e) {
                     // TODO: handle
