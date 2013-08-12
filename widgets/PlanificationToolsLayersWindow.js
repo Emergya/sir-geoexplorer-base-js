@@ -28,11 +28,6 @@
 
 (function() {
 
-//var TREE_SERVICE_URL = 'http://localhost/ptools-layers.php';
-//var TREE_SERVICE_URL = 'rest/persistenceGeo/treeService';
-
-var TREE_SERVICE_URL = '{0}/persistenceGeo/treeService';
-var TREE_IPT_URL = '{0}/persistenceGeo/getNodeTypes';
 
 
 Viewer.dialog.PlanificationToolsLayersWindow = Ext.extend(Ext.Window, {
@@ -82,9 +77,14 @@ Viewer.dialog.PlanificationToolsLayersWindow = Ext.extend(Ext.Window, {
 
         var padding = 'padding: 10px 16px;';
         var border = 'border: 0px solid transparent;'
-        
-        this.layersTree = new Viewer.widgets.PlanificationToolsLayersTree({
+
+        this.layersTree = new PersistenceGeo.widgets.FolderTreePanel({
             restBaseUrl: this.restBaseUrl,
+            recursive: true,
+            folderType: PersistenceGeo.widgets.FolderTreePanel.prototype.KNOWN_FOLDER_TYPES.IPT_TYPE,
+            rootNodeText: this.title,
+            showVirtualFolder: false,
+            showNodeTypes: true,
             listeners: {
                 checkchange: this.onTreeNodeCheckChanged,
                 scope: this
@@ -111,126 +111,5 @@ Viewer.dialog.PlanificationToolsLayersWindow = Ext.extend(Ext.Window, {
 });
 
 Ext.reg('viewer_planification_tools_layers_windowtree', Viewer.dialog.PlanificationToolsLayersWindow);
-
-
-Viewer.widgets.PlanificationToolsLayersTree = Ext.extend(Ext.tree.TreePanel, {
-
-    // Planos comunales
-    prcNode: null,
-
-    // Planos intercomunales
-    priNode: null,
-    // Array de planos
-    ipt: null,
-    
-    // Array de items
-    itemsArray: [],
-    
-    // rest component
-    restBaseUrl: "rest",
-
-    constructor: function(config) {
-
-        Ext.apply(this, config);
-
-        var rootNode = new Ext.tree.TreeNode({
-            id: 'root',
-            text: 'Root',
-            expanded: true
-        });
-        
-        Viewer.widgets.PlanificationToolsLayersTree.superclass.constructor.call(this, Ext.apply({
-            border: false,
-            autoScroll: true,
-            loader: new Ext.tree.TreeLoader({
-                dataUrl: String.format(TREE_SERVICE_URL, this.restBaseUrl),
-                listeners: {
-                    load: this.onNodeLoaded,
-                    beforeload: function(treeLoader, node) {
-                        var params = ['type', 'filter'];
-                        for (var i = 0, len = params.length; i<len; i++) {
-                            var param = params[i];
-                            if (node.attributes[param] !== undefined) {
-                                treeLoader.baseParams[param] = node.attributes[param];
-                            } else {
-                                delete treeLoader.baseParams[param];
-                            }
-                        }
-                    },
-                    scope: this
-                }
-            }),
-            root: rootNode,
-            rootVisible: false
-        }, config));
-    	
-    	this.on({
-            beforeappend: this.onBeforeAppend,
-            scope: this
-        });
-
-        this.addEvents({
-            nodeLoaded: true
-        });
-    },
-    
-    /** private: method[initComponent]
-     * :arg target: ``Object`` The object initializing this plugin.
-     */
-    initComponent: function(target) {
-    	this.init_root();
-    	Viewer.widgets.PlanificationToolsLayersTree.superclass.initComponent.apply(this, arguments);
-    },
-
-    init_root: function() {
-    	Ext.Ajax.request({
-            url: String.format(TREE_IPT_URL, this.restBaseUrl),   
-            method: 'GET',
-            disableCaching: false,
-            success: function (response, request){
-            	var jsonObject = JSON.parse(response.responseText);
-            	ipt = [];
-            	for(el in jsonObject){
-            		if(!!jsonObject[el].id && !!jsonObject[el].type){
-            			var item = new Ext.tree.TreeNode({
-                            id: 'node-' + jsonObject[el].type,
-                            text: jsonObject[el].type,
-                            leaf: false,
-                            type: jsonObject[el].id.toString(),
-                            expanded: true
-                        });
-            			this.itemsArray.push(item);
-                		this.root.appendChild(item);
-            		}
-            	}
-            	this.reload();
-            },
-            scope: this 
-        });
-    },
-    
-    reload: function(){
-    	if(this.itemsArray.length > 0){
-    		for(var i=0; i<this.itemsArray.length; i++){
-        		this.loader.load(this.itemsArray[i], function() {}, this);
-        	}
-    	}
-    },
-
-    onBeforeAppend: function(tree, parent, node) {
-        if (node.isLeaf()) {
-            node.attributes.checked = false;
-        }
-        var s = node.text.split(':');
-        node.text = s.length > 1 ? s[1] : node.text;
-    },
-
-    onNodeLoaded: function(treeLoader, node, response) {
-        this.fireEvent('nodeLoaded', treeLoader, node);
-    }
-
-});
-
-Ext.reg('viewer_planification_tools_layers_tree', Viewer.widgets.PlanificationToolsLayersTree);
 
 })();

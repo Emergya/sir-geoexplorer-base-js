@@ -29,6 +29,7 @@
 Viewer.widgets.SearchByCoordinates = Ext.extend(Ext.TabPanel, {
 
     constructor : function (config) {
+        
 
         this.listeners = Ext.apply({
             beforerender : this.onBeforeRender,
@@ -82,11 +83,15 @@ Viewer.widgets.SearchByCoordinates = Ext.extend(Ext.TabPanel, {
                     .getValue());
     
             this.coords.setUTM(point);
+            
+            if (!this.validateCoordinates()) {
+            	Ext.MessageBox.alert("Error en coordenadas", "Coordenadas fuera de rango");
+            } else {
+            	this.formLonLat.getForm().loadRecord(this.coords);
+            	this.formDecimal.getForm().loadRecord(this.coords);
+            	this.fireEvent('buttonUtmClicked', this.coords);
+            }
     
-            this.formLonLat.getForm().loadRecord(this.coords);
-            this.formDecimal.getForm().loadRecord(this.coords);
-    
-            this.fireEvent('buttonUtmClicked', this.coords);
         } else {
             Ext.MessageBox.alert("Introduzca las coordenadas", 
             "Introduzca las coordenadas X e Y.");
@@ -112,11 +117,15 @@ Viewer.widgets.SearchByCoordinates = Ext.extend(Ext.TabPanel, {
             };
     
             this.coords.setDegrees(point);
+            
+            if (!this.validateCoordinates()) {
+                Ext.MessageBox.alert("Error en coordenadas", "Coordenadas fuera de rango");
+            } else {
+            	this.formUTM.getForm().loadRecord(this.coords);
+            	this.formDecimal.getForm().loadRecord(this.coords);
+            	this.fireEvent('buttonLonLatClicked', this.coords);
+            }
     
-            this.formUTM.getForm().loadRecord(this.coords);
-            this.formDecimal.getForm().loadRecord(this.coords);
-    
-            this.fireEvent('buttonLonLatClicked', this.coords);
         } else {
             Ext.MessageBox.alert("Introduzca las coordenadas", 
             "Introduzca la latitud y longitud en grados, minutos y segundos");
@@ -129,18 +138,39 @@ Viewer.widgets.SearchByCoordinates = Ext.extend(Ext.TabPanel, {
                     this.txtLatDecimal.getValue());
     
             this.coords.setDecimal(point);
+            
+            if (!this.validateCoordinates()) {
+            	Ext.MessageBox.alert("Error en coordenadas", "Coordenadas fuera de rango");
+            } else {
+            	this.formUTM.getForm().loadRecord(this.coords);
+            	this.formLonLat.getForm().loadRecord(this.coords);
+            	this.fireEvent('buttonDecimalClicked', this.coords);
+            }
     
-            this.formUTM.getForm().loadRecord(this.coords);
-            this.formLonLat.getForm().loadRecord(this.coords);
-    
-            this.fireEvent('buttonDecimalClicked', this.coords);
         } else {
             Ext.MessageBox.alert("Introduzca las coordenadas", 
                     "Introduzca la latitud y longitud en grados decimales.");
         }
     },
+    
+    validateCoordinates: function () {
+		 var latDecimal = this.coords.get('lat_decimal');
+	     var lonDecimal = this.coords.get('lon_decimal');
+	     
+	     if (lonDecimal < this.minLon || lonDecimal > this.maxLon || latDecimal < this.minLat || latDecimal > this.maxLat) {
+	     	return false;
+	     } else {
+	    	 return true;
+	     }
+	},
 
     onBeforeRender : function () {
+    	
+        //Max an Min lot lan in decimal
+        this.minLon = -78.91935;
+        this.maxLon = -65.68393;
+        this.minLat = -56.96844;
+        this.maxLat = -16.48775;
 
         this.txtUtmX = new Ext.form.NumberField({
             name : 'utm_x',
@@ -364,3 +394,4 @@ Viewer.widgets.SearchByCoordinates = Ext.extend(Ext.TabPanel, {
 });
 
 Ext.reg('vw_search_by_coordinates', Viewer.widgets.SearchByCoordinates);
+

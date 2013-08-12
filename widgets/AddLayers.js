@@ -24,9 +24,9 @@
  * to be covered by the GNU General Public License. This exception does not
  * however invalidate any other reasons why the executable file might be covered
  * by the GNU General Public License.
- * 
+ *
  * Authors:: Alejandro Díaz Torres (mailto:adiaz@emergya.com)
- * 
+ *
  */
 
 /**
@@ -53,7 +53,7 @@ Ext.namespace("Viewer.plugins");
 Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
 
     ptype: "vw_addlayers",
-    
+
 
     /** i18n **/
     addButtonText: "Add Layers",
@@ -67,7 +67,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
     uploadXlsText: "Upload a XLS file",
     uploadKmlImportText: "Upload a KML file",
     invalidWMSURLText: "Enter a valid URL to a WMS endpoint (e.g. http://example.com/geoserver/wms)",
-      addWMSLayerActionText: "Add WMS layer...",
+    addWMSLayerActionText: "Add WMS layer...",
     temporaryLayerActionText: "Temporary layer...",
     addWFSLayerActionText: "WFS...",
     findActionMenuText: "Find Layers...",
@@ -79,10 +79,19 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
     tempLayerCreateButtonText: "Create",
     tempLayerCancelButtonText: "Cancel",
     tempLayerDescriptionText: "Create a temporary layer of selected geometry type",
-    
+    nameBlankText: "Layer name cannot be empty.",
+    waitText: "Please wait...",
+
+    /** Remove parameters **/
+    removeText: "Remove",
+    removeTitleText: "Remove source permanently",
+    removeSourceWindowTitleText: "Remove source",
+    removeSourceWindowText: "Remove Source '{0}' ({1}) removed permanently?",
+    verboseRemove: true,
+
     uploadShpWindow: null,
     uploadXlsWindow: null,
-//    uploadKmlImporterWindow: null,
+    //    uploadKmlImporterWindow: null,
 
     /** Indicate show preview window **/
     activePreview: true,
@@ -99,13 +108,16 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
     /** Default prewiev window height **/
     previewHeight: 256,
     /**  If when adding layers the make persist window will be shown **/
-    showPersistWindowOnAdd :false,
-    
+    showPersistWindowOnAdd: false,
+
+    /** The button used by the addmin to remove a persisted source*/
+    deleteWMSSourceBtn: null,
+
     /** api: method[addActions]
      */
     addActions: function() {
         var commonOptions = {
-            tooltip : this.addActionTip,
+            tooltip: this.addActionTip,
             text: this.addActionText,
             menuText: this.addActionMenuText,
             disabled: true,
@@ -114,48 +126,48 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
         var options, uploadButton, uploadKMLButton, uploadRasterButton;
         if (this.initialConfig.search || (this.uploadSource)) {
             var items = [new Ext.menu.Item({
-                iconCls: 'vw-icon-add-layer-wms',
-                tooltip: "Add WMS Layer",
-                text: this.addWMSLayerActionText,
-                handler: this.showCapabilitiesGrid,
-                scope: this
-            })];
+                    iconCls: 'vw-icon-add-layer-wms',
+                    tooltip: "Add WMS Layer",
+                    text: this.addWMSLayerActionText,
+                    handler: this.showCapabilitiesGrid,
+                    scope: this
+                })];
 
             items.push(new Ext.menu.Item({
-                iconCls: 'vw-icon-add-layer-wfs', 
+                iconCls: 'vw-icon-add-layer-wfs',
                 text: this.addWFSLayerActionText,
                 tooltip: "Add WFS Feature Type",
                 handler: this.showCatalogueWFSSearch,
                 scope: this
             }));
             items.push(new Ext.menu.Item({
-                iconCls: 'vw-icon-add-layer-vector', 
+                iconCls: 'vw-icon-add-layer-vector',
                 text: this.temporaryLayerActionText,
                 tooltip: "Add temporary layer",
                 handler: this.createTemporaryLayer,
                 scope: this
             }));
-            
+
             if (this.initialConfig.search) {
                 items.push(new Ext.menu.Item({
-                    iconCls: 'gxp-icon-addlayers', 
+                    iconCls: 'gxp-icon-addlayers',
                     text: this.findActionMenuText,
                     handler: this.showCatalogueSearch,
                     scope: this
                 }));
             }
-            
+
             items.push(new Ext.menu.Item({
-            	iconCls: 'vw-icon-add-layer-shp',
-            	text: this.uploadShapeText,
-            	handler: this.uploadShapeHandler,
-            	scope: this
+                iconCls: 'vw-icon-add-layer-shp',
+                text: this.uploadShapeText,
+                handler: this.uploadShapeHandler,
+                scope: this
             }));
             items.push(new Ext.menu.Item({
                 iconCls: 'vw-icon-add-layer-shp',
                 text: this.uploadXlsText,
                 handler: this.uploadXlsHandler,
-            	scope: this
+                scope: this
             }));
             items.push(new Ext.menu.Item({
                 iconCls: 'gxp-icon-filebrowse',
@@ -164,7 +176,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 scope: this
             }));
             items.push(new Ext.menu.Item({
-                iconCls: 'vw-icon-add-layer-wms',
+                iconCls: 'vw-icon-add-layer-shp',
                 text: this.uploadKmlImportText,
                 handler: this.uploadKmlHandler,
                 scope: this
@@ -191,12 +203,12 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             });
         } else {
             options = Ext.apply(commonOptions, {
-                handler : this.getAddLayersPanel,
+                handler: this.getAddLayersPanel,
                 scope: this
             });
         }
         var actions = gxp.plugins.AddLayers.superclass.addActions.apply(this, [options]);
-        
+
         this.target.on("ready", function() {
             if (this.uploadSource) {
                 var source = this.target.layerSources[this.uploadSource];
@@ -219,30 +231,30 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             }
             actions[0].enable();
         }, this);
-
+    
         return actions;
     },
-    
+
     /**
      * api: method[uploadShapeHandler]
      */
     uploadShapeHandler: function() {
-    	if (!this.uploadShpWindow) {
-    		this.uploadShpWindow = new Viewer.plugins.ShpWizard();
-    		this.uploadShpWindow.on({
-    			'close': {
-    				fn: function() {
-    					this.uploadShpWindow = null;    					
-    				},
-    				scope: this
-    			}
-    		});
+        if (!this.uploadShpWindow) {
+            this.uploadShpWindow = new Viewer.plugins.ShpWizard();
+            this.uploadShpWindow.on({
+                'close': {
+                    fn: function() {
+                        this.uploadShpWindow = null;
+                    },
+                    scope: this
+                }
+            });
 
-    	}
-    	this.uploadShpWindow.show();
-    	
+        }
+        this.uploadShpWindow.show();
+
     },
-     /**
+    /**
      * api: method[uploadXlsHandler]
      */
     uploadXlsHandler: function() {
@@ -251,7 +263,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             this.uploadXlsWindow.on({
                 'close': {
                     fn: function() {
-                        this.uploadXlsWindow = null;                        
+                        this.uploadXlsWindow = null;
                     },
                     scope: this
                 }
@@ -259,9 +271,9 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
 
         }
         this.uploadXlsWindow.show();
-        
+
     },
-    
+
     /**
      * api: method[uploadKmlHandler]
      */
@@ -271,7 +283,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             this.uploadKmlImporterWindow.on({
                 'close': {
                     fn: function() {
-                        this.uploadKmlImporterWindow = null;                        
+                        this.uploadKmlImporterWindow = null;
                     },
                     scope: this
                 }
@@ -279,7 +291,32 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
 
         }
         this.uploadKmlImporterWindow.show();
-        
+
+    },
+
+      /** api: method[showCapabilitiesGrid]
+     * Shows the window with a capabilities grid.
+     */
+    showCapabilitiesGrid: function() {
+        if(!this.capGrid) {
+            this.initCapGrid();
+        } else if (!(this.capGrid instanceof Ext.Window)) {
+            this.addOutput(this.capGrid);
+        }
+
+
+        var userInfo = this.target.persistenceGeoContext.userInfo;
+        var showDeleteWMSSourceBtn = userInfo && userInfo.admin;
+
+
+        this.capGrid.show();
+
+
+        if(showDeleteWMSSourceBtn) {
+            this.deleteWMSSourceBtn.show();
+        } else {
+            this.deleteWMSSourceBtn.hide();
+        }
     },
 
     /**
@@ -291,7 +328,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             this.uploadRasterWindow.on({
                 'close': {
                     fn: function() {
-                        this.uploadRasterWindow = null;                        
+                        this.uploadRasterWindow = null;
                     },
                     scope: this
                 }
@@ -308,9 +345,9 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
      *  If this tool is provided an ``upload`` property, a button will be created
      *  that launches a window with a :class:`gxp.LayerUploadPanel`.
      */
-    createUploadRasterButton: function(Cls){
+    createUploadRasterButton: function(Cls) {
         Cls = Cls || Ext.Button;
-        var uploadConfig = this.initialConfig.upload || !!this.initialConfig.uploadSource;
+        var uploadConfig = this.initialConfig.upload || !! this.initialConfig.uploadSource;
         var button;
         var url;
         if (uploadConfig) {
@@ -341,7 +378,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                                 uploadcomplete: function(panel, detail) {
                                     var layers = detail["import"].tasks[0].items;
                                     var item, names = {}, resource, layer;
-                                    for (var i=0, len=layers.length; i<len; ++i) {
+                                    for (var i = 0, len = layers.length; i < len; ++i) {
                                         item = layers[i];
                                         if (item.state === "ERROR") {
                                             Ext.Msg.alert(item.originalName, item.errorMessage);
@@ -411,7 +448,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
 
         return button;
     },
-    
+
     /** api: method[createUploadButton]
      *  :arg Cls: ``Function`` The class to use for creating the button. If not
      *      provided, an ``Ext.Button`` instance will be created.
@@ -420,7 +457,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
      *  that launches a window with a :class:`gxp.LayerUploadPanel`.
      */
     createUploadKMLButton: function(Cls) {
-                
+
         var win = new Ext.Window({
             title: this.uploadKMLText,
             modal: true,
@@ -449,7 +486,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
 
         Cls = Cls || Ext.Button;
 
-        var uploadConfig = this.initialConfig.upload || !!this.initialConfig.uploadSource;
+        var uploadConfig = this.initialConfig.upload || !! this.initialConfig.uploadSource;
 
         var button = new Cls({
             text: this.uploadKMLText,
@@ -481,7 +518,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 });
             }
         }
-        
+
         this.on({
             sourceselected: function(tool, source) {
                 button[this.uploadSource ? "show" : "hide"]();
@@ -503,16 +540,15 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
         return button;
     },
 
-    showCatalogueWFSSearch: function(){
+    showCatalogueWFSSearch: function() {
         var map_ = this.target.mapPanel.map;
         var this_ = this;
         var wfsDialog = new Viewer.dialog.WfsWizard({
             scope: this.target,
             makePersistentText: this.makePersistentText,
-            returnProjection: this.target.mapPanel.map.projection ?
-                this.target.mapPanel.map.projection : Viewer.GEO_PROJECTION,
-            listeners:{
-                featureTypeAdded: function(record){
+            returnProjection: this.target.mapPanel.map.projection ? this.target.mapPanel.map.projection : Viewer.GEO_PROJECTION,
+            listeners: {
+                featureTypeAdded: function(record) {
                     this_.addLayers([record], false);
                     // map_.addLayer(record.getLayer());
 
@@ -525,26 +561,35 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
 
         wfsDialog.show();
     },
-    
+
     /** private: method[addLayers]
      *  :arg records: ``Array`` the layer records to add
      *  :arg isUpload: ``Boolean`` Do the layers to add come from an upload?
      */
     addLayers: function(records, isUpload) {
 
-        if(records.length == 1 && 
-            records[0].getLayer() instanceof OpenLayers.Layer.Vector){
-            this.target.mapPanel.map.addLayer(records[0].getLayer());
-            this.layer = records[0].getLayer();
-            records[0].getLayer().events.register("loadend", this, this.onLoadEnd);
+        if (records.length == 1 &&
+            records[0].getLayer() instanceof OpenLayers.Layer.Vector) {
+            this.addVectorLayer(records, isUpload);
+        } else {
+            this.addWMSLayers(records, isUpload);
         }
 
         //Viewer.plugins.AddLayers.superclass.addLayers.call(this, records, isUpload);
 
+
+    },
+
+    /** private: method[addWMSLayers]
+     *  :arg records: ``Array`` the layer records to add
+     *  :arg isUpload: ``Boolean`` Do the layers to add come from an upload?
+     *  Only adds WMS layers
+     */
+    addWMSLayers: function(records, isUpload) {
         var source = this.selectedSource;
         var layerStore = this.target.mapPanel.layers,
             extent, record, layer;
-        for (var i=0, ii=records.length; i<ii; ++i) {
+        for (var i = 0, ii = records.length; i < ii; ++i) {
             record = records[i];
             if (record) {
                 layer = record.getLayer();
@@ -555,7 +600,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                         extent.extend(record.getLayer().maxExtent);
                     }
                 }
-                if(this.showPersistWindowOnAdd && this.target.isAuthorized()){
+                if (this.showPersistWindowOnAdd && this.target.isAuthorized()) {
                     //  mark temp
                     layer.temporal = true;
                     this.showSaveLayerWindow(records[i]);
@@ -584,9 +629,20 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
         }
     },
 
+    /** private: method[addWMSLayers]
+     *  :arg records: ``Array`` the layer records to add
+     *  :arg isUpload: ``Boolean`` Do the layers to add come from an upload?
+     *  Only adds Vector layers without source paremeter
+     */
+    addVectorLayer: function(records, isUpload) {
+        this.target.mapPanel.map.addLayer(records[0].getLayer());
+        this.layer = records[0].getLayer();
+        records[0].getLayer().events.register("loadend", this, this.onLoadEnd);
+    },
+
     /** api: method[onLoadEnd]
      */
-    onLoadEnd: function(){
+    onLoadEnd: function() {
         this.zoomToExtent(this.layer);
     },
 
@@ -600,7 +656,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
         }
         var extent = layer.restrictedExtent || dataExtent || layer.maxExtent || map.maxExtent;
 
-        if(extent)
+        if (extent)
             this.target.mapPanel.map.zoomToExtent(extent);
     },
 
@@ -608,11 +664,11 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
      * private: method[showSaveLayerWindow]
      * Show a dialog to save a layerRecord
      */
-    showSaveLayerWindow: function (layerRecord){
+    showSaveLayerWindow: function(layerRecord) {
         var saveWindow = new Ext.Window({
             title: this.makePersistentText,
             closeAction: 'hide',
-            width:500
+            width: 500
         });
         var savePanel = new Viewer.widgets.SaveLayerPanel({
             layerRecord: layerRecord,
@@ -630,25 +686,108 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
      * Constructs a window with a capabilities grid.
      */
     initCapGrid: function() {
-        var source, data = [], target = this.target;        
+        var source, data = [],
+            target = this.target;
         for (var id in target.layerSources) {
             source = target.layerSources[id];
             if (source.store && !source.hidden) {
-                data.push([id, source.title || id, source.url]);                
+                data.push([id, source.title || id, source.url]);
             }
         }
+
+        var target = this.target;
+
         var sources = new Ext.data.ArrayStore({
             fields: ["id", "title", "url"],
             data: data
         });
 
+        this.storedSources = new Ext.data.ArrayStore({
+            fields: ["id", "title", "url"],
+            data: []
+        });
+
+        Ext.Msg.wait(this.waitText);
+
+        //old init
+        this.initCapGridFromSourceAndData(data, sources, target);
+
+
+
+        //restore layer sources
+        var tmpSources = {};
+        Ext.Ajax.request({
+            url: this.target.defaultRestUrl + '/persistenceGeo/loadAllSourceTools',
+            method: 'POST',
+            success: function(response) {
+
+                var json = Ext.util.JSON.decode(response.responseText);
+                var sources2 = json.data;
+
+                var callbackFn = function(id) {
+                    // add to combo and select
+                    var record = new sources.recordType({
+                        id: id,
+                        title: tmpSources[target.layerSources[id].url].name
+                    });
+                    sources.insert(0, [record]);
+                };
+
+                var fallbackFn = function(source, msg) {
+                    //TODO
+                    console.error("Error loading " + msg);
+                };
+
+                for (var i = 0; i < json.results; i++) {
+                    source = sources2[i];
+                    tmpSources[source.url] = sources2[i];
+                    if (source.ptype == "gxp_wmscsource" && !! source.url && !! source.id) {
+                        var storedRecord = new sources.recordType({
+                            id: source.id,
+                            title: source.name,
+                            url: source.url
+                        });
+                        this.storedSources.insert(0, [storedRecord]);
+                        this.target.addLayerSource({
+                            config: {
+                                url: source.url,
+                                name: source.name
+                            }, // assumes default of gx_wmssource
+                            callback: callbackFn,
+                            fallback: fallbackFn,
+                            scope: this
+                        });
+                    }
+                }
+                Ext.Msg.updateProgress(1);
+                Ext.Msg.hide();
+            },
+            failure: function(response) {
+                Ext.Msg.updateProgress(1);
+                Ext.Msg.hide();
+
+                //TODO
+                console.error("Error loading sources!!");
+            },
+            scope: this
+        });
+
+    },
+
+    /**
+     * private: method[initCapGridFromSourceAndData]
+     * Constructs a window with a capabilities grid.
+     */
+    initCapGridFromSourceAndData: function(data, sources, target) {
+
         var expander = this.createExpander();
-        
+
         function addLayers() {
             var source = this.selectedSource;
             var records = capGridPanel.getSelectionModel().getSelections();
             var recordsToAdd = [],
                 numRecords = records.length;
+
             function collectRecords(record) {
                 if (recordsToAdd) {
                     recordsToAdd.push(record);
@@ -659,7 +798,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                     this.capGrid.hide();
                 }
             }
-            for (var i=0, ii=records.length; i<ii; ++i) {
+            for (var i = 0, ii = records.length; i < ii; ++i) {
                 var record = source.createLayerRecord({
                     name: records[i].get("name"),
                     source: source.id
@@ -669,7 +808,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 }
             }
         }
-        
+
         var idx = 0;
         if (this.startSourceId !== null) {
             sources.each(function(record) {
@@ -696,7 +835,9 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 scope: this
             }
         });
-        
+
+        this.capGridPanel = capGridPanel;
+
         var sourceComboBox = new Ext.form.ComboBox({
             ref: "../sourceComboBox",
             width: 165,
@@ -711,26 +852,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             mode: "local",
             value: data[idx][0],
             listeners: {
-                select: function(combo, record, index) {
-                    var id = record.get("id");
-                    if (id === this.addServerId) {
-                        showNewSourceDialog();
-                        sourceComboBox.reset();
-                        return;
-                    }
-                    var source = this.target.layerSources[id];
-                    capGridPanel.reconfigure(source.store, capGridPanel.getColumnModel());
-                    // TODO: remove the following when this Ext issue is addressed
-                    // http://www.extjs.com/forum/showthread.php?100345-GridPanel-reconfigure-should-refocus-view-to-correct-scroller-height&p=471843
-                    capGridPanel.getView().focusRow(0);
-                    this.setSelectedSource(source);
-                    // blur the combo box
-                    //TODO Investigate if there is a more elegant way to do this.
-                    (function() {
-                        combo.triggerBlur();
-                        combo.el.blur();
-                    }).defer(100);
-                },
+                select: this.defaultSourceComboSelect,
                 focus: function(field) {
                     if (target.proxy) {
                         field.reset();
@@ -739,7 +861,9 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 scope: this
             }
         });
-        
+
+        this.sourceComboBox = sourceComboBox;
+
         var capGridToolbar = null;
         if (this.target.proxy || data.length > 1) {
             capGridToolbar = [
@@ -749,16 +873,29 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 sourceComboBox
             ];
         }
-        
+
         if (this.target.proxy) {
             this.addServerId = Ext.id();
-            sources.loadData([[this.addServerId, this.addServerText + "..."]], true);
+            sources.loadData([
+                [this.addServerId, this.addServerText + "..."]
+            ], true);
         }
-        
+
         var newSourceDialog = {
-            xtype: "gxp_newsourcedialog",
+            xtype: "pgeo_newsourcedialog",
             header: false,
+            target: this.target,
             invalidURLText: this.invalidWMSURLText,
+            storedSources: this.storedSources,
+            onUrlSaved: function(source) {
+                var storedRecord = new this.storedSources.recordType({
+                    id: source.id,
+                    title: source.name,
+                    url: source.url
+                });
+                this.storedSources.insert(0, [storedRecord]);
+                this.hide();
+            },
             listeners: {
                 "hide": function(cmp) {
                     if (!this.outputTarget) {
@@ -767,13 +904,16 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 },
                 "urlselected": function(newSourceDialog, url) {
                     newSourceDialog.setLoading();
+
                     this.target.addLayerSource({
-                        config: {url: url}, // assumes default of gx_wmssource
+                        config: {
+                            url: url
+                        }, // assumes default of gx_wmssource
                         callback: function(id) {
                             // add to combo and select
                             var record = new sources.recordType({
                                 id: id,
-                                title: this.target.layerSources[id].title || this.untitledText
+                                title: newSourceDialog.nameTextField.getValue() || this.target.layerSources[id].title || this.untitledText
                             });
                             sources.insert(0, [record]);
                             sourceComboBox.onSelect(record, 0);
@@ -781,8 +921,9 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                         },
                         fallback: function(source, msg) {
                             newSourceDialog.setError(
-                                new Ext.Template(this.addLayerSourceErrorText).apply({msg: msg})
-                            );
+                                new Ext.Template(this.addLayerSourceErrorText).apply({
+                                msg: msg
+                            }));
                         },
                         scope: this
                     });
@@ -790,22 +931,16 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 scope: this
             }
         };
+
+        this.newSourceDialog = newSourceDialog;
+
         var me = this;
+
         function showNewSourceDialog() {
-            if (me.outputTarget) {
-                me.addOutput(newSourceDialog);
-            } else {
-                new Ext.Window({
-                    title: gxp.NewSourceDialog.prototype.title,
-                    modal: true,
-                    hideBorders: true,
-                    width: 300,
-                    items: newSourceDialog
-                }).show();
-            }
-        }        
-        
-        
+            me.showNewSourceDialog();
+        }
+
+
         var items = {
             xtype: "container",
             region: "center",
@@ -825,9 +960,9 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                 html: this.instructionsText
             });
         }
-        
+
         var bbarItems = [this.createBbarItems(capGridPanel, filters, addLayers)];
-        
+
         var uploadButton;
         if (!this.uploadSource) {
             uploadButton = this.createUploadButton();
@@ -864,26 +999,90 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
         if (Cls === Ext.Panel) {
             this.addOutput(this.capGrid);
         }
-        
+
     },
 
-    createBbarItems: function(capGridPanel, filters, addLayers){
+    /**
+     * Overriden method so it doesn't change the set name.
+     */
+    setSelectedSource: function(source, callback) {
+        this.selectedSource = source;
+        var store = source.store;
+        this.fireEvent("sourceselected", this, source);
+        if (this.capGrid && source.lazy) {
+            source.store.load({
+                callback: (function() {
+                    var sourceComboBox = this.capGrid.sourceComboBox,
+                        store = sourceComboBox.store,
+                        valueField = sourceComboBox.valueField,
+                        index = store.findExact(valueField, sourceComboBox.getValue()),
+                        rec = store.getAt(index),
+                        source = this.target.layerSources[rec.get("id")];
+                    if (source) {
+                        if (rec.get("title") == this.untitledText && !Ext.isEmpty(source.title)) {
+                            rec.set("title", source.title);
+                            sourceComboBox.setValue(rec.get(valueField));
+                        }
+                    } else {
+                        store.remove(rec);
+                    }
+                }).createDelegate(this)
+            });
+        }
+    },
 
-        return ["->",
+    showNewSourceDialog: function() {
+        if (this.outputTarget) {
+            this.addOutput(this.newSourceDialog);
+        } else {
+            new Ext.Window({
+                title: gxp.NewSourceDialog.prototype.title,
+                modal: true,
+                hideBorders: true,
+                resizable: false,
+                width: 350,
+                items: this.newSourceDialog
+            }).show();
+        }
+    },
+
+    defaultSourceComboSelect: function(combo, record, index) {
+        var id = record.get("id");
+        if (id === this.addServerId) {
+            this.showNewSourceDialog();
+            this.sourceComboBox.reset();
+            return;
+        }
+        var source = this.target.layerSources[id];
+        this.capGridPanel.reconfigure(source.store, this.capGridPanel.getColumnModel());
+        // TODO: remove the following when this Ext issue is addressed
+        // http://www.extjs.com/forum/showthread.php?100345-GridPanel-reconfigure-should-refocus-view-to-correct-scroller-height&p=471843
+        this.capGridPanel.getView().focusRow(0);
+        this.setSelectedSource(source);
+        // blur the combo box
+        //TODO Investigate if there is a more elegant way to do this.
+        (function() {
+            combo.triggerBlur();
+            combo.el.blur();
+        }).defer(100);
+    },
+
+    createBbarItems: function(capGridPanel, filters, addLayers) {
+        var defaultBbar = ["->",
             new Ext.Button({
                 text: this.onlyCompatibleText,
                 iconCls: "gxp-icon-filter",
                 enableToggle: true,
-                handler: function(button, state){
+                handler: function(button, state) {
                     this.filterCapaGrid(button, state, capGridPanel, filters);
                 },
-                scope : this
+                scope: this
             }),
             new Ext.Button({
                 text: this.addButtonText,
                 iconCls: "gxp-icon-addlayers",
                 handler: addLayers,
-                scope : this
+                scope: this
             }),
             new Ext.Button({
                 text: this.doneText,
@@ -891,91 +1090,188 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                     this.capGrid.hide();
                 },
                 scope: this
-            })];
+            })
+        ];
+        
+        // We always add the admin bar, but we won't show anything unless the user is admin.
+        defaultBbar.push(this.obtainAdminBbar());
+
+        return defaultBbar;
     },
 
-    filterCapaGrid: function (button, state, capGridPanel, filters){
+    /**
+     * Method:[obtainAdminBbar]
+     *
+     * Obtain extra buttons for admin user logged
+     **/
+    obtainAdminBbar: function() {
+        var items = new Array();
+        if ( !! this.storedSources && !! this.storedSources.data) {
+
+            var deleteButton = new Ext.Button({
+                text: this.removeText,
+                title: this.removeTitleText,
+                disabled: true,
+                handler: function() {
+                    var id = this._deleteButtonConfig.id,
+                        name = this._deleteButtonConfig.name;
+                    if (this.verboseRemove) {
+                        Ext.Msg.confirm(this.removeSourceWindowTitleText, String.format(this.removeSourceWindowText, name, id), this.removeLayerSourceConfirm, this);
+                    } else {
+                        this.removeLayerSource(id);
+                    }
+                },
+                scope: this
+            });
+            this.deleteWMSSourceBtn = deleteButton;
+
+            this.sourceComboBox.addListener('select', function(combo, record, index) {
+                var id = null;
+                var name = null;
+                var url = null;
+                var wmsSourceId = record.get('id');
+                storedSourceSelected = null;
+                for (var i = 0; i < this.storedSources.data.length; i++) {
+                    if (this.selectedSource.url == this.storedSources.data.get(i).get('url')) {
+                        id = this.storedSources.data.get(i).get('id');
+                        name = this.storedSources.data.get(i).get('title');
+                        url = this.storedSources.data.get(i).get('url');
+                        storedSourceSelected = this.storedSources.data.get(i);
+                        break;
+                    }
+                }
+                this._deleteButtonConfig = {
+                    id: id,
+                    name: name,
+                    url: url,
+                    wmsSourceId: wmsSourceId,
+                    deleteableRecord: record,
+                    storedSourceSelected: storedSourceSelected
+                };
+                if ( !! id && !! name) {
+                    deleteButton.setDisabled(false);
+                } else {
+                    deleteButton.setDisabled(true);
+                }
+                //this.defaultSourceComboSelect(combo, record, index);
+            }, this);
+            items.push(deleteButton);
+        }
+        return items;
+    },
+
+    removeLayerSourceConfirm: function(btn) {
+        if (btn == 'yes') {
+            this.removeLayerSource(this._deleteButtonConfig.id);
+        }
+    },
+
+    removeLayerSource: function(id) {
+        Ext.Ajax.request({
+            url: this.target.defaultRestUrl + '/persistenceGeo/deleteSourceTool/' + id,
+            method: 'POST',
+            success: function(response) {
+                this.sourceComboBox.store.remove(this._deleteButtonConfig.deleteableRecord);
+                this.storedSources.remove(this._deleteButtonConfig.storedSourceSelected);
+                this.sourceComboBox.onSelect(this.sourceComboBox.store.getAt(0), 0);
+            },
+            failure: function(response) {
+                //TODO
+                console.error("Error removing source!!");
+            },
+            scope: this
+        });
+    },
+
+    filterCapaGrid: function(button, state, capGridPanel, filters) {
         var store = capGridPanel.getStore();
-        if(!!store.url){
+        if ( !! store.url) {
             // only filter wms!!
-            var filter = (filters.filter===true) ? false : true;
+            var filter = (filters.filter === true) ? false : true;
             filters.filter = filter;
             var srs_filter = filters.filters.get("srs");
-            var srsMap = this.target.mapPanel.map.projection;    
-            if(filter){
+            var srsMap = this.target.mapPanel.map.projection;
+            if (filter) {
                 srs_filter.setValue(srsMap);
-            }else{
+            } else {
                 srs_filter.setValue('');
             }
             store.reload();
         }
     },
 
-    createFilters: function (){
+    createFilters: function() {
         this.filters = new Ext.ux.grid.GridFilters({
             // encode and local configuration options defined previously for easier reuse
             encode: false, // json encode the filter query
-            local: true,   // defaults to false (remote filtering)
-            filters: [
-                {
+            local: true, // defaults to false (remote filtering)
+            filters: [{
                     type: 'string',
                     dataIndex: 'title',
                     disabled: false
-                },
-                {
+                }, {
                     type: 'string',
                     dataIndex: 'name',
                     disabled: false
-                },
-                {
+                }, {
                     type: 'map',
                     dataIndex: 'srs',
                     disabled: false
                 }
             ]
-        });    
+        });
 
         return this.filters;
     },
 
-    createColumnModel: function(expander){
+    createColumnModel: function(expander) {
         return new Ext.grid.ColumnModel([
-                expander,
-                {id: "title", header: this.panelTitleText, dataIndex: "title", sortable: true},
-                {header: "Id", dataIndex: "name", width: 120, sortable: true},
-                {
-                    header: this.panelSRSText, dataIndex: "srs", 
-                    width: 70,  sortable: true,  hidden: true,
-                    renderer: function(data) {
-                        var srs = "<ul>";
-                        for(var code in data){
-                            srs += "<li>" + code + "</li>";
-                        }
-                        srs += "</ul>";
-                         return srs;
-                     },
-                    filter: {
-                        type: 'map'
-                        // specify disabled to disable the filter menu
-                        //, disabled: true
+            expander, {
+                id: "title",
+                header: this.panelTitleText,
+                dataIndex: "title",
+                sortable: true
+            }, {
+                header: "Id",
+                dataIndex: "name",
+                width: 120,
+                sortable: true
+            }, {
+                header: this.panelSRSText,
+                dataIndex: "srs",
+                width: 70,
+                sortable: true,
+                hidden: true,
+                renderer: function(data) {
+                    var srs = "<ul>";
+                    for (var code in data) {
+                        srs += "<li>" + code + "</li>";
                     }
+                    srs += "</ul>";
+                    return srs;
+                },
+                filter: {
+                    type: 'map'
+                    // specify disabled to disable the filter menu
+                    //, disabled: true
                 }
-            ]);
+            }
+        ]);
     },
-    
+
     /**
      * Method: mapPreview
-     *  
+     *
      * Shows map preview of a layer
-     * 
+     *
      * Parameters
      *  grid - <Ext.grid.GridPanel> grid with layers information
      *  index - <Integer> with layer index to load
      */
-    mapPreview: function (grid, index) {
+    mapPreview: function(grid, index) {
         var record = grid.getStore().getAt(index);
         var layer;
-        
+
         layer = record.getLayer();
         /**
          * TODO: The WMSCapabilitiesReader should allow for creation
@@ -983,35 +1279,34 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
          */
         if (layer instanceof OpenLayers.Layer.WMS) {
             layer = new OpenLayers.Layer.WMS(
-                layer.name, layer.url,
-                {layers: layer.params["LAYERS"]},
-                {
-                    attribution: layer.attribution,
-                    maxExtent: OpenLayers.Bounds.fromArray(
-                        record.get("llbbox")
-                    ),
-//                    .transform(
-//                        new OpenLayers.Projection(Viewer.GEO_PROJECTION),
-//                        this.mapPanel.map.getProjectionObject()
-//                    )
-                    isBaseLayer: false //Default overlay
-                }
-            );
+                layer.name, layer.url, {
+                layers: layer.params["LAYERS"]
+            }, {
+                attribution: layer.attribution,
+                maxExtent: OpenLayers.Bounds.fromArray(
+                    record.get("llbbox")),
+                //                    .transform(
+                //                        new OpenLayers.Projection(Viewer.GEO_PROJECTION),
+                //                        this.mapPanel.map.getProjectionObject()
+                //                    )
+                isBaseLayer: false //Default overlay
+            });
         }
-        
+
         var win = new Ext.Window({
             title: String.format(this.previewLayerText, record.get("title")),
             width: this.prewievWidth,
             height: this.previewHeight,
             layout: "fit",
             items: [{
-                xtype: "gx_mappanel",
-                layers: [layer],
-                extent: record.get("llbbox")
-            }]
+                    xtype: "gx_mappanel",
+                    layers: [layer],
+                    extent: record.get("llbbox")
+                }
+            ]
         });
         win.show();
-	},
+    },
 
     createTemporaryLayer: function() {
 
@@ -1040,45 +1335,52 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             onAddButtonClicked: function(button, evt) {
                 var geometry = this.radioGroup.getValue().getGroupValue();
                 var name = this.txtName.getValue();
-                if (name.length > 0) {
-                    this.getComponent('formNewLayer').getForm().submit({   
-                                scope: this,
-                                url: '../../vectorialLayerController/newTempLayer',
-                                waitMsg: this.createLayerWaitMsgText,
-                                waitTitle: this.createLayerWaitMsgTitleText,
-                                success: function(fp, o) {
-                                    var resp = Ext.util.JSON.decode(o.response.responseText);
-                                    if (resp && resp.success && resp.data && resp.data.status === "success") {
-                                        //Add layer to map and close window
-                                        var layerName = resp.data.layerName;
-                                        var layerTitle = resp.data.layerTitle;
-                                        var geoserverUrl = (resp.data.serverUrl) || (app.sources.local.url + "/wms");
-                                        var layer = new OpenLayers.Layer.WMS(layerTitle,
-                                                geoserverUrl,
-                                            {
-                                                layers: layerName,
-                                                transparent: true                         
-                                            }, {
-                                                opacity: 1,
-                                                visibility: true                                                
-                                            });
-                                        layer.metadata.layerResourceId = resp.data.layerResourceId;
-                                        layer.metadata.layerTypeId = resp.data.layerTypeId;
-                                        layer.metadata.temporal = true;
-                                        Viewer.getMapPanel().map.addLayer(layer);
-                                        this.close();
-                                        Ext.Msg.alert('Capa creada', "La capa se ha creado de forma temporal");
-                                    } else if(resp && resp.success && resp.data && resp.data.status === "error") {
-                                        Ext.Msg.alert('Error', resp.data.message);
-                                    } else {
-                                        Ext.Msg.alert('Error', "Se ha producido un error creando la capa.");
-                            }
-                                },
-                                failure: function(form, action) {
-                                    Ext.Msg.alert('Error', "Se ha producido un error al enviar los datos al servidor");
-                        }
-                    });
+                var form = this.getComponent('formNewLayer').getForm();
+                if (!form.isValid()) {
+                    return;
                 }
+
+                Ext.Msg.wait(this.parentAction.waitText);
+                form.submit({
+                    scope: this,
+                    url: '../../vectorialLayerController/newTempLayer',
+                    waitMsg: this.createLayerWaitMsgText,
+                    waitTitle: this.createLayerWaitMsgTitleText,
+                    success: function(fp, o) {
+                        Ext.Msg.updateProgress(1);
+                        Ext.Msg.hide();
+                        var resp = Ext.util.JSON.decode(o.response.responseText);
+                        if (resp && resp.success && resp.data && resp.data.status === "success") {
+                            //Add layer to map and close window
+                            var layerName = resp.data.layerName;
+                            var layerTitle = resp.data.layerTitle;
+                            var geoserverUrl = (resp.data.serverUrl) || (app.sources.local.url + "/wms");
+                            var layer = new OpenLayers.Layer.WMS(layerTitle,
+                                geoserverUrl, {
+                                layers: layerName,
+                                transparent: true
+                            }, {
+                                opacity: 1,
+                                visibility: true
+                            });
+                            layer.metadata.layerResourceId = resp.data.layerResourceId;
+                            layer.metadata.layerTypeId = resp.data.layerTypeId;
+                            layer.metadata.temporal = true;
+                            Viewer.getMapPanel().map.addLayer(layer);
+                            this.close();
+                            Ext.Msg.alert('Capa creada', "La capa se ha creado de forma temporal");
+                        } else if (resp && resp.success && resp.data && resp.data.status === "error") {
+                            Ext.Msg.alert('Error', resp.data.message);
+                        } else {
+                            Ext.Msg.alert('Error', "Se ha producido un error creando la capa.");
+                        }
+                    },
+                    failure: function(form, action) {
+                        Ext.Msg.updateProgress(1);
+                        Ext.Msg.hide();
+                        Ext.Msg.alert('Error', "Se ha producido un error al enviar los datos al servidor");
+                    }
+                });
             },
 
             onBeforeRender: function() {
@@ -1087,24 +1389,47 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                     layout: 'form',
                     itemId: 'formNewLayer',
                     padding: 10,
-                    items: [
-                        {
+                    items: [{
                             xtype: 'label',
                             cls: 'toolDescription',
                             text: this.parentAction.tempLayerDescriptionText
                         },
                         this.radioGroup = new Ext.form.RadioGroup({
                             items: [
-                                new Ext.form.Radio({ boxLabel: this.parentAction.tempLayerPointText, name: 'geometryType', inputValue: 'POINT', checked: true}),
-                                new Ext.form.Radio({ boxLabel: this.parentAction.tempLayerLineText, name: 'geometryType', inputValue: 'LINESTRING' }),
-                                new Ext.form.Radio({ boxLabel: this.parentAction.tempLayerPolygonText, name: 'geometryType', inputValue: 'POLYGON' })
+                                new Ext.form.Radio({
+                                    boxLabel: this.parentAction.tempLayerPointText,
+                                    name: 'geometryType',
+                                    inputValue: 'POINT',
+                                    checked: true
+                                }),
+                                new Ext.form.Radio({
+                                    boxLabel: this.parentAction.tempLayerLineText,
+                                    name: 'geometryType',
+                                    inputValue: 'LINESTRING'
+                                }),
+                                new Ext.form.Radio({
+                                    boxLabel: this.parentAction.tempLayerPolygonText,
+                                    name: 'geometryType',
+                                    inputValue: 'POLYGON'
+                                })
                             ],
-                            fieldLabel: "Tipo de geometría",
+                            fieldLabel: "Tipo de geometría"
                         }),
                         this.txtName = new Ext.form.TextField({
                             fieldLabel: this.parentAction.tempLayerNameLabelText,
                             name: 'layerName',
-                            anchor: '95%'
+                            anchor: '95%',
+                            allowBlank: false,
+                            blankText: this.parentAction.nameBlankText,
+                            listeners: {
+                                valid: function() {
+                                    this.btnAdd.setDisabled(false);
+                                },
+                                invalid: function() {
+                                    this.btnAdd.setDisabled(true);
+                                },
+                                scope: this
+                            }
                         })
                     ],
                     buttons: [
@@ -1127,7 +1452,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             }
         });
 
-        var dialog = new Dialog({ 
+        var dialog = new Dialog({
             mapPanel: this.target.mapPanel,
             parentAction: this
         });

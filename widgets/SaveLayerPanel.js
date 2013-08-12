@@ -235,7 +235,7 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
     getPersonalizedItems: function (){
         var items = new Array();
         var fieldLabel = this.labelLayerName ? this.labelLayerName : this.target.labelLayerName;
-        var value = this.layerName ? this.layerName : this.target.layerName;
+        var value = $("<div/>").html(this.layerName ? this.layerName : this.target.layerName).text();
         var emptyText = this.selectNameText ? this.selectNameText : this.target.selectNameText;
         var changeFunction = this.setLayerName ? this.setLayerName : this.target.setLayerName;
 

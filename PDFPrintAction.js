@@ -46,16 +46,27 @@ Ext.namespace("gxp.plugins");
  *    Provides an action for showing channel selector dialog.
  */
 gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
-    
+
     /** api: ptype = gxp_extendedtoolbar */
     ptype: "gxp_pdfprint",
-    
+
+    /** api: config[pdfFooterText] 
+     * If present, the text used for the footer. No footer will be shown if not pressent.
+     */
+    pdfFooterText: null,
+
+    /** api: config[pdfLogoUri]
+     * If pressent the url/data uri used for the main logo of the printed PDF. If not present
+     * no logo will be printed.
+     */
+    pdfLogoUri : null,
+
     /** i18n * */
     /** api: config[buttonText]
      *  ``String`` Text to show button
      */
     buttonText: 'Print',
-     
+
     /** api: config[menuText]
      *  ``String``
      *  Text for show in menu item (i18n).
@@ -63,17 +74,23 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
     menuText: 'Print',
     errorText:"An error was found. Please try again later.",
 
-   
+    googleBaseLayerConfirmationText: "<p>A Google base layer is currently selected, and won't be printed because of Google Maps terms of use (see <a href=\"https://developers.google.com/maps/faq#tos_tiles\">this link</a>), so a white background will appear under the selected layers.</p><p>For better results please select a non Google base layer.",
+    continueAndUseGoogleBaseLayerText: "Continue anyway",
+    cancelText: "Cancel",
+
     /** api: config[tooltip]
      *  ``String``
      *  Text for channel tool tooltip (i18n).
      */
     tooltip: 'Print',
-    
+
     /** private: property[iconCls]
      */
     iconCls: 'gxp-icon-print',
-    
+
+    /** public: property[toggleGroup]*/
+    toggleGroup: null,
+
     /** private: method[constructor]
      */
     constructor: function(config) {
@@ -91,17 +108,22 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
     /** api: method[addActions]
      */
     addActions: function() {
-    	
-    	return gxp.plugins.PDFPrintAction.superclass.addActions.apply(this, [{
+
+        var actions =  gxp.plugins.PDFPrintAction.superclass.addActions.apply(this, [{
             buttonText: this.showButtonText ? this.buttonText : '',
             menuText: this.menuText,
             iconCls: this.iconCls,
-            tooltip: this.tooltip,            
+            tooltip: this.tooltip,
+            enableToggle: true,
+            allowDepress: true,
+            toggleGroup: this.toggleGroup,
+            deactivateOnDisable: true,
+            disabled:true,
             handler: function() {
                 var ds = Viewer.getComponent('PDFPrintWindow');
                 if (ds === undefined) {
 
-                    var printProvider = new GeoExt.data.PrintProvider({
+                    this.printProvider = new GeoExt.data.PrintProvider({
                         url : app.sources.local.url.replace("ows","pdf"),
                         listeners: {
                             scope: this,
@@ -109,18 +131,34 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                                 Ext.MessageBox.updateProgress(1);
                                 Ext.MessageBox.hide();
                                 // We modifiy the service urls so they actually work.
-                                printProvider.capabilities.createURL = app.sources.local.url.replace("ows","pdf/create.json");
-                                printProvider.capabilities.printURL = app.sources.local.url.replace("ows","pdf/print.pdf");                                
-                                
-                                ds = new Viewer.dialog.PDFPrintWindow({
-                                    persistenceGeoContext: this.target.persistenceGeoContext,
-                                    printProvider : printProvider,
-                                    target: this.target,
-                                    action: this
-                                });
-                                Viewer.registerComponent('PDFPrintWindow', ds);
-                                ds.show();
-                            },                           
+                                this.printProvider.capabilities.createURL = app.sources.local.url.replace("ows","pdf/create.json");
+                                this.printProvider.capabilities.printURL = app.sources.local.url.replace("ows","pdf/print.pdf");
+
+                                if(app.mapPanel.map.baseLayer.CLASS_NAME=="OpenLayers.Layer.Google") {
+                                    // We cannot print Google base layers so we need to ask the user what to do.
+                                    Ext.Msg.show({
+                                        msg: this.googleBaseLayerConfirmationText,
+                                        buttons: {
+                                            ok: this.continueAndUseGoogleBaseLayerText,
+                                            cancel: this.cancelText
+                                        },
+                                        minWidth: 400,
+                                        fn: function(buttonId) {
+                                            if(buttonId == "ok") {
+                                                ds = this._createAndShowWindow();
+                                            }
+                                            if(buttonId == "cancel") {
+                                                if(this.actions[0].items[0].pressed){
+                                                    this.actions[0].items[0].toggle();
+                                                }
+                                            }
+                                        },
+                                        scope: this
+                                    });
+                                } else {
+                                    ds = this._createAndShowWindow();
+                                }
+                            },
 
                             printexception : function(printProvider, response) {
                                 Ext.MessageBox.updateProgress(1);
@@ -136,21 +174,54 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
                             }
                         }
                     });
-                    printProvider.customParams.imageName = "";
+                    this.printProvider.customParams.imageName = "";
                     Ext.Msg.wait("Por favor, espere...");
-                    printProvider.loadCapabilities();
+                    this.printProvider.loadCapabilities();
                 } else {
                     if (ds.isVisible()) {
-                    ds.hide();
+                        ds.hide();
                     } else {
                         ds.show();
-                    }    
+                    }
                 }
-            },            
+            },
+            listeners : {
+                toggle: function(button, pressed) {
+                    var ds = Viewer.getComponent('PDFPrintWindow');
+                    if (!pressed && ds) {
+                        ds.hide();
+                    }
+                },
+                scope: this
+            },
             scope: this
         }]);
-    } 
-    
+
+        this.target.on("ready", function() {
+            actions[0].enable();
+        }, this);
+
+        return actions;
+    },
+
+    _createAndShowWindow : function() {
+        var ds = new Viewer.dialog.PDFPrintWindow({
+            persistenceGeoContext: this.target.persistenceGeoContext,
+            printProvider : this.printProvider,
+            target: this.target,
+            action: this,
+            pdfFooterText: this.pdfFooterText,
+            pdfLogoUri: this.pdfLogoUri
+        });
+        Viewer.registerComponent('PDFPrintWindow', ds);
+        ds.show();
+          ds.on("hide", function() {
+            // We deactivate the tool if we close the window.
+            if(this.actions[0].items[0].pressed){
+                this.actions[0].items[0].toggle();
+            }
+        },this);
+    }
 });
 
 Ext.preg(gxp.plugins.PDFPrintAction.prototype.ptype, gxp.plugins.PDFPrintAction);

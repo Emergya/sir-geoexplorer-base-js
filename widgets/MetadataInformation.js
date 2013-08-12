@@ -81,38 +81,65 @@ gxp.plugins.MetadataInformation = Ext.extend(gxp.plugins.Tool, {
     /** api: method[addActions]
      */
     addActions: function() {
-        var selectedLayer = null;
+        this.selectedLayer = null;
         var action = gxp.plugins.DefaultSearchesAction.superclass.addActions.apply(this, [{
             menuText: this.menuText,
             iconCls: this.iconCls,
             tooltip: this.tooltip,
             disabled: true,
-            handler: function(action, evt) {
-            	var layerID = selectedLayer.layerID;
-                var urlToGetMetadataInfo = "../../visor-api/mostrarMetadatosDeCapa/";
-                var win = new Ext.Window({
-                    title: this.windowTitle,
-                    width: 300,
-                    height: 300,
-                    layout: 'fit',
-                    autoScroll: true
-                });
-                win.show();
-                win.load({
-                    url: urlToGetMetadataInfo + layerID,
-                    text: this.windowLoadingMsg
-                });
-            },
+            handler: this.handleAction,
             scope: this
         }]);
 
+        this.launchAction = action[0];
+
         this.target.on("layerselectionchange", function(record) {
             if(record && record.data){
-                selectedLayer = record.getLayer();
+                this.selectedLayer = record.getLayer();
             }
+            this.enableOrDisable(); 
         }, this);
 
         return action;
+    },
+
+    /** api: method[enableOrDisable]
+     */
+    enableOrDisable: function (){
+        var disable = true;
+        if(!!this.selectedLayer
+            && !!this.selectedLayer.layerID){
+            disable = false;
+        }
+        this.launchAction.setDisabled(disable);
+        return disable;
+    },
+    
+    /** api: method[handleAction]
+     */
+    handleAction: function(action, evt) {
+        if(!this.enableOrDisable()){
+            this.addOutput();
+        }
+    },
+    
+    /** api: method[addOutput]
+     */
+    addOutput: function() {
+        var layerID = this.selectedLayer.layerID;
+        var urlToGetMetadataInfo = app.defaultRestUrl + "/../visor-api/mostrarMetadatosDeCapa/";
+        var win = new Ext.Window({
+            title: this.windowTitle,
+            width: 300,
+            height: 300,
+            layout: 'fit',
+            autoScroll: true
+        });
+        win.show();
+        win.load({
+            url: urlToGetMetadataInfo + layerID,
+            text: this.windowLoadingMsg
+        });
     }
 });
 

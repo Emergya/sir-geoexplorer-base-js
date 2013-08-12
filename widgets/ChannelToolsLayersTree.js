@@ -28,7 +28,7 @@
 
 (function () {
 
-    var ADDITIONAL_LAYERS_URL = '{0}/persistenceGeo/treeServiceMap';
+    var ADDITIONAL_LAYERS_URL = '{0}/persistenceGeo/tree/treeServiceMap';
 
     var NODE_TYPES = {
         FOLDER: 'FolderDto',
@@ -40,7 +40,8 @@
     var FILTER_TYPES = {
         ALL_CHANNEL_IN_ZONES: 'ALL_CHANNEL_IN_ZONES',
         SHOW_FOLDER_LAYERS: 'SHOW_FOLDER_LAYERS',
-        HIDE_IPT_CHANNELS: 'HIDE_IPT_CHANNELS'
+        HIDE_IPT_CHANNELS: 'HIDE_IPT_CHANNELS',
+        SHOW_UNASSIGNED_FOLDER: 'SHOW_UNASSIGNED_FOLDER'
     };
 
     Viewer.widgets.ChannelToolsLayersTree = Ext.extend(Ext.tree.TreePanel, {
@@ -76,7 +77,7 @@
             var rootFilter = null;
             var zonesFilter = FILTER_TYPES.ALL_CHANNEL_IN_ZONES + ',' + FILTER_TYPES.HIDE_IPT_CHANNELS;
             if (this.showLayers) {
-                rootFilter = FILTER_TYPES.SHOW_FOLDER_LAYERS;
+                rootFilter = FILTER_TYPES.SHOW_FOLDER_LAYERS+","+FILTER_TYPES.SHOW_UNASSIGNED_FOLDER+","+FILTER_TYPES.HIDE_IPT_CHANNELS;
                 zonesFilter += "," + FILTER_TYPES.SHOW_FOLDER_LAYERS;
             }
 

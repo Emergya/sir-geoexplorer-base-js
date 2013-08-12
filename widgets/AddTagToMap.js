@@ -54,6 +54,8 @@ gxp.plugins.AddTagToMap = Ext.extend(gxp.plugins.Tool, {
 
     layerRemoved: false,
 
+    toggleGroup : null,
+
 	/** i18n **/
 	addTagToMapTooltipText: "Add tag to map",
 	titlePrompt: "Write",
@@ -76,10 +78,7 @@ gxp.plugins.AddTagToMap = Ext.extend(gxp.plugins.Tool, {
 
 	/** api: method[addActions] */
 	addActions: function(){
-		this.createLabelLayer();
-		var tagLayer = Viewer.getMapPanel().map.getLayersByName(this.labelTitleLayer)[0];
-		var tagControl = this.createControl();
-		var tagAction = this.createAction(tagControl);
+		var tagAction = this.createAction();
     	gxp.plugins.AddTagToMap.superclass.addActions.apply(this, [tagAction]);
 	},
 
@@ -156,14 +155,16 @@ gxp.plugins.AddTagToMap = Ext.extend(gxp.plugins.Tool, {
     	tagLayer.metadata = {
     		labelLayer: true
     	};
-    	var map = Viewer.getMapPanel().map;
-    	map.addLayer(tagLayer);
+
+
+    	this.tagLayer = tagLayer;
 	},
 
 	/** private: method[createControl] */
 	createControl: function(){
-		var tagLayer = Viewer.getMapPanel().map.getLayersByName(this.labelTitleLayer)[0];
-		var tagControl = new OpenLayers.Control.DrawFeature(tagLayer, OpenLayers.Handler.Point);
+		this.createLabelLayer();
+		
+		var tagControl = new OpenLayers.Control.DrawFeature(this.tagLayer, OpenLayers.Handler.Point);
 		tagControl.featureAdded = this.featureAddedHandler;
 		tagControl.handlerOptions = {scope: this};
 		tagControl.setMap(Viewer.getMapPanel().map);
@@ -172,24 +173,43 @@ gxp.plugins.AddTagToMap = Ext.extend(gxp.plugins.Tool, {
 	},
 
 	/** private: method[createAction] */
-	createAction: function(control){
+	createAction: function(){
+		this.control = this.createControl();
 		return new GeoExt.Action({
     		iconCls: this.iconCls,
-            tooltip: this.addTagToMapTooltipText,
-    		control: control,
+            tooltip: this.addTagToMapTooltipText,    		
     		map: Viewer.getMapPanel().map,
     		enableToggle: true,
+    		toggleGroup : this.toggleGroup,
+    		control: this.control,
             pressed: false,
-            scope: this
+	         listeners : {
+	            toggle: function(button, pressed) {
+	            	if (pressed) {
+
+
+
+	            		this.control.activate();
+	                } else {
+	                    this.control.deactivate();
+	                }
+	            },
+	            scope: this
+	        }
     	});
 	},
 
 	/** private: method[activateHandler] */
 	activateHandler: function(){
-		if(this.layerRemoved){
+		if(this.layerRemoved || !this.layerAdded){
 			this.createLabelLayer();
-        	this.actions[0].control.layer = Viewer.getMapPanel().map.getLayersByName(this.labelTitleLayer)[0];
+
+			var map = Viewer.getMapPanel().map;
+    		map.addLayer(this.tagLayer);
+
+        	this.control.layer = this.tagLayer
         	this.layerRemoved = false;
+        	this.layerAdded = true;
 		}
 	}
 });

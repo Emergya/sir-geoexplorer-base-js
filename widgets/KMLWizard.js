@@ -66,19 +66,20 @@ Viewer.plugins.KMLWizard = Ext.extend(Ext.Window, {
     step: 0,
 
     /** i18n **/
-    windowTitleText: "Crear nueva capa a partir de KML",
-    fileEmptyText: "Seleccione un archivo KML",
-    layerNameEmptyText: "Escriba un nombre para la capa",
-    buttonNextText: "Siguiente",
-    layerNameLabelText: "Nombre de la capa",
-    fileLabelText: "Achivo KML",
-    chooseFileText: "Examinar...",
-    waitTitleMsgText: "Subida de archivo",
-    createLayerWaitMsgText: "Creando capa a partir del archivo KML. Por favor espere.",
-    createLayerWaitMsgTitleText: "Procesando KML",
-    fieldNameEmptyText: 'Escriba un nombre para el campo (letras, números, . y _)',
+    windowTitleText: "New Layer from KML",
+    fileEmptyText: "Select a KML",
+    layerNameEmptyText: "Type a name for the layer",
+    buttonNextText: "Next",
+    layerNameLabelText: "Layer's Name",
+    fileLabelText: "KML File",
+    chooseFileText: "Explore...",
+    waitTitleMsgText: "File upload",
+    createLayerWaitMsgText: "Creating Layer from KML file. Please wait.",
+    createLayerWaitMsgTitleText: "Processing KML",
+    fieldNameEmptyText: 'Type a name for the field (letters, numbers and _)',
     layerTypeId: null,
     layerResourceId: null,
+    descriptionTextKML: 'Enter the name for the new layer and select a KML file to upload.',
     
     initComponent: function() {
     	var me = this;
@@ -138,6 +139,11 @@ Viewer.plugins.KMLWizard = Ext.extend(Ext.Window, {
                         msgTarget: 'side'
     				},
                     items:[
+						{
+						    xtype: 'label',
+						    cls: 'toolDescription',
+						    text: this.descriptionTextKML
+						}, 
                         {
                         	xtype: 'textfield',
                         	id: 'name',
@@ -216,8 +222,8 @@ Viewer.plugins.KMLWizard = Ext.extend(Ext.Window, {
                         		opacity: 1,
                         		visibility: true                            					
                         	});
-                        layer.metadata.layerResourceId = this.layerResourceId;
-                        layer.metadata.layerTypeId = this.layerTypeId;
+                        layer.metadata.layerResourceId = resp.data.layerResourceId;
+                        layer.metadata.layerTypeId = resp.data.layerTypeId;
                         layer.metadata.temporal = true;
                         Viewer.getMapPanel().map.addLayer(layer);
                         this.close();

@@ -87,6 +87,12 @@ PersistenceGeo.Parser = Ext.extend(Ext.Component,{
         	restBaseUrl: this.getRestBaseUrl(),
         	map: this.map
         });
+        
+        this.LOADERS_CLASSES["postgis"] = new PersistenceGeo.loaders.WMSLoader({
+        	restBaseUrl: this.getRestBaseUrl(),
+        	map: this.map
+        });
+        
         this.LOADERS_CLASSES["WFS"] = new PersistenceGeo.loaders.WFSLoader({
         	restBaseUrl: this.getRestBaseUrl(),
         	map: this.map
@@ -105,7 +111,7 @@ PersistenceGeo.Parser = Ext.extend(Ext.Component,{
         	map: this.map
         });
         
-        this.LOADERS_CLASSES["imagewold"] = new PersistenceGeo.loaders.WMSLoader({
+        this.LOADERS_CLASSES["imageworld"] = new PersistenceGeo.loaders.WMSLoader({
         	restBaseUrl: this.getRestBaseUrl(),
         	map: this.map
         });

@@ -158,8 +158,13 @@ Viewer.dialog.WfsWizard = Ext.extend(Ext.Window, {
         var url = form.findField('urlTextField').getValue();
 
         var versionIdx = url.indexOf("version=");
+
         if(versionIdx===-1) {
-          url+="&version=1.1.0";
+          versionIdx = url.indexOf("Version=");
+        }        
+
+        if(versionIdx===-1) {
+          url+="&Version=1.1.0";
         }
 
         if (form.isValid()) {
@@ -179,10 +184,16 @@ Viewer.dialog.WfsWizard = Ext.extend(Ext.Window, {
         });
             this.progressBar.updateProgress(100);
 
+            var xmlContent = request.responseXML;
+            if(!xmlContent) {
+              xmlContent = request.responseText;
+            }
+
+
             if (request.status == 200) {
                 try {
                     this.wfsCapabilitiesStore.on('load', this.wfsLoaded, this);
-                    this.wfsCapabilitiesStore.loadData(request.responseXML);
+                    this.wfsCapabilitiesStore.loadData(xmlContent);
                 } catch (e) {
                     Ext.Msg.alert("Error recuperando WFSCapabilities", "Se ha producido un error al recuperar "
                     + "la información de las capas disponibles en el servidor. Compruebe que la URL introducida es correcta.");

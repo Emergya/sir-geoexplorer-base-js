@@ -101,6 +101,27 @@ PersistenceGeo.loaders.AbstractLoader =  Ext.extend(Ext.Component,
 			this.postFunctionsStyle(layerData, layer);
 			this.postFunctionsOrder(layerData, layer);
 			this.postFunctionsVisibility(layerData, layer);
+			this.postFunctionsMetadata(layerData, layer);
+		},
+		
+
+		/** api: method[postFunctionsMetadata] 
+		 *  This method save common metadata for the layer
+		 */
+		postFunctionsMetadata: function (layerData, layer){
+			if(!layer.metadata){
+		        layer.metadata = {};
+			}
+            // layer type
+			if(!!layerData.typeId){
+				layer.metadata.layerTypeId = layerData.typeId;
+        	}
+            // Authority of the layer
+			if(!!layerData.authId){
+				layer.metadata.authId = layerData.authId;
+        	}
+            // All json formatted
+            layer.metadata.json = layerData;
 		},
 		
 		postFunctionsVisibility: function (layerData, layer){

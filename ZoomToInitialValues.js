@@ -118,11 +118,16 @@ gxp.plugins.ZoomToInitialValues = Ext.extend(gxp.plugins.Tool, {
     },
 
     zoomToInitialValues: function() {
-        if(this._initialViewBBox) {
+        try{
+            if(this._initialViewBBox) {
             this.target.mapPanel.map.zoomToExtent(this._initialViewBBox,false);
-        } else {
-            this.target.mapPanel.map.setCenter(this.center, this.zoom, false, false);
+            } else {
+                this.target.mapPanel.map.setCenter(this.center, this.zoom, false, false);
+            }
+        }catch(e){
+            console.log(e);
         }
+        
         
     },
 
@@ -139,7 +144,6 @@ gxp.plugins.ZoomToInitialValues = Ext.extend(gxp.plugins.Tool, {
         Ext.Ajax.request({
             url: app.defaultRestUrl +"/persistenceGeo/getUserZoneGeom/"+userInfo.id+"/"+this.target.mapPanel.map.projection,
             failure: function(response) {
-                console.debug("Error getting initial view bbox.")
                 this._initialViewBBox =null;
             },
             success: function(response) {
@@ -147,16 +151,20 @@ gxp.plugins.ZoomToInitialValues = Ext.extend(gxp.plugins.Tool, {
 
                 var wktFmtr = new OpenLayers.Format.WKT();
                
-                 var data = wktFmtr.read(result.data);
+                if(!!result.data){
+                    var data = wktFmtr.read(result.data);
 
-                if(data) {
-                    var geometry = data.geometry;
-                    if(geometry) {
-                        this._initialViewBBox = geometry.getBounds();    
-                    }         
-                }   
+                    if(data) {
+                        var geometry = data.geometry;
+                        if(geometry) {
+                            this._initialViewBBox = geometry.getBounds();    
+                        }         
+                    }   
 
-                this.zoomToInitialValues();
+                    this.zoomToInitialValues();
+                }else{
+                    console.error("Initial values not found in user session!");
+                }
 
             },
             scope: this

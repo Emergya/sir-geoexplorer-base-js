@@ -52,7 +52,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
     ptype: "vw_mouseandscalebox",
     bodyCssClass: 'vw_mouseandscalebox',
     width: 250,
-    height: 190,
+    height: 210,
     x: 5,
     leftPadding: 15, // Why 15? I don't know but it positions it ok.
  //   floating:true,
@@ -62,6 +62,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
     closable: false,
     minimizable: true,
     minimized: false,
+    olControlCustomMousePosition: 'relative',
     headerCfg: {
         cls: 'x-window-header mouseAndScaleBox'
     },
@@ -245,7 +246,7 @@ Viewer.widgets.MouseAndScaleBox = Ext.extend(Ext.Window, {
             }
         });
         this.on("afterlayout", function () {
-            mousePositionPanel.getEl().dom.style.position = 'relative';
+            mousePositionPanel.getEl().dom.style.position = this.olControlCustomMousePosition;
             mousePositionPanel.getEl().dom.style.display = 'inline';
 
             this.getEl().on("click", this.stopMouseEvents, this);

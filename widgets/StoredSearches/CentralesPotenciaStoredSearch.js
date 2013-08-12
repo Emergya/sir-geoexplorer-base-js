@@ -58,7 +58,7 @@ Viewer.controller.CentralesPotenciaStoredSearch = Ext.extend(Viewer.controller.S
                 valueReader: this.AmbitoTerritorialStore, onChange: this.ambitoTerritorialHandler.createDelegate(this) },
             { property: 'REGION', label: 'Región', valueReader: this.RegionStore },
             { property: 'COMUNA', label: 'Comuna', valueReader: this.ComunaStore },
-            { property: 'POT_BR_MW', label: 'Potencia Central', filters: this.defaultFilters },
+            { property: 'POT_BR_MW', label: 'Potencia Central (MW)', filters: this.defaultFilters },
         ];
 
         this.initQueryDef();

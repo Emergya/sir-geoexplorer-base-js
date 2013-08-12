@@ -72,8 +72,10 @@ Viewer.plugins.WMSGetFeatureInfoAction = Ext.extend(gxp.plugins.WMSGetFeatureInf
                 for (var i = 0, len = info.controls.length; i < len; i++){
                     var control = info.controls[i];
                     if (pressed) {
+                        Ext.select(".olMap").setStyle("cursor", "crosshair");
                         control.activate();
                     } else {
+                        Ext.select(".olMap").setStyle("cursor", "default");
                         control.deactivate();
                         this.featureInfoDialog.hide();
                     }
@@ -82,6 +84,13 @@ Viewer.plugins.WMSGetFeatureInfoAction = Ext.extend(gxp.plugins.WMSGetFeatureInf
         }]);
 
         var infoButton = this.actions[0].items[0];
+
+        infoButton.setDisabled(true);
+
+        app.on('ready',function(){
+            infoButton.setDisabled(false);
+        });
+
         var info = {controls: []};
 
         var updateInfo = function() {

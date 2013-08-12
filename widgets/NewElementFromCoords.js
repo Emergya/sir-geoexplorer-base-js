@@ -28,9 +28,31 @@
 
 Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
 
-    TOOL_POINT: 'POINT',
-    TOOL_LINE: 'LINE',
-    TOOL_POLYGON: 'POLYGON',
+    TOOL_POINT: 'Point',
+    TOOL_LINE: 'Line',
+    TOOL_POLYGON: 'Polygon',   
+
+    action: null,
+
+    addPointText: 'Add Point',
+    latText: "Latitude",
+    lonText: "Longitude",
+    saveTitleText: 'Save Layer Changes?',
+    saveMsgText: 'The active layer has changed. Save the changes now?',
+    saveChangesText: "Save Changes",
+    discardChangesText: "Discard changes",
+    cancelText: "Cancel",
+    removeText: "Remove",
+    waitText:"Please wait...",
+    geometryLabels : {
+        "Point" : "Enter the points to add to the selected layer:",
+        "Line": "Enter the vertexes of the line to be added to the selected layer:",
+        "Polygon" : "Enter the vertexes of the polygon to be added to the selected layer:"
+    },
+
+    saveErrorText: "There was an error saving the feature. Please try again in a few moments.",
+    saveSuccessText: "The new feature was successfully added to the layer.",
+
 
     STATE_NONE: 0,
     STATE_EDITING: 1,
@@ -75,8 +97,9 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
      * the previous data.
      */
     _onShow: function() {
+     
         this.searchByCoordinates.clear();
-        this.changeActiveLayer(this.layerController.getSelectedLayer());
+        this.changeActiveLayer();
         this.currentState = this.STATE_NONE;
     },
 
@@ -92,24 +115,11 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
             return true;
         }
 
-        var cancel;
-        try {
-            cancel = !(layer.metadata.geometries.length > 0);
-        } catch(e) {
-            cancel = true;
-        }
-
-        if (cancel === true) {
-            return false;
-        }
-
-
         if (this.currentState == this.STATE_NONE) {
-            this.changeActiveLayer(layer);
+            this.changeActiveLayer();
 
         } else {
-
-            this.askSaveFeatures(this.ACTION_CLEAR, layer);
+            this.askSaveFeatures(this.ACTION_CLEAR);
             return false;
         }
     },
@@ -126,19 +136,25 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
     },
 
     getCurrentGeometries: function() {
-        try {
-            return this.activeLayer.metadata.geometries[0];
-        } catch (e) {
-            return null;
+        var geometryType = this.action.getFeatureManager().geometryType;
+        if(geometryType.indexOf("Multi") != -1){
+            geometryType = geometryType.replace("Multi", "");
         }
+
+        switch(geometryType) {
+            case "Curve":
+                geometryType= "Line";
+                break;
+            case "Surface":
+                geometryType= "Polygon";
+                break;
+        }
+
+        return geometryType;
     },
 
-    getGeometryLabel: function(geometry) {
-        var labels = {};
-        labels[this.TOOL_POINT] =  'Punto';
-        labels[this.TOOL_LINE] = 'Línea';
-        labels[this.TOOL_POLYGON] = 'Polígono';
-        return labels[geometry] || null;
+    getGeometryLabel: function(geometry) {       
+        return this.geometryLabels[geometry] || null;
     },
 
     /**
@@ -146,10 +162,13 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
      * previous layer data.
      * Stores the features the new layer currently has.
      */
-    changeActiveLayer: function(layer) {
+    changeActiveLayer: function() {
+        if(!this.activeLayer) {
+            this.activeLayer = new OpenLayers.Layer.Vector("tmp layer",{displayInLayerSwitcher:false});
+            Viewer.getMapPanel().map.addLayer(this.activeLayer);
+        }
 
-        this.activeLayer = layer;
-        this.previousFeatures = layer.features;
+        this.activeLayer.removeAllFeatures();
         this.pointStore.removeAll();
         this.pointStore.commitChanges();
         this.lblGeometryInfo.setText(this.getGeometryLabel(this.getCurrentGeometries()));
@@ -162,12 +181,12 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
      * and executes an action, closes the current window
      * or selects a new layer.
      */
-    askSaveFeaturesCallback: function(buttonId, inputText, options, action, layer) {
+    askSaveFeaturesCallback: function(buttonId, inputText, options, action) {
 
         if (buttonId == 'yes') {
 
             this.currentState = this.STATE_NONE;
-            this.layerController.save(this.activeLayer);
+            this._addFeaturesToLayer();
 
         } else if (buttonId == 'no') {
 
@@ -175,32 +194,79 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
             this.activeLayer.removeAllFeatures();
 
         } else  {
+            // Cancelling.
             return;
         }
 
         if (action == this.ACTION_CLEAR) {
-
-            //this.layerController.selectNodeByPath(newNode.getPath());
-            this.changeActiveLayer(layer);
+            this.changeActiveLayer();
 
         } else if (action == this.ACTION_HIDE) {
-
             this.hide();
         }
     },
+
+    _addFeaturesToLayer: function() {
+        var featureManager = this.action.getFeatureManager();
+        var protocol = featureManager.featureStore.proxy.protocol;
+
+        Ext.Msg.wait(this.waitText);
+        var self = this;
+        protocol.commit(this.features, {
+            callback: function(response){
+                Ext.Msg.updateProgress(1);
+                Ext.Msg.hide();
+
+
+                if(!response.success()) {
+                    Ext.Msg.alert("",self.saveErrorText);
+                    return;
+                }
+
+                Ext.Msg.alert("",self.saveSuccessText);
+
+                self.currentState = self.STATE_NONE;
+                self.btnSave.disable();
+
+              
+
+                self.activeLayer.removeAllFeatures();
+
+                // The grid's store is cleared.
+                self.pointStore.removeAll();
+                self.pointStore.commitChanges();
+
+                // We reload the layer
+                featureManager.layerRecord.data.layer.redraw(true);
+                featureManager.featureStore.reload();
+            }
+        });
+    },
+
 
     /**
      * Shows a Yes/No/Cancel dialog when the user tries to close the current
      * window or tries to select another layer and there are pending
      * changes in the active layer.
      */
-    askSaveFeatures: function(action, layer) {
+    askSaveFeatures: function(action) {
+
+        var buttons = {
+            yes: this.saveChangesText,
+            no: this.discardChangesText,
+        };
+
+        // If we are hiding we show a cancel button.
+        // In layer changes we cannot cancel because we cannot cancel the layer change.
+        if(action == this.ACTION_HIDE) {
+            buttons["cancel"] = this.cancelText;
+        }
 
         Ext.Msg.show({
-            title: '¿Guardar cambios en la capa?',
-            msg: 'La capa activa tiene cambios sin guardar, ¿Desea guardarlos ahora?',
-            buttons: Ext.Msg.YESNOCANCEL,
-            fn: this.askSaveFeaturesCallback.createDelegate(this, [action, layer], true),
+            title: this.saveTitleText,
+            msg: this.saveMsgText,
+            buttons: buttons,
+            fn: this.askSaveFeaturesCallback.createDelegate(this, [action], true),
             icon: Ext.MessageBox.QUESTION
         });
     },
@@ -211,10 +277,6 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
      */
     onPointAdded: function(coords) {
 
-        if (this.activeLayer === null) {
-            return;
-        }
-
         this.currentState = this.STATE_EDITING;
 
         var point = coords.getPoint(this.map.getProjectionObject());
@@ -223,6 +285,7 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
             lon: point.lon
         });
         this.pointStore.add(record);
+        this.grid.getView().refresh();
     },
 
     /**
@@ -257,16 +320,21 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
         style_blue.strokeColor = 'blue'; 
         style_blue.fillColor = 'blue';
 
-        if (geometry == this.TOOL_POINT) {
 
-            this.pointStore.each(function(record) {
+        this.pointStore.each(function(record) {
                 var point = new OpenLayers.Geometry.Point(record.get('lon'), record.get('lat'));
                 var pointFeature = new OpenLayers.Feature.Vector(point, null, style_blue);
+
+                if(geometry==this.TOOL_POINT) {
+                     pointFeature.state = OpenLayers.State.INSERT;
+                }
+
                 features.push(pointFeature);
             }, this);
 
+        if(geometry == this.TOOL_POINT) {
+            this.btnSave.enable();
         } else if (geometry == this.TOOL_LINE) {
-
             var points = [];
 
             this.pointStore.each(function(record) {
@@ -275,7 +343,12 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
 
             var line = new OpenLayers.Geometry.LineString(points);
             var lineFeature = new OpenLayers.Feature.Vector(line, null, style_blue);
+            lineFeature.state = OpenLayers.State.INSERT;
             features.push(lineFeature);
+
+            if(points.length>1) {
+                this.btnSave.enable();
+            }
 
         } else if (geometry == this.TOOL_POLYGON) {
 
@@ -288,31 +361,34 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
             var lring = new OpenLayers.Geometry.LinearRing(points);
             var polygon = new OpenLayers.Geometry.Polygon([lring]);
             var polygonFeature = new OpenLayers.Feature.Vector(polygon, null, style_blue);
+            polygonFeature.state = OpenLayers.State.INSERT;
             features.push(polygonFeature);
 
-        } else {
-            // No tool selected?
-            return false;
+            if(points.length > 2) {
+                this.btnSave.enable();
+            }
+
+        } else  {
+            throw new Error("New elementFromCoords::onPointListUpdated: Unsupported geometry type!");
         }
 
-        this.activeLayer.removeAllFeatures();
-        this.activeLayer.addFeatures(features.concat(this.previousFeatures));
+        
 
-        this.btnSave.enable();
+        this.activeLayer.removeAllFeatures();
+        this.activeLayer.addFeatures(features);
+
+        this.features = features;
+
     },
 
     onSaveButtonClicked: function() {
-        this.currentState = this.STATE_NONE;
-        this.layerController.save(this.activeLayer);
-        this.btnSave.disable();
-        this.previousFeatures = this.activeLayer.features;
+        this._addFeaturesToLayer();
     },
 
     onCancelButtonClicked: function() {
         this.currentState = this.STATE_NONE;
         this.hide();
-        this.activeLayer.removeAllFeatures();
-        this.activeLayer.addFeatures(this.previousFeatures);
+        this.activeLayer.removeAllFeatures();        
     },
 
     onBeforeRender: function() {
@@ -353,8 +429,9 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
         });
 
         var padding = 'padding: 10px 16px;';
-        var border = 'border: 0px solid transparent;'
+        var border = 'border: 0px solid transparent;';
 
+        var self= this;
         var c = {
             xtype: 'panel',
             layout: {
@@ -363,24 +440,24 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
             },
             items: [{
                     xtype: 'panel',
-                    height: 40,
+                    height: 35,
                     bodyStyle: padding + border,
                     items: this.lblGeometryInfo
                 },
                 this.searchByCoordinates = new Viewer.widgets.SearchByCoordinates({
                     mapPanel: this.mapPanel,
                     map: this.map,
-                    height: 130,
-                    buttonUtmLabel: 'Añadir',
-                    buttonLonLatLabel: 'Añadir',
-                    buttonDecimalLabel: 'Añadir',
+                    height: 150,
+                    buttonUtmLabel: this.addPointText,
+                    buttonLonLatLabel: this.addPointText,
+                    buttonDecimalLabel: this.addPointText,
                     listeners: {
                         buttonUtmClicked: this.onPointAdded.createDelegate(this),
                         buttonLonLatClicked: this.onPointAdded.createDelegate(this),
                         buttonDecimalClicked: this.onPointAdded.createDelegate(this)
                     }
                 }),
-                new Ext.grid.GridPanel({
+                this.grid = new Ext.grid.GridPanel({
                     store: this.pointStore,
                     colModel: new Ext.grid.ColumnModel({
                         defaults: {
@@ -388,14 +465,13 @@ Viewer.dialog.NewElementFromCoords = Ext.extend(Ext.Window, {
                             sortable: false
                         },
                         columns: [
-                            { header: 'Latitud' },
-                            { header: 'Longitud' },
+                            { header: this.latText},
+                            { header: this.lonText},
                             {
                                 header: '',
                                 width: 50,
                                 renderer: function(v, p, record, rowIndex) {
-                                    return '<div class="vw-remove-grid-button">Remove</div>';
-                                    //return '<input type="button" value="Remove" class="vw_delete_grid_button" />';
+                                    return '<div class="vw-remove-grid-button">'+self.removeText+'</div>';                                    
                                 }
                             }
                         ]

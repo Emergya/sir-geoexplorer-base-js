@@ -145,10 +145,10 @@ Ext.extend(Ext.ux.ColorPicker, Ext.util.Observable, {
         }, true ).update( this.config.captions.color || 'Color' );
         this.form = new Ext.FormPanel({
             frame:true,
-            width: 'auto',
-            height: 227,
+            width: 100,
+            height: 340,
             cls: 'x-cp-form',
-            labelWidth: 12,
+            labelWidth: 30,
             items: [{
                 xtype:'fieldset',
                 title: 'RGB',

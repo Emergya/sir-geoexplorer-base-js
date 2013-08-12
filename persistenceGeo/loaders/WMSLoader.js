@@ -65,6 +65,11 @@ PersistenceGeo.loaders.AbstractLoader, {
             }
         }
 
+           var options = {
+            layers: layers,
+            transparent: transparent
+        };
+
         if ( !! layerData.properties) {
             visibility = this.toBoolean(layerData.properties.visibility) || false;
             transparent = this.toBoolean(layerData.properties.transparent) || true;
@@ -74,14 +79,15 @@ PersistenceGeo.loaders.AbstractLoader, {
 
             format = layerData.properties.format || format;
             layers = layerData.properties.layers || layers;
+
+            if(layerData.properties.tiled) {
+                options.tiled = this.toBoolean(layerData.properties.tiled) || false;
+            }
         }
 
 
         var layer = new OpenLayers.Layer.WMS(layerTitle,
-        layerData.server_resource, {
-            layers: layers,
-            transparent: transparent
-        }, {
+        layerData.server_resource, options, {
             format: format,
             isBaseLayer: isBaseLayer,
             visibility: visibility,

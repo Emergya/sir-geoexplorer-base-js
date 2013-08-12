@@ -230,7 +230,7 @@ Viewer.dialog.ChartWindow = Ext
                                 legend : {
                                     position : 'in'
                                 },
-                                title : "Monto Solicitado en sector"
+                                title : "Monto Solicitado en sector:"
                             },
                             store : this._barStore,
                             columns : [

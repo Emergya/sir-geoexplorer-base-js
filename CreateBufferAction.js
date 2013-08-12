@@ -46,15 +46,15 @@ Ext.namespace("gxp.plugins");
  *    Provides an action for showing the default search dialog.
  */
 gxp.plugins.CreateBufferAction = Ext.extend(gxp.plugins.Tool, {
-    
+
     /** api: ptype = gxp_extendedtoolbar */
     ptype: "gxp_createbuffer",
-    
+
     /** api: config[buttonText]
      *  ``String`` Text to show next to the zoom button
      */
     buttonText: 'Crear buffer',
-     
+
     /** api: config[menuText]
      *  ``String``
      *  Text for zoom menu item (i18n).
@@ -66,11 +66,16 @@ gxp.plugins.CreateBufferAction = Ext.extend(gxp.plugins.Tool, {
      *  Text for zoom action tooltip (i18n).
      */
     tooltip: 'Crear buffer',
-    
+
     /** private: property[iconCls]
      */
     iconCls: 'vw-icon-buffer',
-    
+
+    /** private: property[toolAction]
+     *  The action of the tool.
+     */
+    toolAction: null,
+
     /** private: method[constructor]
      */
     constructor: function(config) {
@@ -83,37 +88,92 @@ gxp.plugins.CreateBufferAction = Ext.extend(gxp.plugins.Tool, {
     init: function(target) {
         gxp.plugins.CreateBufferAction.superclass.init.apply(this, arguments);
         this.target.on('beforerender', this.addActions, this);
+
+        this.target.on('render', this._handleSelectionChange, this);
+    },
+
+    /** private: method[_handleSelectionChange]
+     */
+    _handleSelectionChange: function() {
+        var featureSelector = this._getFeatureSelector();
+        featureSelector.on("selectionchanged", this._onFeatureSelectionChange, this);
+    },
+
+    _onFeatureSelectionChange : function(featureSelector, features) {
+         this.selectedFeatures = features;
+
+        if(features && features.length > 0) {
+            this.toolAction.enable();
+
+            var ds = Viewer.getComponent('NewBuffer');
+            if(ds && !ds.hidden) {
+                // We update the buffer with the newly selected features.
+                ds.createPreviewBuffer();
+            }
+
+        } else {
+
+            // We need to manually deactivate if disabled, as it seems
+            // that the deactivateOnDisable property is not working here...
+            this._deactivateButton();
+
+            this.toolAction.disable();
+        }
+    },
+
+
+    _getFeatureSelector : function() {
+        return Viewer.getComponent(this.featureSelector);
     },
 
     /** api: method[addActions]
      */
     addActions: function() {
-        return gxp.plugins.CreateBufferAction.superclass.addActions.apply(this, [{
+        var actions =  gxp.plugins.CreateBufferAction.superclass.addActions.apply(this, [{
             text: this.showButtonText ? this.buttonText : '',
             menuText: this.menuText,
             iconCls: this.iconCls,
             tooltip: this.tooltip,
-            handler: function(action, evt) {
+            enableToggle: true,
+            deactivateOnDisable: true,
+            disabled: true,
+            pressed: false,
+            toggleHandler: function(action, evt) {
 
                 var ds = Viewer.getComponent('NewBuffer');
                 if (ds === undefined) {
                     var mapPanel = Viewer.getMapPanel();
-                    ds = new Viewer.dialog.NewBuffer({
+                    ds = new Viewer.dialog.CreateBuffer({
                         mapPanel: mapPanel,
-                        map: mapPanel.map
+                        map: mapPanel.map,
+                        action: this
                     });
                     Viewer.registerComponent('NewBuffer', ds);
+
+                     ds.on("hide", function() {
+                        // We deactivate the tool if we close the window.
+                        this._deactivateButton();
+                    },this);
                 }
-                if (ds.isVisible()) {
-                    ds.hide();
-                } else {
+                if (action.pressed) {
                     ds.show();
+                } else {
+                    ds.hide();
                 }
             },
             scope: this
         }]);
+
+        this.toolAction = actions[0];
+
+        return actions;
+    },
+
+    _deactivateButton : function() {
+        if(this.toolAction.items[0].pressed){
+            this.toolAction.items[0].toggle();
+        }
     }
-        
 });
 
 Ext.preg(gxp.plugins.CreateBufferAction.prototype.ptype, gxp.plugins.CreateBufferAction);

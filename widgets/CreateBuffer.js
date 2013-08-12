@@ -26,27 +26,46 @@
  * Author: Antonio Hernández <ahernandez@emergya.com>
  */
 
-Viewer.dialog.NewBuffer = Ext.extend(Ext.Window, {
+Viewer.dialog.CreateBuffer = Ext.extend(Ext.Window, {
+
+    /** api: config[geometryColumnName]
+     *  ``String`` The name of the column storing the temporal layers' geometry in the database.
+     */
+    geometryColumnName: "geom",
+
+    /** api: config[action]
+     *  ``String`` The action creating this window.
+     */
+    action: null,
 
     UNIT_METERS: 'Meter',
     UNIT_KILOMETERS: 'Kilometer',
     UNIT_MILES: 'Mile',
-
     LAYER_NAME: 'Buffers',
 
     layerController: null,
-    vectorLayer: null,
-    selectedFeatures: [],
+    bufferLayer: null,
+
+    form: null,
+
+    waitText: "Please wait...",
+    errorText: "There was an error, please try again in a few moments.",
+    confirmCreateText: "A temporal layer will be created for the buffer. Do you wish to continue?",
+    createBufferLayerText: "Create buffer layer",
+    dontCreateBufferLayerText: "Don't create",
+    bufferLayerCreatedText: "The buffer layer '{0}' was created succesfully.",
+    invalidDistanceText : "Distance must be greater than 0 and less than 10,000.",
 
     constructor: function(config) {
 
         this.listeners = {
             beforerender: this.onBeforeRender,
             show: this._onShow,
+            hide: this._onHide,
             scope: this
         };
 
-        Viewer.dialog.NewBuffer.superclass.constructor.call(this, Ext.apply({
+        Viewer.dialog.CreateBuffer.superclass.constructor.call(this, Ext.apply({
             cls: 'vw_new_buffer_window',
             title: 'Crear buffer',
             width: 400,
@@ -56,134 +75,315 @@ Viewer.dialog.NewBuffer = Ext.extend(Ext.Window, {
         }, config));
 
         this.layerController = Viewer.getController('Layers');
-        this.selectedFeatures = this.layerController.getSelectedFeatures();
 
-        this.vectorLayer = this.layerController.create({
-            type: 'Vector',
-            name: this.LAYER_NAME,
-            options: {}
+        this.bufferLayer = this.layerController.create({
+            "type": 'Vector',
+            "name": this.LAYER_NAME,
+            "options": {
+                displayInLayerSwitcher: false
+            }
         });
 
-        this.map.addLayer(this.vectorLayer);
+        this.map.addLayer(this.bufferLayer);
     },
 
-    onShow: function() {
+    _onHide: function() {
+        this.bufferLayer.removeAllFeatures();
+    },
 
-        if (!this.selectedFeatures) {
-            this.selectedFeatures = [];
+    _onShow: function() {
+        this.distanceField.reset();
+        this.radioGroup.reset();
+
+        this.btnCreate.disable();
+    },
+
+    onCreateButtonClicked: function() {
+        if (!this.distanceField.validate()) {
+            // Shouldn't happen as the create button is disabled if the validation fails.
+            return;
         }
 
-        if (this.selectedFeatures.length == 0) {
-            this.btnCreate.disable();
-        }
+        Ext.Msg.show({
+            "title": "",
+            "msg": this.confirmCreateText,
+            "buttons": {
+                "yes": this.createBufferLayerText,
+                "no": this.dontCreateBufferLayerText
+            },
+            "fn": function(result) {
+                if (result == "yes") {
+                    this._doBufferLayerCreation();
+                }
+            },
+            "scope": this,
+            "modal": true
 
-        this.txtDistance.setValue(0);
+        });
+    },
 
-        this.layerController.on({
-            featureSelected: this.onFeatureSelected,
-            featureUnselected: this.onFeatureUnselected,
+    _doBufferLayerCreation: function() {
+        Ext.Msg.wait(this.waitText);
+        Ext.Ajax.request({
+            method: "POST",
+            url: '../../vectorialLayerController/newTempLayer',
+            params: {
+                "layerName": "Buffer "+ (new Date()).format("d-m-Y H:i:s.u"),
+                "geometryType": "POLYGON"
+
+            },
+            "success": function(response) {
+                this._addBufferLayerToMap(response.responseText);
+            },
+            "failure": function(form, action) {
+                Ext.Msg.updateProgress(1);
+                Ext.Msg.hide();
+
+                Ext.Msg.alert('Error', this.errorText);
+            },
             scope: this
         });
     },
 
-    onHide: function() {
-        this.layerController.un('featureSelected', this.onFeatureSelected, this);
-        this.layerController.un('featureUnselected', this.onFeatureUnselected, this);
+    _addBufferLayerToMap: function(responseText) {
+        var resp = Ext.util.JSON.decode(responseText);
+
+        if (resp && resp.success && resp.data && resp.data.status === "success") {
+            //Add layer to map and close window
+            var layerName = resp.data.layerName;
+            var layerTitle = resp.data.layerTitle;
+            var geoserverUrl = (resp.data.serverUrl) || (app.sources.local.url + "/wms");
+            var layer = new OpenLayers.Layer.WMS(
+            layerTitle,
+            geoserverUrl, {
+                "layers": layerName,
+                "transparent": true
+            }, {
+                "opacity": 1,
+                "visibility": true
+            });
+
+            layer.metadata.layerResourceId = resp.data.layerResourceId;
+            layer.metadata.layerTypeId = resp.data.layerTypeId;
+            layer.metadata.temporal = true;
+            layer.metadata.removable = true;
+
+            var map = Viewer.getMapPanel().map;
+            map.addLayer(layer);
+
+            var self = this;
+            setTimeout(function() {
+                self._addFeaturesToLayer(layer);
+            }, 1000);
+
+        } else if (resp && resp.success && resp.data && resp.data.status === "error") {
+            Ext.Msg.alert('', resp.data.message);
+        } else {
+            Ext.Msg.alert('', this.errorText);
+        }
     },
 
-    onFeatureSelected: function(feature) {
-        this.selectedFeatures.push(feature);
-        this.btnCreate.enable();
-    },
+    _addFeaturesToLayer: function(layer) {
+        var map = Viewer.getMapPanel().map;
 
-    onFeatureUnselected: function(feature) {
-        var aux = [];
-        for (var i=0, l=this.selectedFeatures.length; i<l; i++) {
-            var f = this.selectedFeatures[i];
-            if (feature !== f) {
-                aux.push(f);
+        //We add the features to the created layer.
+        var protocol = OpenLayers.Protocol.WFS.fromWMSLayer(layer, {
+            "geometryName": this.geometryColumnName
+        });
+
+        // // Needed so procolol::commit doesn't fail.
+        layer.projection = map.getProjectionObject();
+
+        var features = this.bufferLayer.features;
+
+
+
+        for (var fIdx = 0; fIdx < features.length; fIdx++) {
+            var feature = features[fIdx];
+
+            feature.layer = layer;
+            feature.state = OpenLayers.State.INSERT;
+        }
+
+        var prefix = protocol.featurePrefix;
+
+        var self = this;
+
+        // This is needed so the workspace is sent to geoserver and the feature type is recognized.
+        protocol.format.namespaces["feature"] = prefix;
+
+        protocol.commit(
+        features, {
+            "prefix": prefix,
+            "callback": function(response) {
+                Ext.Msg.updateProgress(1);
+                Ext.Msg.hide();
+
+                if (!response.success()) {
+                    Ext.Msg.alert("", self.errorText);
+                    return;
+                }
+
+                Ext.Msg.alert('', (new Ext.Template(self.bufferLayerCreatedText)).apply([layer.name]));
+
+                self.bufferLayer.removeAllFeatures();
+
+                layer.redraw(true);
+
+                self.hide();
             }
-        }
-        this.selectedFeatures = aux;
-        if (this.selectedFeatures.length == 0) {
-            this.btnCreate.disable();
-        }
-    },
+        });
 
-    onCreateButtonClicked: function() {
-        if (this.selectedFeatures.length > 0 && this.txtDistance.getValue() > 0) {
-            this.vectorLayer.removeAllFeatures();
-            this.createBuffer();
-        }
+
     },
 
     onCancelButtonClicked: function() {
         this.hide();
     },
 
-    createBuffer: function() {
+    createPreviewBuffer: function() {
 
-        var buffers = [];
-        var radius = this.txtDistance.getValue();
-
-        for (var i=0, l=this.selectedFeatures.length; i<l; i++) {
-            var buffer = this.layerController.createBufferForFeature(
-                this.selectedFeatures[i],
-                radius,
-                this.radioGroup.getValue().getGroupValue()
-            );
-            buffers.push(new OpenLayers.Feature.Vector(
-                buffer,
-                null,
-                {
-                    fillColor: 'blue',
-                    opacity: 0.6
-                }
-            ));
+        if (this._previewTimeout) {
+            clearTimeout(this._previewTimeout);
         }
-        this.vectorLayer.addFeatures(buffers);
+
+        var self = this;
+        this._previewTimeout = setTimeout(
+
+        function() {
+            self._doPreviewBufferCreation();
+        }, 200);
+
+
+    },
+
+    _doPreviewBufferCreation: function() {
+
+        var radius = this.distanceField.getValue();
+        var units = this.radioGroup.getValue().getGroupValue();
+
+        if (!radius) {
+            return;
+        }
+
+
+        if (radius == this._lastRadius && units == this._lastUnits && this.action.selectedFeatures.length== this._lastFeatureCount) {
+            // To prevent having to calculate already shown buffers.       
+            return;
+        }
+
+        Ext.Msg.wait(this.waitText);
+
+        this._lastRadius = radius;
+        this._lastUnits = units;
+
+
+        this.bufferLayer.removeAllFeatures();
+
+        this._lastFeatureCount= this.action.selectedFeatures.length;
+
+        var self = this;
+        setTimeout(function() {
+            var buffers = [];
+            var features = self.action.selectedFeatures;
+            for (var i = 0; i < features.length; i++) {
+                var buffer = self.layerController.createBufferForFeature(
+                features[i],
+                radius,
+                units);
+                buffers.push(new OpenLayers.Feature.Vector(
+                buffer,
+                null, {
+                    fillColor: 'yellow',
+                    fillOpacity: 0.6
+                }));
+            }
+            self.bufferLayer.addFeatures(buffers);
+
+            Ext.Msg.updateProgress(1);
+            Ext.Msg.hide();
+
+            self.btnCreate.enable();
+        }, 100);
+
+
     },
 
     onBeforeRender: function() {
 
         var padding = 'padding: 10px 16px;';
-        var border = 'border: 0px solid transparent;'
+        var border = 'border: 0px solid transparent;';
 
-        var c = {
+        this.form = {
             xtype: 'form',
             layout: 'form',
             padding: '20px 10px',
             items: [
-                this.txtDistance = new Ext.form.NumberField({
-                    fieldLabel: 'Distancia',
-                    anchor: '95%'
+            new Ext.form.NumberField({
+                fieldLabel: 'Distancia',
+                anchor: '95%',
+                ref: "./distanceField",
+                invalidText: this.invalidDistanceText,
+                validator: function(value) {
+                    if (value === "") {
+                        return false;
+                    }
+
+                    return value > 0 && value <= 10000;
+                },
+                listeners: {
+                    scope: this,
+                    valid: function() {
+                        this.createPreviewBuffer();
+                    },
+                    invalid: function() {
+                        this.btnCreate.disable();
+                    }
+                }
+            }),
+            new Ext.form.RadioGroup({
+                ref: "./radioGroup",
+                items: [
+                new Ext.form.Radio({
+                    boxLabel: 'Metros',
+                    name: 'units',
+                    inputValue: this.UNIT_METERS,
+                    checked: true
                 }),
-                this.radioGroup = new Ext.form.RadioGroup({
-                    items: [
-                        new Ext.form.Radio({ boxLabel: 'Metros', name: 'units', inputValue: this.UNIT_METERS, checked: true }),
-                        new Ext.form.Radio({ boxLabel: 'Kilómetros', name: 'units', inputValue: this.UNIT_KILOMETERS }),
-                        new Ext.form.Radio({ boxLabel: 'Millas', name: 'units', inputValue: this.UNIT_MILES })
-                    ]
-                })
-            ],
+                new Ext.form.Radio({
+                    boxLabel: 'Kilómetros',
+                    name: 'units',
+                    inputValue: this.UNIT_KILOMETERS
+                }),
+                new Ext.form.Radio({
+                    boxLabel: 'Millas',
+                    name: 'units',
+                    inputValue: this.UNIT_MILES
+                })],
+                listeners: {
+                    scope: this,
+                    change: function() {
+                        this.distanceField.validate();
+                    }
+                }
+            })],
             buttons: [
-                this.btnCreate = new Ext.Button({
-                    text: 'Crear',
-                    listeners: {
-                        click: this.onCreateButtonClicked,
-                        scope: this
-                    }
-                }),
-                this.btnCancel = new Ext.Button({
-                    text: 'Cancelar',
-                    listeners: {
-                        click: this.onCancelButtonClicked,
-                        scope: this
-                    }
-                })
-            ]
+            this.btnCreate = new Ext.Button({
+                text: 'Crear',
+                listeners: {
+                    click: this.onCreateButtonClicked,
+                    scope: this
+                }
+            }),
+            this.btnCancel = new Ext.Button({
+                text: 'Cancelar',
+                listeners: {
+                    click: this.onCancelButtonClicked,
+                    scope: this
+                }
+            })]
         };
 
-        this.add(c);
+        this.add(this.form);
     }
 });

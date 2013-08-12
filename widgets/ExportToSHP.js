@@ -38,7 +38,7 @@
 /** api: (extends)
  *  plugins/Tool.js
  */
-Ext.namespace("Viewer.plugins");
+Ext.namespace('Viewer.plugins');
 
 /** api: constructor
  *  .. class:: ExportToSHP(config)
@@ -47,20 +47,27 @@ Ext.namespace("Viewer.plugins");
  *    TODO Make this plural - selected layers
  */
 Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
-    
-    /** api: ptype = vw_exporttoshp */
-    ptype: "vw_exporttoshp",
 
-    exportToSHPText: "Export to SHP",
-    exportToSHPTooltipText: "Export a layer to shape file",
-    exportToSHPMsg: "Generating ZIP File ...",
-    exportToSHPErrorTitle: "Error",
-    exportToSHPErrorContent: "Error to export the layer",
+    /** api: ptype = vw_exporttoshp */
+    ptype: 'vw_exporttoshp',
+
+    exportToSHPText: 'Export to SHP',
+    exportToSHPTooltipText: 'Export a layer to shape file',
+    exportToSHPMsg: 'Generating ZIP File ...',
+    exportToSHPErrorTitle: 'Error',
+    exportToSHPErrorContent: 'Error to export the layer',
     objectOwner: 'map',
     selectedLayer: null,
 
-    requireLogin : true,
-    rasterTypeIDs: [1,2,3,8,9,10],
+    requireLogin: true,
+
+    /** apy: config[rasterTypeIDs]
+     * The list of ids of the layer types that mean a layer is raster.
+     * This should be replaced by other more sturdier, less hacky, test.         
+     */
+    rasterTypeIDs: [1, 2, 3, 8, 9, 10],
+
+    action: null,
 
     /** private: method[init]
      * :arg target: ``Object`` The object initializing this plugin.
@@ -69,59 +76,62 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
         Viewer.plugins.ExportToSHP.superclass.init.apply(this, arguments);
         this.target.on('beforerender', this.addActions, this);
     },
-    
+
     /** api: method[addActions] */
     addActions: function() {
-        
-        var actions = PersistenceGeo.tree.MakeLayerPersistent.superclass.addActions.apply(this, [{
+
+        var enabled = this._checkEnabled();
+
+        var actions =
+            PersistenceGeo.tree.MakeLayerPersistent.superclass.addActions.apply(
+                this, [{
             menuText: this.exportToSHPText,
-            iconCls: "gxp-icon-export-shp",
-            disabled: true,
+            iconCls: 'gxp-icon-export-shp',
+            disabled: !enabled,
             tooltip: this.exportToSHPTooltipText,
             handler: function() {
                 var urlToExport = null;
                 var paramsToExport = null;
-                var urlLocalGeoServer = app.sources.local.url.replace("/ows", "");
-                if(this.selectedLayer.url){
-                    if(this.selectedLayer.url.indexOf(urlLocalGeoServer) != -1){
+                var urlLocalGeoServer = app.sources.local.url.replace('/ows', '');
+                if (this.selectedLayer.url) {
+                    if (this.selectedLayer.url.indexOf(urlLocalGeoServer) != -1) {
                         urlToExport = urlLocalGeoServer;
                     }
                 }
                 var contextLayer = null;
-                if(this.selectedLayer.params && this.selectedLayer.params.LAYERS){
-                    if(this.selectedLayer.params.LAYERS.indexOf(":") != -1){
-                        contextLayer = this.selectedLayer.params.LAYERS.split(":")[0];
+                if (this.selectedLayer.params && this.selectedLayer.params.LAYERS) {
+                    if (this.selectedLayer.params.LAYERS.indexOf(':') != -1) {
+                        contextLayer = this.selectedLayer.params.LAYERS.split(':')[0];
                     }
                 }
-                if(contextLayer != null){
-                    urlToExport += "/" + contextLayer + "/wfs"
+                if (contextLayer !== null) {
+                    urlToExport += '/' + contextLayer + '/ows';
                 }
 
                 paramsToExport = {
-                    'SERVICE': 'WFS',
-                    'VERSION': this.selectedLayer.params.VERSION,
-                    'REQUEST': 'GetFeature',
-                    'TYPENAME': this.selectedLayer.params.LAYERS,
-                    'SRS': this.selectedLayer.params.SRS,
-                    'OUTPUTFORMAT': 'shape-zip'
+                    'service': 'WFS',
+                    'version': '1.0.0',
+                    'request': 'GetFeature',
+                    'typename': this.selectedLayer.params.LAYERS,
+                    'outputformat': 'shape-zip'
                 };
 
                 Ext.MessageBox.wait(this.exportToSHPMsg);
-                
+
                 Ext.Ajax.request({
                     url: urlToExport,
                     params: paramsToExport,
                     method: 'GET',
                     disableCaching: false,
-                    success: function(o, r, n){
-                        var elemIF = document.createElement("iframe");
+                    success: function(o, r, n) {
+                        var elemIF = document.createElement('iframe');
                         elemIF.src = app.proxy + encodeURIComponent(this.prepareUrlToDownload(r));
-                        elemIF.style.display = "none"; 
+                        elemIF.style.display = 'none';
                         document.body.appendChild(elemIF);
                         Ext.MessageBox.updateProgress(1);
                         Ext.MessageBox.hide();
                     },
-                    failure: function(o, r, n){
+                    failure: function(o, r, n) {
                         Ext.MessageBox.updateProgress(1);
                         Ext.MessageBox.hide();
                         Ext.Msg.show({
@@ -136,36 +146,34 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
             scope: this
         }]);
 
+        this.action = actions[0];
+
         var owner = this.target;
         if (this.objectOwner === 'toolbar') {
             owner = app;
         }
-        owner.on("layerselectionchange", function(record) {
-            if(record && record.data){
+        owner.on('layerselectionchange', function(record) {
+            if (record && record.data) {
                 this.selectedLayer = record.data.layer;
-                
-                //if(this.objectOwner === 'toolbar') {
-                    this.enableOrDisableAction();
-//                }
             }
+            this.enableOrDisableAction();
         }, this);
-        
+
         this.enableOrDisableAction();
     },
 
-    prepareUrlToDownload: function(data){
-        //"http://gofre.emergya.es:8080/geoserver/gore/wfs?SERVICE=WFS&VERSION=1.1.1&REQUEST=GetFeature&TYPENAME=gore%3Aagroclima&SRS=EPSG%3A900913&OUTPUTFORMAT=shape-zip";
+    prepareUrlToDownload: function(data) {
         var urlToReturn = null;
-        if(data != null){
+        if (data !== null) {
             urlToReturn = data.url;
             var cont = 0;
-            if(data.params!=null){
-                for(p in data.params){
-                    if(cont === 0){
-                        urlToReturn += "?" + p + "=" + data.params[p];
-                        cont ++;
-                    }else{
-                        urlToReturn += "&" + p + "=" + data.params[p];
+            if (data.params !== null) {
+                for (var p in data.params) {
+                    if (cont === 0) {
+                        urlToReturn += '?' + p + '=' + data.params[p];
+                        cont++;
+                    }else {
+                        urlToReturn += '&' + p + '=' + data.params[p];
                     }
                 }
             }
@@ -173,7 +181,7 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
         return urlToReturn;
     },
     isLocalGeoserver: function(url) {
-        var urlLocalGeoServer = app.sources.local.url.replace("/ows", "");
+        var urlLocalGeoServer = app.sources.local.url.replace('/ows', '');
         if (url && url.indexOf(urlLocalGeoServer) != -1) {
             return true;
         } else {
@@ -181,26 +189,29 @@ Viewer.plugins.ExportToSHP = Ext.extend(gxp.plugins.Tool, {
         }
     },
     enableOrDisableAction: function() {
-        if(!this.selectedLayer) {
+        var enabled = this._checkEnabled();
+
+        // We add a timeout so the menu item get's actually disabled.
+        var self = this;
+        setTimeout(function() {
+            self.action.setDisabled(!enabled);
+        },10);
+    },
+
+    _checkEnabled : function() {
+
+          if (!this.selectedLayer) {
             this.selectedLayer = Viewer.getSelectedLayer();
         }
 
         var layerSelected = !!this.selectedLayer;
-
-        var hasLayerTypeId= layerSelected && this.selectedLayer.metadata && this.selectedLayer.metadata.layerTypeId;
-        var isVectorial = layerSelected  && hasLayerTypeId && this.rasterTypeIDs.indexOf(this.selectedLayer.metadata.layerTypeId)<0;
+        var hasLayerTypeId = layerSelected && this.selectedLayer.metadata && !!this.selectedLayer.metadata.layerTypeId;
+        var isVectorial = layerSelected && hasLayerTypeId && this.rasterTypeIDs.indexOf(this.selectedLayer.metadata.layerTypeId) < 0;
         var userLogged = !this.requireLogin || !!app.persistenceGeoContext.userLogin;
 
-        if (isVectorial && userLogged  && this.isLocalGeoserver(this.selectedLayer.url)) {
-            Ext.each(this.actions, function(item) {
-                item.enable();
-                    }, this);
-        } else {
-            Ext.each(this.actions, function(item) {
-               item.disable(); 
-            }, this);        
-        }
-        
+        var enabled = isVectorial && userLogged && this.isLocalGeoserver(this.selectedLayer.url);
+
+        return enabled;
     }
 });
 
