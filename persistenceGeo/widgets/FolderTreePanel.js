@@ -124,6 +124,8 @@ PersistenceGeo.widgets.FolderTreePanel = Ext.extend(Ext.tree.TreePanel, {
 
         Ext.apply(this, config);
 
+        this.itemsArray = new Array();
+
         PersistenceGeo.widgets.FolderTreePanel.superclass.constructor.call(this, Ext.apply({
             border: false,
             autoScroll: true,
@@ -178,7 +180,7 @@ PersistenceGeo.widgets.FolderTreePanel = Ext.extend(Ext.tree.TreePanel, {
         this.addEvents({
             nodeLoaded: true
         });
-    },
+    },        
 
     /** api: function[getRootFilter]
      *  ``String``

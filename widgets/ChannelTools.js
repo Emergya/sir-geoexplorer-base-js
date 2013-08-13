@@ -84,7 +84,7 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
             restBaseUrl: this.restBaseUrl,
             recursive: this.showLayers,
             rootNodeText:this.titleText,
-            rootVisible: true,
+            rootVisible: !this.showLayers,
             folderType: this.showLayers 
                 ? PersistenceGeo.widgets.FolderTreePanel.prototype.KNOWN_FOLDER_TYPES.DEFAULT_TYPE: // show folders in root when show layers!!
                 null,
