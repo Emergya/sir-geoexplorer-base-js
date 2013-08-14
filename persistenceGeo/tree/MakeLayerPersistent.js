@@ -98,7 +98,7 @@ PersistenceGeo.tree.MakeLayerPersistent = Ext.extend(gxp.plugins.Tool, {
             title: this.makePersistentText,
             closeAction: 'hide',
             width: 500,
-            height: 200
+            autoHeight: true
         });
         var savePanel = new Viewer.widgets.SaveLayerPanel({
             layerRecord: layerRecord,
