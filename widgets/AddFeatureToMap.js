@@ -93,7 +93,7 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
      * :arg target: ``Object`` The object initializing this plugin.
      */
     init: function(target) {
-        gxp.plugins.AddFeatureToMap.superclass.init.apply(this, arguments);   
+        gxp.plugins.AddFeatureToMap.superclass.init.apply(this, arguments);
         this.target.on('beforerender', this.addActions, this);
 
     },
@@ -103,7 +103,6 @@ gxp.plugins.AddFeatureToMap = Ext.extend(gxp.plugins.Tool, {
 
 		var featureManager = this.getFeatureManager();
 		var featureLayer = featureManager.featureLayer;
-        featureLayer.map = Viewer.getMapPanel().map;
 		//featureManager.schemaCache = {};
 		//featureManager = this.updateFeatureManager(featureManager);
 		var control = new OpenLayers.Control.DrawFeature(

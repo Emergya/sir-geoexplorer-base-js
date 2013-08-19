@@ -64,7 +64,7 @@ Viewer.widgets.SaveLayerPanel = Ext.extend(Ext.Container, {
     layerLoadedText : 'Layer {0} has been loaded',
     inProjectionText : "File projection",
     loadText : "Load",
-    saveLayerTitleText: "Added layer", 
+    saveLayerTitleText: "Added layer",
     saveLayerText: "Layer '{0}' has been added permanently to viewer.",
     saveLayerErrorTitleText: "Error ocurred!!",
     saveLayerErrorText: "An error ocurred saving '{0}' layer",
