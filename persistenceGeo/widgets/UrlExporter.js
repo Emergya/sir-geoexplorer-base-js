@@ -112,7 +112,9 @@ PersistenceGeo.widgets.UrlExporter = Ext.extend(gxp.plugins.Tool, {
             width: 0,
             height: 0,
             css: 'display:none;visibility:hidden;height:0;',
-            src: requestUrl
+            // Fixes #85836 by using the non-proxied url to download the file as the proxy breaks the download of non persisted layers,
+            // Returning 0b files..., but working ok in persisted ones. Restore the proxied url if #87063 ever gets fixed.
+            src: proxiedUrl
         });
     },
 
