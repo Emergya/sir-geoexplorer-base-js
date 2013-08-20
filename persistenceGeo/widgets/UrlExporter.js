@@ -194,8 +194,6 @@ PersistenceGeo.widgets.UrlExporter = Ext.extend(gxp.plugins.Tool, {
         var fileName = this.selectedLayer.layerTitle;
         if(!fileName) {
             fileName = this.selectedLayer.name;
-            var wsIdx = fileName.indexOf(":");
-            fileName= fileName.substring(wsIdx+1);
         }
         
         return  fileName + '.' + extension;
