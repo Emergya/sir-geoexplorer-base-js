@@ -48,6 +48,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
     //defaultRestUrl: "http://localhost:8080/sig-minen/rest",
     loginUrl: "/sig-minen/j_spring_security_check",
     logoutUrl: "/sig-minen/logout",
+    trackingUrl: "/sig-minen/stats",
     adminUrl: '../../controlUsuarioLogado',
     pdfFooterText: "",
     logoDataUri: "",
@@ -1163,6 +1164,15 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             }
         };
 
+    },
+
+    trackUrl : function(url) {
+        Ext.Ajax.request({
+            url: 'proxy/?url=http://localhost:8080'+this.trackingUrl+"/"+url,
+            method: 'POST',
+            disableCaching: false            
+        });    
     }
+    
 
 });
