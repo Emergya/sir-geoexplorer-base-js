@@ -69,11 +69,11 @@ PersistenceGeo.widgets.ExportToSHP = Ext.extend(PersistenceGeo.widgets.UrlExport
                 'or selectedLayers.params.LAYERS is undefined');
             // TODO show messagebox
         }
-        
+
         var params = {
             layers: requestedLayers,
             DOWNLOAD: 'true',
-            FILENAME: this.selectedLayer.params.LAYERS.replace(':', '-') + '.shp',
+            FILENAME: this.getFileName("zip"),
             service: 'WFS',
             version: '1.0.0',
             request: 'GetFeature',

@@ -73,7 +73,7 @@ PersistenceGeo.widgets.ExportToKML = Ext.extend(PersistenceGeo.widgets.UrlExport
         var params = {
             layers: requestedLayers,
             DOWNLOAD: 'true',
-            FILENAME: this.selectedLayer.params.LAYERS.replace(':', '-') + '.kml'
+            FILENAME: this.getFileName("kml")
         };
 
         if (!this.isRasterLayer(this.selectedLayer.metadata.layerTypeId)) {

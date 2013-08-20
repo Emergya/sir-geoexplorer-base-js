@@ -146,11 +146,11 @@ PersistenceGeo.widgets.UrlExporter = Ext.extend(gxp.plugins.Tool, {
 
     prepareUrlToDownload: function(data) {
         var urlToReturn = null;
-        if (data != null) {
+        if (data !== null) {
             urlToReturn = data.url;
-            if (data.params != null) {
+            if (data.params !== null) {
                 var first = true;
-                for (p in data.params) {
+                for (var p in data.params) {
                     if (first) {
                         first = false;
                         urlToReturn += '?';
@@ -188,6 +188,18 @@ PersistenceGeo.widgets.UrlExporter = Ext.extend(gxp.plugins.Tool, {
             }, this);
         }
 
+    },
+
+    getFileName: function (extension) {
+        var fileName = this.selectedLayer.layerTitle;
+        if(!fileName) {
+            fileName = this.selectedLayer.name;
+            var wsIdx = fileName.indexOf(":");
+            fileName= fileName.substring(wsIdx+1);
+        }
+        
+        return  fileName + '.' + extension;
     }
+
 
 });
