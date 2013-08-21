@@ -187,6 +187,13 @@ Viewer.plugins.WMSStylesDialogMod = Ext.extend(gxp.WMSStylesDialog, {
 
         gxp.WMSStylesDialog.superclass.initComponent.apply(this, arguments);
     },
+
+    newStyleName: function() {
+        //var layerName = this.layerRecord.get("name");
+        var layerName = this.layerRecord.getLayer().params.LAYERS;
+        return layerName.split(":").pop() + "_" +
+            gxp.util.md5(layerName + new Date() + Math.random()).substr(0, 8);
+    },
     
     /** api: method[updateDefault]
      *  Saves default style of the layer with the selected style
