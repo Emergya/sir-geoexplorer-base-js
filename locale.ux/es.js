@@ -761,6 +761,19 @@ GeoExt.Lang.add(
         persistentDeletionConfirmQuestionText: 'La capa se eliminará permanentemente del servidor.<br><br>¿Realmente desea borrar la capa?',
         persistentDeletionContinueBtnText: "Borrar capa",
         persistentDeletionCancelBtnText: "No borrar capa",
+    },
+
+    'PersistenceGeo.widgets.MakeLayerPublic.prototype':  {
+        toolText: "Publicar",
+        toolTooltipText: "Publica la capa",
+        toolWindowText: "Publicaci\u00f3n de capa {0}",
+        toolIconCls: 'gxp-icon-savelayers',
+        formActionFieldText: "Accion a realizar",
+        formActionFieldValueText: "Publicar nueva capa",
+        formNameFieldText: "Nombre deseado",
+        formNameFieldValueText: "Nombre de la capa",
+        formTemplateFieldText: "Norma a aplicar",
+        formTemplateFieldValueText: "ISO 19119"
     }
 
 });

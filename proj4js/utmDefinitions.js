@@ -58,3 +58,5 @@ Proj4js.defs["EPSG:32757"] = "+proj=utm +zone=57 +south +ellps=WGS84 +datum=WGS8
 Proj4js.defs["EPSG:32758"] = "+proj=utm +zone=58 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
 Proj4js.defs["EPSG:32759"] = "+proj=utm +zone=59 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
 Proj4js.defs["EPSG:32760"] = "+proj=utm +zone=60 +south +ellps=WGS84 +datum=WGS84 +units=m +no_defs";
+Proj4js.defs["EPSG:3857"] = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
+Proj4js.defs["SR-ORG:6864"] = "+proj=merc +lon_0=0 +k=1 +x_0=0 +y_0=0 +a=6378137 +b=6378137 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs";
