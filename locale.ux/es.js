@@ -546,7 +546,15 @@ GeoExt.Lang.add(
     },
 
     'Viewer.dialog.DefaultSearches.prototype': {
-        titleTool: 'Búsquedas Predeterminadas'
+        titleTool: 'Búsquedas Predeterminadas',
+        layerTitle: 'Resultado de la búsqueda',
+        provinceFieldLabel: 'Provincia',
+        provinceFieldPrompt:  'Seleccione una provincia',
+        municipalityFieldLabel: 'Comunas',
+        municipalityFieldPrompt:  'Seleccione una provincia primero',
+        coordinatesSectionLabel: 'Coordenadas',
+        searchBtnLabel: 'Buscar',
+        adminstrativeLimitsSectionLabel: 'Límites Administrativos',
     },
 
     'gxp.FeatureEditPopup.prototype': {

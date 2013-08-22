@@ -29,12 +29,20 @@
 Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
 
     LAYER_NAME: 'DefaultSearchLayer',
-    layerTitle: 'Resultado de la búsqueda',
+   
 
     mapProjection: null,
     
     /** i18n **/
     titleTool: "Predetermine searches",
+    layerTitle: 'Search Result',
+    provinceFieldLabel: 'Province',
+    provinceFieldPrompt:  'Select a province',
+    municipalityFieldLabel: 'Locality',
+    municipalityFieldPrompt:  'Select a province first',
+    coordinatesSectionLabel: 'Coordinates',
+    searchBtnLabel: 'Search',
+    adminstrativeLimitsSectionLabel: 'Administrative Limits',
 
     constructor: function(config) {
 
@@ -176,8 +184,8 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
 
         this.cmbProvince = new Ext.form.ComboBox({
             name: 'province',
-            fieldLabel: 'Provincia',
-            emptyText: 'Seleccione una provincia',
+            fieldLabel: this.provinceFieldLabel,
+            emptyText: this.provinceFieldPrompt,
             editable: false,
             store: new Ext.data.JsonStore({
                 // store configs
@@ -205,8 +213,8 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
         });
         this.cmbMunicipality = new Ext.form.ComboBox({
             name: 'municipality',
-            fieldLabel: 'Municipalidades',
-            emptyText: 'Seleccione una provincia primero',
+            fieldLabel: this.municipalityFieldLabel,
+            emptyText: this.municipalityFieldPrompt,
             disabled: true,
             editable: false,
             //store: new Viewer.store.Municipalities(),
@@ -255,14 +263,14 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
                 animate: true
             },
             items: [{
-                title: 'Coordenadas',
+                title: this.coordinatesSectionLabel,
                 layout: 'fit',
                 items: this.searchByCoordinates = new Viewer.widgets.SearchByCoordinates({
                     mapPanel: this.mapPanel,
                     map: this.map,
-                    buttonUtmLabel: 'Buscar',
-                    buttonLonLatLabel: 'Buscar',
-                    buttonDecimalLabel: 'Buscar',
+                    buttonUtmLabel: this.searchBtnLabel,
+                    buttonLonLatLabel: this.searchBtnLabel,
+                    buttonDecimalLabel: this.searchBtnLabel,
                     listeners: {
                         buttonUtmClicked: this.onBtnUtmClicked.createDelegate(this),
                         buttonLonLatClicked: this.onBtnLonLatClicked.createDelegate(this),
@@ -270,7 +278,7 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
                     }
                 })
             }, {
-                title: 'Límites Administrativos',
+                title: this.adminstrativeLimitsSectionLabel,
                 layout: 'fit',
                 defaults: {
                     bodyStyle: padding + border
