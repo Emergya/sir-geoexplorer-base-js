@@ -210,12 +210,13 @@ Viewer.widgets.QueryForm = Ext.extend(gxp.plugins.QueryForm, {
                     if (ownerCt && ownerCt instanceof Ext.Window) {
                         ownerCt.hide();
                     }
-                    addFilterBuilder(
+                    this.addFilterBuilder(
                         featureManager, featureManager.layerRecord,
                         featureManager.schema
                     );
                     featureManager.loadFeatures();
-                }
+                },
+                scope:this
             }, {
                 text: this.queryActionText,
                 iconCls: "gxp-icon-find",
