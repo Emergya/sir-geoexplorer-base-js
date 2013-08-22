@@ -47,6 +47,7 @@ var catalogue = null;
  */
 function initGNManager(){
     var lang = 'spa';
+    var DEFAULT_LANG_CODE = "es";
 
     // Config for WGS84 based maps
     GeoNetwork.map.PROJECTION = "EPSG:900913";
@@ -60,6 +61,9 @@ function initGNManager(){
         restrictedExtent: GeoNetwork.map.EXTENT,
         controls: []
     };
+
+    // Translations
+    initGNTranslations(DEFAULT_LANG_CODE);
 
     // Editor function
     function edit(metadataId, create, group, child) {
@@ -320,6 +324,8 @@ function initGNManager(){
 
     };
 
+    
+
     var metadataResultsView = new GeoNetwork.MetadataResultsView({
         catalogue : catalogue,
         displaySerieMembers : true,
@@ -366,4 +372,22 @@ function initGNManager(){
     // });
     //catalogueWindow.show();
     //return catalogue;
+}
+
+/**
+ * api: method[initGNTranslations]
+ * Add GeoNetwork translations to the 
+ * OL internacionalization and make the 
+ * lang selected as selected code
+ */
+function initGNTranslations(lang){
+
+    // Init translation to default language
+    var defaultLang = OpenLayers.Lang[lang];
+    if(!defaultLang){
+       defaultLang = {};
+    }
+    Ext.applyIf(defaultLang, GeoNetwork.Lang[lang]);
+    OpenLayers.Lang[lang] = defaultLang;
+    OpenLayers.Lang.setCode(lang);
 }
