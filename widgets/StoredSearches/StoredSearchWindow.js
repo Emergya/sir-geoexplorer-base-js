@@ -448,6 +448,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
         return text.replace(/[^A-Za-z0-9\[\] ]/g,function(a){return latin_map[a]||a});        
     },
 
+
     createPDFDocument: function(margin, pageWidth, avalaibleWidth) {
         //We generate an XTemplate here by using 2 intermediary XTemplates - one to create the header,
         //the other to create the body (see the escaped {} below)
@@ -505,20 +506,23 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
             return false;
         },this);
 
-         
-        //var content  = this._cratePDFTable(columns, data);
-        var content = this._createPDFList(columns, data);
-        
+
+        var content = "";
+
+        content += this.createSearchFiltersText();
+
+        //content += this._createPDFTable(columns, data);
+        content += this._createPDFList(columns, data);
 
         // We add a summary at the end of the document.
-        content+="<p><b>Número de registros encontrados: </b>" +data.length+"</p>";
+        content += "<p><b>Número de registros encontrados: </b>" +data.length+"</p>";
 
         if(featureColumns.indexOf("POT_BR_MW")) {
             var potBrut = data.reduce(function(acc, element){
                 return acc + (+element["POT_BR_MW"]);
             }, 0);
 
-            content+= " <p><b>"+this.columnLabels["POT_BR_MW"]+ " Total: </b>"+ Ext.util.Format.number(potBrut,"0.000,00/i")+"</p>";
+            content +=  " <p><b>"+this.columnLabels["POT_BR_MW"]+ " Total: </b>"+ Ext.util.Format.number(potBrut,"0.000,00/i")+"</p>";
         }
 
        
@@ -533,6 +537,44 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
        
 
         return items;
+    },
+
+
+    getColumnLabel : function(searchLabel) {
+           var headerLabel = this.columnLabels[searchLabel];
+            if(!headerLabel) {
+                headerLabel = searchLabel.charAt(0).toUpperCase() + searchLabel.slice(1).toLowerCase();
+            }
+            return headerLabel;
+    },
+
+    createSearchFiltersText : function() {
+        var textResult = "<p>";
+        var localQueryDef = this._manager.filter.filters;
+
+        if (localQueryDef.length>0){
+            textResult += "<b>Filtros de búsqueda utilizados: </b>";
+        }
+
+        textResult += "<dd><ul>";
+
+        for (var i=0, l=localQueryDef.length; i<l; i++) {
+            var item = localQueryDef[i];
+            var labelText = this.getColumnLabel(item.property);
+
+            if (item.value && item.property !== "ESTADO"){
+                if (item.type == "=="){
+                    textResult += "<li><i>" + labelText + "</i>: " + item.value + "</li>";
+                }
+                else{
+                    textResult += "<li><i>" + labelText + "</i>  " + item.type.replace(/</g, '&lt;').replace(/>/g, '&gt;') + " " + item.value + "</li>";
+                }
+            }
+        }
+        textResult += "</ul></dd>";
+
+        textResult += "</p>";
+        return textResult;
     },
 
     _createPDFList : function(columns, data) {
