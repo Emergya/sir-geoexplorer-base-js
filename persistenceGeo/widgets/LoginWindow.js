@@ -67,8 +67,8 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window, {
     userFieldText: "User",
     passwordFieldText: "Password",
     saveErrorText: "Trouble saving: ",
-    loginUserErrorTitleText: 'Login error!',
-    loginUserErrorText: 'Unknow user \'{0}\'.\n Please check username and password or contact with the system administrator',
+    loginUserErrorTitleText: 'Login Error',
+    loginUserErrorText: 'Wrong user or password!\n Please try again or contact with the system administrator',
 
     /**
      * Used to check if the login button is pressed by an user
