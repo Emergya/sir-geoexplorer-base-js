@@ -57,8 +57,8 @@ PersistenceGeo.widgets.NewSourceDialog = Ext.extend(gxp.NewSourceDialog, {
 
         this.urlTextField = new Ext.form.TextField({
             fieldLabel: "URL",
-            allowBlank: false,
             width: 250,
+            allowBlank: false,
             msgTarget: "under",
             validator: this.urlValidator.createDelegate(this),
             listeners: {
@@ -107,50 +107,31 @@ PersistenceGeo.widgets.NewSourceDialog = Ext.extend(gxp.NewSourceDialog, {
             }
         });
 
+        this.bbar = [
+            new Ext.Toolbar.Fill(),
+            new Ext.Button({
+                text: this.cancelText,
+                tooltip: this.cancelTitleText,
+                handler: this.hide,
+                scope: this
+            }),
+            new Ext.Button({
+                text: this.addServerText,
+                tooltip: this.addServerTitleText,
+                handler: this.addServer,
+                scope: this
+            })
+        ];
+
         if (isAuthorized) {
-            this.bbar = [
-                new Ext.Toolbar.Fill(),
-                new Ext.Button({
-                    text: this.cancelText,
-                    tooltip: this.cancelTitleText,
-                    handler: this.hide,
-                    scope: this
-                }),
-                new Ext.Button({
-                    text: this.addServerText,
-                    tooltip: this.addServerTitleText,
-                    iconCls: "add",
-                    handler: this.addServer,
-                    scope: this
-                }),
+            this.bbar.push(
                 new Ext.Button({
                     text: this.storeAndAddServerText,
                     tooltip: this.storeAndAddServerTitleText,
-                    iconCls: "add",
                     handler: this.storeAndAddServer,
                     scope: this
-                })
-            ];
-        } else {
-            this.bbar = [
-                new Ext.Toolbar.Fill(),
-                new Ext.Button({
-                    text: this.cancelText,
-                    tooltip: this.cancelTitleText,
-                    handler: this.hide,
-                    scope: this
-                }),
-                new Ext.Button({
-                    text: this.addServerText,
-                    tooltip: this.addServerTitleText,
-                    iconCls: "add",
-                    handler: this.addServer,
-                    scope: this
-                })
-            ];
+                }));
         }
-
-
 
         this.items = this.form;
 
@@ -163,6 +144,7 @@ PersistenceGeo.widgets.NewSourceDialog = Ext.extend(gxp.NewSourceDialog, {
         }, this);
 
         this.on({
+            show: this.onShow,
             hide: this.reset,
             removed: this.reset,
             scope: this
@@ -181,6 +163,12 @@ PersistenceGeo.widgets.NewSourceDialog = Ext.extend(gxp.NewSourceDialog, {
 
         this.on("urlsaved", this.onUrlSaved, this);
 
+        // We clear the form, thus preventing the validation error
+        // to show before the user has actually written anything.  
+        var form = this.form;
+        setTimeout(function(){
+           form.getForm().clearInvalid();
+        },300);
     },
 
     /** API: method[onUrlSaved]
@@ -190,6 +178,22 @@ PersistenceGeo.widgets.NewSourceDialog = Ext.extend(gxp.NewSourceDialog, {
     onUrlSaved: function(source) {
         console.log("Saved " + source.url + "!");
     },
+
+     /** private: method[addServer]
+     *
+     * Save server for the current session only.
+     */
+    addServer: function() {
+        // Clear validation before trying again.
+        this.error = null;
+        if (this.urlTextField.validate()) {
+
+            // Fixes #87337 as the hidden method uses a field that no longer exists
+            // in this subclass.
+            this.fireEvent("urlselected", this, this.urlTextField.getValue(), "WMS");
+        }
+    },
+    
 
     /** private: method[storeAndAddServer]
      *
