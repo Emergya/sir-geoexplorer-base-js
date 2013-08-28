@@ -199,7 +199,9 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
                 // reader configs
                 root: 'data',
                 idProperty: 'id',
-                fields: ['id', 'code', 'name', 'type', 'extension']
+                fields: ['id', 'code', 'name', 'type', 'extension'],
+                remoteSort: false,
+                sortInfo: {field:"name", direction:"ASC"}
             }),
             valueField: 'id',
             displayField: 'name',
@@ -230,7 +232,9 @@ Viewer.dialog.DefaultSearches = Ext.extend(Ext.Window, {
                 // reader configs
                 root: 'data',
                 idProperty: 'id',
-                fields: ['id', 'code', 'name', 'type', 'extension']
+                fields: ['id', 'code', 'name', 'type', 'extension'],
+                remoteSort: false,
+                sortInfo: {field:"name", direction:"ASC"}
             }),
             valueField: 'id',
             displayField: 'name',
