@@ -389,33 +389,33 @@ Viewer.dialog.WMSGetFeatureInfo = Ext.extend(Ext.Window, {
 
         Ext.each(groups,function(group){
 
-          // We set default custom renderers so we intercept urls and show'em as links.
-                var customRenderers = {};
-               
-                for (var field in group.fields) {
-                    customRenderers[field] = function(value) {
-                        if (Ext.form.VTypes.url(value)) {
-                            return (new Ext.Template(self.linkTemplate).apply([value]));
-                        } else if (Ext.isNumber(+value)) {
-                            return Ext.util.Format.number(+value, self.numberFormat);
-                        }
-                        return value;
-                    };
-                }
-
-                config.push(Ext.apply({
-                    xtype: 'gxp_editorgrid',
-                    readOnly: true,
-                    title: group.title,
-                    feature: feature,
-                    fields: group.fields,
-                    customRenderers: customRenderers,
-                    listeners: {
-                        'beforeedit': function(e) {
-                            return false;
-                        }
+            // We set default custom renderers so we intercept urls and show'em as links.
+            var customRenderers = {};
+           
+            Ext.each(group.fields,function(field){
+                customRenderers[field] = function(value) {
+                    if (Ext.form.VTypes.url(value)) {
+                        return (new Ext.Template(self.linkTemplate).apply([value]));
+                    } else if (Ext.isNumber(+value)) {
+                        return Ext.util.Format.number(+value, self.numberFormat);
                     }
-                }, {}));
+                    return value;
+                };
+            });
+
+            config.push(Ext.apply({
+                xtype: 'gxp_editorgrid',
+                readOnly: true,
+                title: group.title,
+                feature: feature,
+                fields: group.fields,
+                customRenderers: customRenderers,
+                listeners: {
+                    'beforeedit': function(e) {
+                        return false;
+                    }
+                }
+            }, {}));
         });
 
         
