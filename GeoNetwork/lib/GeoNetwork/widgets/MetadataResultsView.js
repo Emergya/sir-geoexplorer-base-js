@@ -446,6 +446,8 @@ GeoNetwork.MetadataResultsView = Ext.extend(Ext.DataView, {
         var l = new OpenLayers.Layer.Vector(OpenLayers.i18n("mdResultsLayer"), {
             styleMap: new OpenLayers.StyleMap({'default': this.layer_style, 'hover': this.layer_style_hover})
         });
+        // Patch to prevent showing in layer tree
+        l.displayInLayerSwitcher = GeoNetwork.Settings.displayResultsInLayerSwitcher;
         this.addCurrentFeatures(l);
         map.layer = l;
         map.map.addLayer(l);

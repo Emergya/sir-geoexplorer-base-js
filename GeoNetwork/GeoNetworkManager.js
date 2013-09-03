@@ -53,7 +53,8 @@ function initGNManager(){
     GeoNetwork.map.PROJECTION = "EPSG:900913";
     GeoNetwork.map.EXTENT = app.mapPanel.map.maxExtent;
 
-    GeoNetwork.map.BACKGROUND_LAYERS = [app.mapPanel.map.baseLayer];
+    GeoNetwork.map.BACKGROUND_LAYERS = [new OpenLayers.Layer.OSM("OSM")];
+    GeoNetwork.map.BACKGROUND_LAYERS[0].baseLayer = true;
 
     GeoNetwork.map.MAP_OPTIONS = {
         projection: GeoNetwork.map.PROJECTION,
@@ -277,7 +278,7 @@ function initGNManager(){
                             metadataShowFn : show
                         });
 
-    catalogue.login('admin', 'admin');
+    catalogue.login(GeoNetwork.Settings.username, GeoNetwork.Settings.password);
 
      /**
              * Bottom bar

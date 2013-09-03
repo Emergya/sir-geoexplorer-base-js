@@ -50,6 +50,11 @@ PersistenceGeo.plugins.ZoomToLayerExtent = Ext.extend(gxp.plugins.ZoomToLayerExt
      *  contain the entire extent.  Default is false.
      */
     closest: false,
+    
+    /** api: config[applyWhenLayerChange]
+     *  ``Boolean`` Obtain and zoom to layer extent when the layer selection change.
+     */
+    applyWhenLayerChange: true,
 
     readedServers: {},
 
@@ -68,6 +73,33 @@ PersistenceGeo.plugins.ZoomToLayerExtent = Ext.extend(gxp.plugins.ZoomToLayerExt
             ,{name: 'maxx', mapping: 'BoundingBox > @maxx'}
             ,{name: 'maxy', mapping: 'BoundingBox > @maxy'}
             ]),
+
+    /** api: method[addActions]
+     */
+    addActions: function() {
+        var actions = PersistenceGeo.plugins.ZoomToLayerExtent.superclass.addActions.call(this, arguments);
+
+        this.target.on({
+            layerselectionchange: this.handleLayerChange,
+            scope: this
+        });
+
+        return actions;
+    },
+
+    /** api: method[handleLayerChange]
+     */
+    handleLayerChange: function(rec){
+        if(this.applyWhenLayerChange && rec){
+            var layer = rec.getLayer();
+            if (layer) {
+                // Don't apply in temporal layers
+                if(!layer.metadata || !layer.metadata.temporal){
+                    this.getMaxLayerExtent(layer);
+                }
+            }
+        }
+    },
 
     /** api: method[extent]
      */

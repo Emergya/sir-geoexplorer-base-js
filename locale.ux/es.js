@@ -771,7 +771,7 @@ GeoExt.Lang.add(
         persistentDeletionCancelBtnText: "No borrar capa",
     },
 
-    'PersistenceGeo.widgets.MakeLayerPublic.prototype':  {
+    'PersistenceGeo.tree.MakeLayerPublic.prototype':  {
         toolText: "Publicar",
         toolTooltipText: "Publica la capa",
         toolWindowText: "Publicaci\u00f3n de capa {0}",

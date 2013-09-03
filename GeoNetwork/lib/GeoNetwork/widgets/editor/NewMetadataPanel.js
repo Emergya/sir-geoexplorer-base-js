@@ -99,9 +99,18 @@ GeoNetwork.editor.NewMetadataPanel = Ext.extend(Ext.Panel, {
             ctCls: 'gn-bt-main',
             disabled: true,
             handler: function(){
-                // FIXME could be improved
-                this.catalogue.metadataEdit(this.selectedTpl, true, this.selectedGroup, this.isChild, this.isTemplate, this.selectedSchema);
-                this.ownerCt.hide();
+                if(this.ownerCt.controller){
+                    // PersistenceGeo implementation
+                    this.controller = this.ownerCt.controller;
+                    var validForm = this.controller.validateForm();
+                    if(validForm){
+                        this.controller.metadataEdit(this.selectedTpl, true, this.selectedGroup, this.isChild, this.isTemplate, this.selectedSchema); 
+                    }
+                }else{
+                    // FIXME could be improved
+                    this.catalogue.metadataEdit(this.selectedTpl, true, this.selectedGroup, this.isChild, this.isTemplate, this.selectedSchema);
+                    this.ownerCt.hide();   
+                }
             },
             scope: this
         });

@@ -491,6 +491,54 @@ GeoNetwork.map.ExtentMap = function(){
     return {
         init: function(){
         },
+        /** api: method[setBBox]
+         *
+         * Take all the DIVs of class extentViewer and places a map within. If it
+         * contains a single div, look in it content for a geometry in WKT format
+         * and add it in the map.
+         *
+         * The DIV can have some attributes:
+         *   - edit: if 'true', add edition tools
+         *   - target_polygon: the id of the input that must be updated with the GML
+         *                     content of the polygon being edited
+         *   - watched_bbox: the coma separated 4 ids of the input field (east, south,
+         *                   west, north) to listen for modifications
+         */
+        setBbox: function(bounds){
+            
+            
+            var viewers = Ext.DomQuery.select('.extentViewer');
+            
+            for (idx = 0; idx < viewers.length; ++idx) {
+                var viewer = viewers[idx];
+                targetPolygon = viewer.getAttribute("target_polygon");
+                watchedBbox = viewer.getAttribute("watched_bbox");
+                edit = viewer.getAttribute("edit") === 'true';
+                eltRef = viewer.getAttribute("elt_ref");
+                descRef = viewer.getAttribute("desc_ref");
+                mode = viewer.getAttribute("mode");
+
+                var boundsReproj;
+                // If current map projection is not WGS84, reproject bounds
+                // coordinate to store WGS84 in metadata record.
+                
+                if (mainProj !== wgsProj) {
+                    boundsReproj = bounds.clone().transform(mainProj, wgsProj);
+                } else {
+                    boundsReproj = bounds;
+                }
+
+                // // Update form values
+                var wsen = watchedBbox.split(','); 
+                Ext.get(wsen[0]).dom.value = boundsReproj.left;
+                Ext.get(wsen[1]).dom.value = boundsReproj.bottom;
+                Ext.get(wsen[2]).dom.value = boundsReproj.right;
+                Ext.get(wsen[3]).dom.value = boundsReproj.top;
+
+                // // Update Bbox on map
+                updateBbox(this.mapPanel.map, watchedBbox, eltRef, false);
+            }
+        },
         /** api: method[initMapDiv]
          *
          * Take all the DIVs of class extentViewer and places a map within. If it
@@ -763,6 +811,7 @@ GeoNetwork.map.ExtentMap = function(){
                     map: maps[eltRef],
                     tbar: (edit ? tbarItems : null)
                 });
+                this.mapPanel = mapPanel;
                 
                 if (children.length > 0) {
                     readFeature(children[0].innerHTML, {

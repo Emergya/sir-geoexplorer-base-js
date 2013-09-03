@@ -6,12 +6,23 @@ var cookie = new Ext.state.CookieProvider({
     expires : new Date(new Date().getTime()
             + (1000 * 60 * 60 * 24 * 365))
 });
-var GN_URL = '/proxy/?url=http://localhost/geonetwork';
+// var GN_URL = '/proxy/?url=http://localhost/geonetwork';
+// var GN_URL = '/proxy/?url=http://localhost:8080/geonetwork';
+var GN_URL = '../geonetwork';
+// var GN_URL = 'http://localhost/geonetwork';
 // '/geonetwork';//'../..'
 // 'http://localhost:8080/geonetwork';//'../..'
 
 
 GeoNetwork.Settings = {};
+
+// GN credentials. TODO: integrate with user logged
+GeoNetwork.Settings.username = "admin";
+GeoNetwork.Settings.password = "admin";
+
+// Display in layer switcher options 
+// @see GeoNetwork/MetadataResultsView.js
+GeoNetwork.Settings.displayResultsInLayerSwitcher = false;
 
 GeoNetwork.Util.defaultLocale = 'es';
 // Restrict locales to a subset of languages
