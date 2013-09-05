@@ -144,7 +144,10 @@ PersistenceGeo.widgets.NewSourceDialog = Ext.extend(gxp.NewSourceDialog, {
         }, this);
 
         this.on({
-            show: this.onShow,
+            show: function(){
+                this.onShow();
+                this.reset();
+            },
             hide: this.reset,
             removed: this.reset,
             scope: this
@@ -203,9 +206,9 @@ PersistenceGeo.widgets.NewSourceDialog = Ext.extend(gxp.NewSourceDialog, {
         // Clear validation before trying again.
         this.error = null;
         if (this.urlTextField.validate()) {
-            this.fireEvent("urlselected", this, this.urlTextField.getValue());
-            var url = this.urlTextField.getValue();
             var name = this.nameTextField.getValue();
+            var url = this.urlTextField.getValue();
+            this.fireEvent("urlselected", this, url);
             this.layerSourceAddHandler("gxp_wmscsource", url, name, "test");
         }
     },
