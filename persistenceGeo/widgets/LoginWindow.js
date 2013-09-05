@@ -283,6 +283,9 @@ PersistenceGeo.widgets.LoginWindow = Ext.extend(Ext.Window, {
      */
     authenticate: function() {
         this.show();
+
+        // Fix for #87743
+        this.panel.form.reset();
     },
 
     postLoginFunction: function(form, action) {
