@@ -67,6 +67,9 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
     uploadXlsText: "Upload a XLS file",
     uploadKmlImportText: "Upload a KML file",
     invalidWMSURLText: "Enter a valid URL to a WMS endpoint (e.g. http://example.com/geoserver/wms)",
+
+    customLocalSourceTitle : "GeoServer Local",
+
     addWMSLayerActionText: "Add WMS layer...",
     temporaryLayerActionText: "Temporary layer...",
     addWFSLayerActionText: "WFS...",
@@ -112,6 +115,15 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
 
     /** The button used by the addmin to remove a persisted source*/
     deleteWMSSourceBtn: null,
+
+    startSourceId: "local",
+
+    /**
+     * api: config[customLocalSourceURL]
+     * If present, we wont use the "local" layer source but create one using the given URL.
+     */
+    customLocalSourceURL: null,
+
 
     /** api: method[addActions]
      */
@@ -686,17 +698,29 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
      * Constructs a window with a capabilities grid.
      */
     initCapGrid: function() {
-        var source, data = [],
-            target = this.target;
-        for (var id in target.layerSources) {
-            source = target.layerSources[id];
-            if (source.store && !source.hidden) {
-                data.push([id, source.title || id, source.url]);
+        var source, data = [], target = this.target;
+
+        if(this.customLocalSourceURL){
+            data.push([this.startSourceId, this.customLocalSourceTitle, this.customLocalSourceURL]);
+            this.target.addLayerSource({
+                id: this.startSourceId,
+                config: {
+                    title: this.customLocalSourceTitle,
+                    url:  this.customLocalSourceURL
+                }
+            });
+
+        } else {
+            // If we haven't defined a custom base source URL we load the default sources.
+            for (var id in target.layerSources) {
+                source = target.layerSources[id];
+                if (source.store && !source.hidden) {
+                    data.push([id, source.title || id, source.url]);
+                }
             }
         }
 
-        var target = this.target;
-
+      
         var sources = new Ext.data.ArrayStore({
             fields: ["id", "title", "url"],
             data: data
@@ -730,7 +754,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                         id: id,
                         title: tmpSources[target.layerSources[id].url].name
                     });
-                    sources.insert(0, [record]);
+                    sources.insert(0,[record]);
                 };
 
                 var fallbackFn = function(source, msg) {
@@ -747,7 +771,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
                             title: source.name,
                             url: source.url
                         });
-                        this.storedSources.insert(0, [storedRecord]);
+                        this.storedSources.insert(0,[storedRecord]);
                         this.target.addLayerSource({
                             config: {
                                 url: source.url,
@@ -780,9 +804,7 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
      */
     initCapGridFromSourceAndData: function(data, sources, target) {
 
-        var expander = this.createExpander();
-
-        function addLayers() {
+         function addLayers() {
             var source = this.selectedSource;
             var records = capGridPanel.getSelectionModel().getSelections();
             var recordsToAdd = [],
@@ -819,6 +841,8 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
         }
 
         source = this.target.layerSources[data[idx][0]];
+        source.store.load();
+        this.selectedSource = source;
 
         var filters = this.createFilters();
         var capGridPanel = new Ext.grid.GridPanel({
@@ -826,10 +850,11 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
             width: 500,
             minSize: 350,
             autoScroll: true,
-            autoExpandColumn: "title",
             loadMask: true,
-            plugins: [expander, filters],
-            colModel: this.createColumnModel(expander),
+            plugins: [filters],
+            autoExpandColumn: "title",
+            forceFit: true,
+            colModel: this.createColumnModel(),
             listeners: {
                 rowdblclick: this.activePreview ? this.mapPreview : addLayers,
                 scope: this
@@ -1224,9 +1249,9 @@ Viewer.plugins.AddLayers = Ext.extend(gxp.plugins.AddLayers, {
         return this.filters;
     },
 
-    createColumnModel: function(expander) {
+    createColumnModel: function() {
         return new Ext.grid.ColumnModel([
-            expander, {
+            {
                 id: "title",
                 header: this.panelTitleText,
                 dataIndex: "title",

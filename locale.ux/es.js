@@ -782,6 +782,10 @@ GeoExt.Lang.add(
         formNameFieldValueText: "Nombre de la capa",
         formTemplateFieldText: "Norma a aplicar",
         formTemplateFieldValueText: "ISO 19119"
+    },
+
+    "Ext.LoadMask.prototype" : {
+        msg: "Cargando..."
     }
 
 });
