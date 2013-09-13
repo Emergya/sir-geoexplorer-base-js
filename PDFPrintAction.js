@@ -61,6 +61,12 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
      */
     pdfLogoUri : null,
 
+    /**
+     * api: config[northArrowPosition]
+     * How the north arrow will be placed. Acceptable values are "bottomRight", "topRight" and "topLeft".
+     */
+    northArrowPosition: "bottomRight",
+
     /** i18n * */
     /** api: config[buttonText]
      *  ``String`` Text to show button
@@ -211,7 +217,8 @@ gxp.plugins.PDFPrintAction = Ext.extend(gxp.plugins.Tool, {
             target: this.target,
             action: this,
             pdfFooterText: this.pdfFooterText,
-            pdfLogoUri: this.pdfLogoUri
+            pdfLogoUri: this.pdfLogoUri,
+            northArrowPosition: this.northArrowPosition
         });
         Viewer.registerComponent('PDFPrintWindow', ds);
         ds.show();

@@ -34,6 +34,12 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 	action: null,
 	printProvider: null,
 
+	/**
+	 * api: config[northArrowPosition]
+	 * How the north arrow will be placed. Acceptable values are "bottomRight", "topRight" and "topLeft".
+	 */
+	northArrowPosition: "bottomRight",
+
 	/** i18n * */
 	printText: 'Print',
 	closeText: "Close",
@@ -594,7 +600,8 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 
 		var imageName = this._getFormValue("northArrow");
 		if (imageName) {
-			this.printProvider.customParams.imageName = imageName;
+			// We set the arrow image name in a parameter named after the position we want to place it.
+			this.printProvider.customParams[this.northArrowPosition +"ArrowImageName"] = imageName;
 		}
 
 		this._previewMapPanel.print();

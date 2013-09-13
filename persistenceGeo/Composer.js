@@ -29,6 +29,13 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
      */
     publicWorkspace: "gore",
 
+    /**
+     * api: config[printingNorthArrowPosition]
+     * The position where the north arrow will be rendered in the map PDF printing functionality.
+     * Acceptable values are "topRight", "bottomRight" and "topLeft".
+     */
+    printingNorthArrowPosition: "bottomRight",
+
     // Begin i18n.
     mapText: "Map",
     saveMapText: "Save map",
@@ -169,7 +176,8 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             actionTarget: "map.tbar",
             toggleGroup: "globalToggle",
             pdfFooterText: this.pdfFooterText,
-            pdfLogoUri: this.logoDataUri
+            pdfLogoUri: this.logoDataUri,
+            northArrowPosition:  this.printingNorthArrowPosition
         }, {
             ptype: "gxp_zoomtoinitialvalues",
             id: "zoomToInitialValues",
