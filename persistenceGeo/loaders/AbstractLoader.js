@@ -120,6 +120,10 @@ PersistenceGeo.loaders.AbstractLoader =  Ext.extend(Ext.Component,
 			if(!!layerData.authId){
 				layer.metadata.authId = layerData.authId;
         	}
+        	// Metadata UUID for GN. @see RestLayerPublishController
+        	if(!!layerData.properties && !!layerData.properties.metadataUuid){
+        		layer.metadata.metadataUuid = layerData.properties.metadataUuid;
+        	}
             // All json formatted
             layer.metadata.json = layerData;
 		},

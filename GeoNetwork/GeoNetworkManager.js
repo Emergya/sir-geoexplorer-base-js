@@ -265,6 +265,7 @@ function initGNManager(){
                             hostUrl : GN_URL,
                             mdOverlayedCmpId : 'resultsPanel',
                             adminAppUrl : GN_URL + '/srv/' + lang + '/admin',
+                            //casEnabled: true,
                             // Declare default store to be used for records and
                             // summary
                             metadataStore : GeoNetwork.Settings.mdStore ? new GeoNetwork.Settings.mdStore()
@@ -278,7 +279,7 @@ function initGNManager(){
                             metadataShowFn : show
                         });
 
-    catalogue.login(GeoNetwork.Settings.username, GeoNetwork.Settings.password);
+    //catalogue.login(GeoNetwork.Settings.username, GeoNetwork.Settings.password);
 
      /**
              * Bottom bar
@@ -391,4 +392,62 @@ function initGNTranslations(lang){
     Ext.applyIf(defaultLang, GeoNetwork.Lang[lang]);
     OpenLayers.Lang[lang] = defaultLang;
     OpenLayers.Lang.setCode(lang);
+}
+
+GeoNetwork.loginGN = function(username, password){
+    var loginUrl = GN_URL + "/j_spring_security_check";
+
+    Ext.Ajax.request({
+        url : loginUrl + '../../j_spring_security_check',
+        params : {
+            username : username,
+            password : password
+        },
+        headers : {
+            "Content-Type" : "application/x-www-form-urlencoded"
+        },
+        success : function(){
+            if(catalogue){
+                catalogue.login(username, password);
+            }
+        },
+        failure : function(response){
+            console.error("Error in GN login");
+        },
+        scope : this
+    });
+
+    // Ext.Ajax.request({
+    //     url: logoutUrl,
+    //     headers: {Accept: 'application/json, text/javascript, */*; q=0.01'},
+    //     params : {
+    //         username: username,
+    //         password: password
+    //     },
+    //     method: 'POST'
+    // });
+
+    
+}
+
+GeoNetwork.logoutGN = function(){
+    Ext.Ajax.request({
+        url : GN_URL + '/j_spring_security_logout',
+        headers : {
+            "Content-Type" : "application/x-www-form-urlencoded"
+        },
+        success : function() {
+            if(catalogue){
+                catalogue.fireEvent('afterLogout', 
+                        catalogue, catalogue.identifiedUser);
+            }
+        },
+        failure : function() {
+            if(catalogue){
+                catalogue.fireEvent('afterBadLogout', 
+                    catalogue, catalogue.identifiedUser);
+            }
+    },
+        scope : this
+    });
 }

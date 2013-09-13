@@ -320,7 +320,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
         var newTools = this.defaultTools;
         if(!!config.tools){
             for(var i = 0 ; i< config.tools.length ; i++){
-                if(!config.tools[i].before){
+                if(!config.tools[i].before && !config.tools[i].replace){
                     newTools.push(config.tools[i]);
                 }else{
                     newTools = this.reOrderConfig(config.tools[i], newTools);
@@ -335,28 +335,50 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
      */
     reOrderConfig: function (newTool, newTools){
         var beforeConfig = newTool.before;
+        var replaceConfig = newTool.replace;
         var newToolIndex = newTools.length;
         for(var i = 0 ; i< newTools.length ; i++){
             var found = true;
-            for(var key in beforeConfig){
-                if(beforeConfig[key] != newTools[i][key]){
-                    found = false;
-                }
+            if(!!beforeConfig){
+                found = this.containsConfig(newTools[i], beforeConfig);
+            }else if(!!replaceConfig){
+                found = this.containsConfig(newTools[i], replaceConfig);
             }
             if(found){
                 newToolIndex = i;
                 break;
             }
         }
-        var previousTool = newTool;
-        delete previousTool.before; // not used in final config.
-        for(;newToolIndex < newTools.length ; newToolIndex++){
-            var tmpPreviousTool = newTools[newToolIndex];
+        var replace = !!newTool.replace;
+        delete newTool.before; // not used in final config.
+        delete newTool.replace; // not used in final config.
+        if(replace){
+            newTools[newToolIndex] = newTool;
+            return newTools;
+        }else{
+            var previousTool = newTool;
+            for(;newToolIndex < newTools.length ; newToolIndex++){
+                var tmpPreviousTool = newTools[newToolIndex];
+                newTools[newToolIndex] = previousTool;
+                previousTool = tmpPreviousTool;
+            }
             newTools[newToolIndex] = previousTool;
-            previousTool = tmpPreviousTool;
+            return newTools;
         }
-        newTools[newToolIndex] = previousTool;
         return newTools;
+    },
+
+    /** private: method[containsConfig]
+     *  Compare if all keys contained in ``compareConfig`` has the same value in ``config``
+     */
+    containsConfig: function(config, compareConfig){
+        var found = true;
+        for(var key in compareConfig){
+            if(compareConfig[key] != config[key]){
+                found = false;
+            }
+        }
+        return found;
     },
 
     /** private: method[changeBaseLayerProperty]

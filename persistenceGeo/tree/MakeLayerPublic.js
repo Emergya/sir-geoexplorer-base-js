@@ -103,6 +103,40 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.widgets.GeoNetwo
      */
     jsonData: null,
 
+    /** api: config[checkUserInfo]
+     *  ``Boolean``
+     *  Check user logged info to active this tool. Default it's true
+     */
+    checkUserInfo: true,
+
+    /** private: method[checkIfEnable]
+     *  :arg layerRec: ``GeoExt.data.LayerRecord``
+     *
+     *  Only enabled when the selected layer have metadata UUID
+     */
+    checkIfEnable: function(record) {
+
+        var disable = true;
+
+        if(record && record.getLayer()){
+          var layer = record.getLayer();
+          disable = !!layer.metadata && !!layer.metadata.metadataUuid;
+         
+            if (!disable && this.checkUserInfo) {
+                // Obtain user info from persistenceGeoContext
+                var userInfo = this.target.persistenceGeoContext.userInfo;
+                if(!userInfo || !userInfo.id){
+                    disable = true;
+                } else {
+                    // Only for the owned layers of not admin users
+                    disable = userInfo.admin || !app.persistenceGeoContext.isOwner(layer);
+                }
+            }
+        }
+
+        this.launchAction.setDisabled(disable); 
+    },
+
     /** private: method[constructor]
      *  Contructor method.
      */
@@ -115,6 +149,7 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.widgets.GeoNetwo
         this.on({
             validate: this.validateForm,
             obtaindata: this.obtainCommonData,
+            editorpanelaction: this.onEditorPanelAction,
             scope: this
         });
 
@@ -136,7 +171,12 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.widgets.GeoNetwo
              *
              *  True if the form data is valid or false otherwise
              */
-            "validate"
+            "validate",
+
+            /** api: event[editorpanelaction]
+             *  Called when an action in the editor panel is called
+             */
+            "editorpanelaction"
         );
     },
 
@@ -196,6 +236,8 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.widgets.GeoNetwo
                 this.targetWindow.close();
                 delete this.targetWindow;
             }
+            this.selectedTargetId = null;
+            this.selectedTargetName = null;
             this.closing = false;
         }
     },
@@ -412,8 +454,16 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.widgets.GeoNetwo
                 contact_phone: this.target.persistenceGeoContext.userInfo.telefono,
                 contact_mail: this.target.persistenceGeoContext.userInfo.email,
                 contact_country: this.defaultCountry,
-                // Online info
-                online_url: layerUrl
+                // Author info
+                author_name: this.target.persistenceGeoContext.userInfo.nombreCompleto,
+                author_group: this.target.persistenceGeoContext.userInfo.authority,
+                author_phone: this.target.persistenceGeoContext.userInfo.telefono,
+                author_mail: this.target.persistenceGeoContext.userInfo.email,
+                author_country: this.defaultCountry,
+                // Online (download) info
+                online_url: layerUrl,
+                // Online (get map) url
+                get_map_url: layerUrl
             }
         };
         return this.getJsonData();
@@ -461,15 +511,61 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.widgets.GeoNetwo
             height: mapPanelSize.height
         });
 
-        console.log("create = "+create);
-
         editorWindow.show();
         editorPanel.init(metadataId, create, group, child);
         editorPanel.doLayout(false);
 
         //editorPanel.initWithController(this);
 
-    }
+    },
+
+    saveUrl: '/persistenceGeo/saveLayerPublishRequest',
+
+    onEditorPanelAction: function (action, arg1){
+        console.log("Action --> "+action);
+        if(action == "finish"){
+
+            var targetFolder = this.jsonData.activeAction == this.KNOWN_ACTIONS.NEW_LAYER ?
+                this.jsonData.selectedTargetId : null;
+            var targetLayer = this.jsonData.activeAction == this.KNOWN_ACTIONS.UPDATE_LAYER ?
+                this.jsonData.selectedTargetId : null;
+            this.jsonData.metadataUuid = arg1;
+            Ext.Ajax.request({
+                url : this.target.defaultRestUrl + this.saveUrl,
+                params:{
+                    layerId: this.jsonData.layerSelected.getLayer().layerID,
+                    layerName: this.jsonData.name,
+                    metadataUrl: this.jsonData.metadataUuid,
+                    targetFolder: targetFolder,
+                    targetLayer: targetLayer
+                },
+                method: 'POST',
+                success : this.handleSuccess,
+                failure : this.handleFailure,
+                scope : this
+            });
+        }
+    },
+
+    handleSuccess: function(response){
+        if(response.responseText){
+            var jsonData = Ext.decode(response.responseText);
+            if(!jsonData.success){
+                this.handleFailure(jsondata);
+            }else{
+                var layer = this.jsonData.layerSelected.getLayer();
+                if(!layer.metadata){
+                    layer.metadata = {};
+                }
+                layer.metadata.metadataUuid = this.jsonData.metadataUuid;
+            }
+        }
+        console.log(response);
+    },
+
+    handleFailure: function(response){
+
+    },
 
 });
 
