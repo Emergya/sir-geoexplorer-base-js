@@ -210,7 +210,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
             width: 500,
             uploadSource: "local",
             // We only show in the layer selector the layers in the public workspace
-            customLocalSourceURL: this.geoserverBaseurl+"/"+this.publicWorkspace+"/wms?request=GetCapabilities"
+            customLocalSourceURL: this.geoserverBaseurl+"/wms?request=GetCapabilities&namespace="+this.publicWorkspace
         }, {
             ptype: 'gxp_extendedtoolbar',
             buttonText: 'Exportar',
