@@ -18,7 +18,7 @@
  */
 
 /**
- * @requires GeoNetwork/windows/BaseWindow.js
+ * requires GeoNetwork/windows/BaseWindow.js
  */ 
 
 Ext.namespace('GeoNetwork');

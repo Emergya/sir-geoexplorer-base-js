@@ -18,7 +18,7 @@
  */
 
 /**
- * @requires GeoNetwork/lang/nl.js
+ * requires GeoNetwork/lang/nl.js
  */
 
 Ext.namespace('GeoNetwork', 'GeoNetwork.wms');

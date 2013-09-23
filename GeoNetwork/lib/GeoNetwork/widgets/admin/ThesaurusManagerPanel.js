@@ -23,7 +23,7 @@
 Ext.namespace('GeoNetwork.admin');
 
 /**
- * @require Catalogue.js
+ * require Catalogue.js
  */
 /** api: (define)
  *  module = GeoNetwork.admin

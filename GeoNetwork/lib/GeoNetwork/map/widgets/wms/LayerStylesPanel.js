@@ -18,7 +18,7 @@
  */
 
 /**
- * @requires GeoNetwork/widgets/wms/PreviewPanel.js
+ * requires GeoNetwork/widgets/wms/PreviewPanel.js
  */
 
 Ext.namespace('GeoNetwork', 'GeoNetwork.wms');

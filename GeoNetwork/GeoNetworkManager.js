@@ -26,15 +26,14 @@
 
 
 /**
- * @required  ext-ux/DateTime/DateTime.js
- * @required  OpenLayers/Handler/RegularPolygon.js
- * @required  OpenLayers/LoadingPanel.js
- * @required  OpenLayers/ScaleBar.js
- * @required  OpenLayers/Format/GeoNetworkRecords.js
- * @required  OpenLayers/Format/CSWGetRecords/v2_0_2_GeoNetwork.js
- * @required  GeoNetwork/Settings.js
- * @required  GeoNetwork/Templates.js
- * @required  GeoNetwork/lib/GeoNetwork.js
+ * required  ext-ux/DateTime/DateTime.js
+ * required  OpenLayers/Handler/RegularPolygon.js
+ * required  OpenLayers/LoadingPanel.js
+ * required  OpenLayers/ScaleBar.js
+ * required  OpenLayers/Format/GeoNetworkRecords.js
+ * required  OpenLayers/Format/CSWGetRecords/v2_0_2_GeoNetwork.js
+ * required  GeoNetwork/Settings.js
+ * required  GeoNetwork/Templates.js
  */
 
 // Common catalogue var for GN widgets
