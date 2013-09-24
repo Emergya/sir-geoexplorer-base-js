@@ -103,7 +103,10 @@ GeoNetwork.editor.LinkedMetadataPanel = Ext.extend(Ext.Panel, {
          *  Define configuration per schema. For ISO19139 profiles, all relations are displayed.
          */
         resourcesTypesCfg: {
-            iso19139: ['thumbnail', 'onlinesrc', 'parent', 'children', 'service', 'dataset', 'sources', 'fcats', 'sibling'],
+            iso19139: ['thumbnail'
+                // TODO: Fix integration
+                //,'onlinesrc', 'parent', 'children', 'service', 'dataset', 'sources', 'fcats', 'sibling'
+                ],
 //            'iso19139.xyz': ['thumbnail', 'parent', 'children', 'service', 'dataset', 'fcats', 'sibling'],
             'dublin-core': ['children']
         },

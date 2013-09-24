@@ -84,9 +84,17 @@ PersistenceGeo.widgets.GeoNetworkEditorToolbar = Ext.extend(GeoNetwork.editor.Ed
             },
             scope: this.editor
         });
+
+        var saveAndCloseText = OpenLayers.i18n('saveAndClose');
+        if(this.editor 
+            && this.editor.controller
+            && this.editor.controller.isUpdate){
+            //TODO: i18n
+            saveAndCloseText = 'Aprobar';
+        }
         
         this.saveAndCloseAction = new Ext.Action({
-            text: OpenLayers.i18n('saveAndClose'),
+            text: saveAndCloseText,
             iconCls: 'quitMetadata',
             handler: function(){
                 this.finish();
@@ -136,8 +144,26 @@ PersistenceGeo.widgets.GeoNetworkEditorToolbar = Ext.extend(GeoNetwork.editor.Ed
             scope: this.editor
         });
         
-        cmp.push(this.createViewMenu(), ['-'], this.saveAction, this.checkAction, this.saveAndCloseAction, this.minorCheckbox, 
-                ['->'], this.resetAction, this.cancelAction, this.configMenu());
+        // TODO: Customize more!
+        cmp.push(
+                this.createViewMenu(), 
+                ['-'], 
+                //this.saveAction, 
+                this.saveAndCloseAction
+                //, 
+                //this.minorCheckbox, 
+                //['->'], this.resetAction
+                );
+
+        if(this.editor 
+            && this.editor.controller
+            && this.editor.controller.isUpdate){
+            cmp.push(this.cancelAction);
+        }else{
+             cmp.push( 
+                this.checkAction);
+        }
+        cmp.push(['->'], this.configMenu());
 
         GeoNetwork.editor.EditorToolbar.superclass.initComponent.call(this);
         

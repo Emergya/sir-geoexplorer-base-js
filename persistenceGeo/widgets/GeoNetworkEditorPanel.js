@@ -122,7 +122,7 @@ PersistenceGeo.widgets.GeoNetworkEditorPanel = Ext.extend(GeoNetwork.editor.Edit
         
         var tbarConfig = {editor: panel};
         Ext.apply(tbarConfig, this.tbarConfig);
-        this.toolbar = new GeoNetwork.editor.EditorToolbar(tbarConfig);
+        this.toolbar = new PersistenceGeo.widgets.GeoNetworkEditorToolbar(tbarConfig);
         
         var editorPanel = {
             region: 'center',
@@ -176,8 +176,9 @@ PersistenceGeo.widgets.GeoNetworkEditorPanel = Ext.extend(GeoNetwork.editor.Edit
             minWidth: 280,
             width: 280,
             items: [
+                // TODO: Fix integration and uncomment panels!!
                 this.relationPanel, 
-                this.suggestionPanel,
+                // this.suggestionPanel,
                 this.validationPanel, 
                 this.helpPanel]
         };
@@ -251,7 +252,10 @@ PersistenceGeo.widgets.GeoNetworkEditorPanel = Ext.extend(GeoNetwork.editor.Edit
     finish: function(){
         PersistenceGeo.widgets.GeoNetworkEditorPanel.superclass.finish.call(this);
         if (this.controller){
-            this.controller.fireEvent('editorpanelaction', 'finish', this.relationPanel.metadataUuid);
+            this.controller.fireEvent('editorpanelaction', 'finish', {
+                metadataUuid: this.relationPanel.metadataUuid,
+                metadataId: this.metadataId
+            });
         }
     },
     /** api: method[save]
@@ -261,7 +265,10 @@ PersistenceGeo.widgets.GeoNetworkEditorPanel = Ext.extend(GeoNetwork.editor.Edit
     save: function(){
         PersistenceGeo.widgets.GeoNetworkEditorPanel.superclass.save.call(this);
         if (this.controller){
-            this.controller.fireEvent('editorpanelaction', 'finish');
+            this.controller.fireEvent('editorpanelaction', 'finish', {
+                metadataUuid: this.relationPanel.metadataUuid,
+                metadataId: this.metadataId
+            });
         }
     },
     callAction: function(action){
@@ -278,7 +285,10 @@ PersistenceGeo.widgets.GeoNetworkEditorPanel = Ext.extend(GeoNetwork.editor.Edit
     validate: function(){
         PersistenceGeo.widgets.GeoNetworkEditorPanel.superclass.validate.call(this);
         if (this.controller){
-            this.controller.fireEvent('editorpanelaction', 'validate');
+            this.controller.fireEvent('editorpanelaction', 'validate', {
+                metadataUuid: this.relationPanel.metadataUuid,
+                metadataId: this.metadataId
+            });
         }
     },
     /** api: method[reset]
@@ -298,7 +308,10 @@ PersistenceGeo.widgets.GeoNetworkEditorPanel = Ext.extend(GeoNetwork.editor.Edit
     cancel: function(){
         PersistenceGeo.widgets.GeoNetworkEditorPanel.superclass.cancel.call(this);
         if (this.controller){
-            this.controller.fireEvent('editorpanelaction', 'cancel');
+            this.controller.fireEvent('editorpanelaction', 'cancel', {
+                metadataUuid: this.relationPanel.metadataUuid,
+                metadataId: this.metadataId
+            });
         }
     }
 
