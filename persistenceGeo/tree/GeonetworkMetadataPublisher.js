@@ -56,8 +56,16 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
     formNameFieldText: "Target name",
     formNameFieldValueText: "Name of the layer",
     metadataWindowText: "Metadata for layer {0} publish request",
-    targetLayerWindowTitleText: "Target layer",
+    metadataEditorTitle: "Metadata editor",
+    targetLayerWindowTitleText: "Layer to be updated",
     targetFolderWindowTitleText: "Target folder",
+    validationErrorsTitle: "Validation errors",
+    noLayerSelectedError: "A layer must be selected.",
+    noValidActionSelectedError: "An action must be selected.",
+    noValidTargetFolderError: "A target folder must be selected",
+    noValidTargetLayerError: "A layer to be updated must be selected",
+    noDesiredNameSetError: "A name for the layer to be published must be selected",
+
 
     /**
      * api: config[formActionFieldPosibleValues]
@@ -442,11 +450,41 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
      *  True if the form data is valid or false otherwise
      */
     validateForm: function(){
-        return this.layerSelected && this.selectedTargetId && this.selectedTargetName 
-            && this.nameField && this.nameField.getValue() && this.activeAction 
-            && (this.KNOWN_ACTIONS.NEW_LAYER == this.activeAction 
-                || this.KNOWN_ACTIONS.UPDATE_LAYER == this.activeAction);
-    }, 
+
+        var errors = [];
+        
+        if(!this.layerSelected) {
+            errors.push(this.noLayerSelectedError);
+        }
+
+
+        if(!this.activeAction || (this.KNOWN_ACTIONS.NEW_LAYER != this.activeAction 
+                && this.KNOWN_ACTIONS.UPDATE_LAYER != this.activeAction)) {
+            errors.push(this.noValidActionSelectedError);
+        }
+
+        if(!this.nameField || !this.nameField.getValue()) {
+            this.nameField.isValid();
+            errors.push(this.noDesiredNameSetError);
+        }
+
+        if(!this.selectedTargetId || !this.selectedTargetName) {
+            if(this.KNOWN_ACTIONS.NEW_LAYER == this.activeAction){
+                errors.push(this.noValidTargetFolderError);
+            } else {
+                errors.push(this.noValidTargetLayerError);
+            }
+        }
+
+        
+
+        if (errors.length>0) {
+            Ext.Msg.alert(this.validationErrorsTitle, errors.join('<br>'));
+            return false;
+        }
+
+        return true;
+    },
 
     defaultCountry: 'España',
 
@@ -576,7 +614,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
         }
 
         var editorWindow = new Ext.Window({
-            title: "Metadata editor", items:[editorPanel],
+            title: this.metadataEditorTitle, items:[editorPanel],
             closeAction: 'close',
             width: width,
             height: height

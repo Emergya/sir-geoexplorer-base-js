@@ -46,12 +46,12 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
     ptype: "pgeo_confirmlayerpublic",
 
     /** i18n **/
-    toolText: 'Confirm or cancel',
-    toolTooltipText: 'Confirm or cancel a layer request publish',
+    toolText: 'Confirm or reject publish request',
+    toolTooltipText: 'Confirms or rejects a layer request publish',
     toolWindowText: "Layer {0} publish request confirmation",
-    cancelButtonText: 'Confirm cancel',
-    commentFieldLabelText: 'Comment',
-    cancelWindowText: 'Cancel \'{0}\' publish',
+    cancelButtonText: 'Confirm rejection',
+    commentFieldLabelText: 'Rejection reasons',
+    cancelWindowText: 'Reject publication of \'{0}\'',
 
     /** Save url for the layer publish request **/
     saveUrl: '/persistenceGeo/confirmPublishRequest',
@@ -84,7 +84,7 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
           }
         }
 
-        this.launchAction.setDisabled(disable); 
+        this.launchAction.setDisabled(disable);
     },
 
     /**

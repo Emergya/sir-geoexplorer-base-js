@@ -768,21 +768,56 @@ GeoExt.Lang.add(
         persistentDeletionConfirmTitleText: 'Borrar Capa',
         persistentDeletionConfirmQuestionText: 'La capa se eliminará permanentemente del servidor.<br><br>¿Realmente desea borrar la capa?',
         persistentDeletionContinueBtnText: "Borrar capa",
-        persistentDeletionCancelBtnText: "No borrar capa",
+        persistentDeletionCancelBtnText: "No borrar capa"
     },
 
     'PersistenceGeo.tree.MakeLayerPublic.prototype':  {
-        toolText: "Publicar",
-        toolTooltipText: "Publica la capa",
-        toolWindowText: "Publicaci\u00f3n de capa {0}",
-        toolIconCls: 'gxp-icon-savelayers',
-        formActionFieldText: "Accion a realizar",
+        toolText: "Solicitar publicación",
+        toolTooltipText: "Solicita la publicación de la capa",
+        toolWindowText: "Publicación de la capa '{0}'",
+        formActionFieldText: "Acción a realizar",
         formActionFieldValueText: "Publicar nueva capa",
         formNameFieldText: "Nombre deseado",
         formNameFieldValueText: "Nombre de la capa",
         formTemplateFieldText: "Norma a aplicar",
         formTemplateFieldValueText: "ISO 19119"
     },
+
+    "PersistenceGeo.tree.ConfirmLayerPublic.prototype": {
+        toolText: 'Confirma o rechaza publicación',
+        toolTooltipText: 'Confirma o rechaza la solicitud de publicación de un usuario',
+        toolWindowText: "Confirmación de la publicación de la capa  '{0}'",
+        cancelButtonText: 'Confirmar rechazo',
+        commentFieldLabelText: 'Motivos del rechazo',
+        cancelWindowText: 'Rechazar publicación de \'{0}\''
+    },
+
+    'PersistenceGeo.tree.GeoNetworkMetadataPublisher.prototype' : {
+        toolText: "Publicar",
+        toolTooltipText: "Crear una solicitud de publicación",
+        toolWindowText: "Solicitud de publicación de la capa '{0}'",
+        formActionFieldText: "Target action",
+        formNameFieldText: "Target name",
+        formNameFieldValueText: "Name of the layer",
+        metadataWindowText: "Metadatos para la capa '{0}'",
+        targetLayerWindowTitleText: "Capa a actualizar",
+        targetFolderWindowTitleText: "Carpeta de destino",
+        formActionFieldPosibleValues: ["Publicar nueva capa", "Actualizar capa"],
+         metadataEditorTitle: "Metadatos de la Capa",
+        validationErrorsTitle: "Errores de validación",
+        noLayerSelectedError: "No hay capa seleccionada.",
+        noValidActionSelectedError: "Debe seleccionar la acción a realizar",
+        noValidTargetFolderError: "Debe seleccionar la carpeta donde se publicará la capa.",
+        noValidTargetLayerError: "Debe seleccionar la capa que se quiere actualizar.",
+        noDesiredNameSetError: "Debe introducir el nombre de la capa a publicar."
+    },
+
+    "PersistenceGeo.tree.GeonetworkMetadataViewer.prototype": {
+        toolText: 'Mostrar metadatos',
+        toolTooltipText: 'Muestra los metadatos de la capa seleccionada',
+        toolWindowText: "Metadatos de la capa '{0}'"
+    },
+    
 
     "Ext.LoadMask.prototype" : {
         msg: "Cargando..."

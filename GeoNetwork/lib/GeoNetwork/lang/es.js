@@ -637,7 +637,10 @@ GeoNetwork.Lang.es = {
     'linklabel-text/plain': 'Web link',
     'linklabel-image/png': 'Image link',
     'linklabel-image/jpeg': 'Image link',
-    'linklabel-': 'Link'
+    'linklabel-': 'Link',
+
+    "metadatatype": "Tipo de metadatos",
+    "tplTitle": "Título de la plantilla"
 };
 
 OpenLayers.Util.extend(OpenLayers.Lang.es, GeoNetwork.Lang.es);

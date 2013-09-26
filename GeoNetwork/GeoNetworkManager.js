@@ -394,10 +394,10 @@ function initGNTranslations(lang){
 }
 
 GeoNetwork.loginGN = function(username, password){
-    var loginUrl = GN_URL + "/j_spring_security_check";
+    var loginUrl = GN_URL+ "/j_spring_security_check";
 
     Ext.Ajax.request({
-        url : loginUrl + '../../j_spring_security_check',
+        url : loginUrl,// + '../../j_spring_security_check',
         params : {
             username : username,
             password : password

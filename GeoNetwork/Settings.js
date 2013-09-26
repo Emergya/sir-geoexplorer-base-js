@@ -7,8 +7,8 @@ var cookie = new Ext.state.CookieProvider({
             + (1000 * 60 * 60 * 24 * 365))
 });
 
-// var GN_URL = '../../../geonetwork';
-var GN_URL = 'http://localhost/geonetwork';
+var GN_URL = '../../../geonetwork';
+//var GN_URL = 'http://localhost/geonetwork';
 
 
 GeoNetwork.Settings = {};

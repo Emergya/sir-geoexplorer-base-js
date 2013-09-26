@@ -59,8 +59,13 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetworkM
 
         if(record && record.getLayer()){
           var layer = record.getLayer();
+
+          var tmpLayer = typeof(layer.layerID) == "undefined" && layer.metadata && layer.metadata.temporal;
+          
           var userInfo = this.target.persistenceGeoContext.userInfo;
-          if(!!userInfo && !userInfo.admin){
+          var layerOwned =  !tmpLayer &&  !!userInfo && !userInfo.admin && !!layer.authId && userInfo.authorityId == layer.authId;
+
+          if(layerOwned){
               this.layerSelected = record;
               if(layer.metadata && layer.metadata.json
                     && layer.metadata.json.properties){
