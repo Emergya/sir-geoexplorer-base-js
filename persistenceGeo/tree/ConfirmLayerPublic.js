@@ -76,7 +76,7 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
         if(record && record.getLayer()){
           var layer = record.getLayer();
           var userInfo = this.target.persistenceGeoContext.userInfo;
-          if(userInfo.admin){
+          if(!!userInfo && userInfo.admin){
               this.layerSelected = record;
               this.layerUuid = layer.metadata.metadataUuid;
               var pending = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'ESTADO'] == "PENDIENTE";
@@ -271,7 +271,7 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
         if(response.responseText){
             var jsonData = Ext.decode(response.responseText);
             if(!jsonData.success){
-                this.handleFailure(jsondata);
+                this.handleFailure(jsonData);
             }else{
                 var layer = this.jsonData.layerSelected.getLayer();
                 if(!layer.metadata){

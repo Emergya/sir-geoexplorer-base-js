@@ -48,6 +48,34 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetworkM
     /** Save url for the layer publish request **/
     saveUrl: '/persistenceGeo/saveLayerPublishRequest',
 
+    /** private: method[checkIfEnable]
+     *  :arg layerRec: ``GeoExt.data.LayerRecord``
+     *
+     *  Only enabled when the selected layer have metadata UUID and the user logged is admin
+     */
+    checkIfEnable: function(record) {
+
+        var disable = true;
+
+        if(record && record.getLayer()){
+          var layer = record.getLayer();
+          var userInfo = this.target.persistenceGeoContext.userInfo;
+          if(!!userInfo && !userInfo.admin){
+              this.layerSelected = record;
+              if(layer.metadata && layer.metadata.json
+                    && layer.metadata.json.properties){
+                  this.layerUuid = layer.metadata.metadataUuid;
+                  var metadataId = layer.metadata.json.properties.metadataId;
+                  disable = !!metadataId;
+              }else{
+                disable = false;
+              }
+          }
+        }
+
+        this.launchAction.setDisabled(disable); 
+    },
+
     /** api: method[onEditorPanelAction]
      *  :param action: ``String`` action called in editor panel
      *  :param arg1: ``Object`` optional parameter from the panel (UUID, for example)
@@ -98,7 +126,10 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetworkM
                     layer.metadata = {};
                 }
                 layer.metadata.metadataUuid = this.jsonData.metadataUuid;
+                layer.metadata.metadataId = this.jsonData.metadataId;
                 //TODO: Change condition
+
+                this.launchAction.setDisabled(true); 
             }
         }
     },
