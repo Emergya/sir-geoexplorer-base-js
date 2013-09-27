@@ -151,12 +151,20 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
      */
     onEditorPanelAction: function (action, arg1){
         if(action == "finish" || action =="validate"){
+            
             // Action 'finish' | 'validate' --> save
             var targetFolder = this.jsonData.activeAction == this.KNOWN_ACTIONS.NEW_LAYER ?
                 this.jsonData.selectedTargetId : null;
             var targetLayer = this.jsonData.activeAction == this.KNOWN_ACTIONS.UPDATE_LAYER ?
                 this.jsonData.selectedTargetId : null;
-            this.jsonData.metadataUuid = arg1;
+
+            // save metadata id and Uuid
+            this.jsonData.metadataUuid = arg1.metadataUuid;
+            this.jsonData.metadataId = arg1.metadataId;
+
+            // publish metadata!!
+            this.makeMetadataPublic();
+
             Ext.Ajax.request({
                 url : this.target.defaultRestUrl + this.saveUrl,
                 params:{
@@ -280,6 +288,38 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
                 layer.metadata.metadataUuid = this.jsonData.metadataUuid;
             }
         }
+    },
+
+    /** This function make the metadata public!! **/
+    makeMetadataPublic: function(){
+
+        var firstUrl = GN_URL + '/srv/eng/metadata.select?id='+this.jsonData.metadataUuid + '&selected=add';
+        var secondUrl = GN_URL + '/srv/eng/metadata.batch.admin.form';
+        var thirdUrl = GN_URL + '/srv/eng/metadata.batch.update.privileges?&timeType=on&_1_0=on&_0_0=on&_-1_0=on';
+
+        Ext.Ajax.request({
+            url : firstUrl,
+            method: 'GET',
+            success : function(){
+                 Ext.Ajax.request({
+                    url : secondUrl,
+                    method: 'GET',
+                    success : function(){
+                       Ext.Ajax.request({
+                            url : thirdUrl,
+                            method: 'GET',
+                            disableCaching: false, //we need this parameter because gn try to parse _dc as _${idGropup}
+                            success : function(){
+                                //console.log("OK!!");
+                            },
+                            scope : this
+                        }); 
+                    },
+                    scope : this
+                });
+            },
+            scope : this
+        });
     },
 
     handleFailure: function(response){
