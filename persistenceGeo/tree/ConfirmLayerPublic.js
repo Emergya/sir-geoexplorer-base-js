@@ -155,8 +155,7 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
      *  For this widget we need to save the layer changes in a gis_layer_publish_request entry
      *  calling to this.saveUrl
      */
-<<<<<<< HEAD
-    onEditorPanelAction: function(action, metadataUuid) {
+    onEditorPanelAction: function(action, arg1) {
         if (action == "doPublication") {
 
             var self  =this;
@@ -166,37 +165,8 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
                     return;
                 }
 
-                self._doPublicationRequest(metadataUuid);
-=======
-    onEditorPanelAction: function (action, arg1){
-        if(action == "finish" || action =="validate"){
-            
-            // Action 'finish' | 'validate' --> save
-            var targetFolder = this.jsonData.activeAction == this.KNOWN_ACTIONS.NEW_LAYER ?
-                this.jsonData.selectedTargetId : null;
-            var targetLayer = this.jsonData.activeAction == this.KNOWN_ACTIONS.UPDATE_LAYER ?
-                this.jsonData.selectedTargetId : null;
-
-            // save metadata id and Uuid
-            this.jsonData.metadataUuid = arg1.metadataUuid;
-            this.jsonData.metadataId = arg1.metadataId;
-
-            // publish metadata!!
-            this.makeMetadataPublic();
-
-            Ext.Ajax.request({
-                url : this.target.defaultRestUrl + this.saveUrl,
-                params:{
-                    layerPublishRequestId: this.jsonData.layerPublishRequestId
-                },
-                method: 'POST',
-                success : this.handleSuccess,
-                failure : this.handleFailure,
-                scope : this
->>>>>>> 4f524f694af37ec77d0b23a0f19ebc2384a90b0b
+                self._doPublicationRequest(arg1);    
             });
-
-
         } else if (action == "cancel") {
             this.showCancelWindow();
         } else if (action == "reset") {
@@ -204,13 +174,17 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
         }
     },
 
-    _doPublicationRequest: function(metadataUuid) {
+    _doPublicationRequest: function(arg1) {
          // Action 'finish' | 'validate' --> save
         var targetFolder = this.jsonData.activeAction == this.KNOWN_ACTIONS.NEW_LAYER ?
             this.jsonData.selectedTargetId : null;
         var targetLayer = this.jsonData.activeAction == this.KNOWN_ACTIONS.UPDATE_LAYER ?
             this.jsonData.selectedTargetId : null;
-        this.jsonData.metadataUuid = metadataUuid;
+        
+        // save metadata id and Uuid
+        this.jsonData.metadataUuid = arg1.metadataUuid;
+        this.jsonData.metadataId = arg1.metadataId;
+        
         Ext.Ajax.request({
             url: this.target.defaultRestUrl + this.saveUrl,
             params: {
