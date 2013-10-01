@@ -85,7 +85,13 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
             if ( !! userInfo && userInfo.admin) {
                 this.layerSelected = record;
                 this.layerUuid = layer.metadata.metadataUuid;
-                var pending = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'ESTADO'] == "PENDIENTE";
+                var pending = false;
+                if(!!layer.metadata.json.properties){
+                    var status = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'ESTADO'];
+                    if(!!status && status =="PENDIENTE") {
+                        pending = true;
+                    }
+                }
                 disable = !this.layerUuid && !pending;
             }
         }
