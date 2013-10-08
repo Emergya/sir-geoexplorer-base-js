@@ -134,6 +134,8 @@ PersistenceGeo.widgets.FolderTreePanel = Ext.extend(Ext.tree.TreePanel, {
     /* Array of items to be refresh in panel reload */
     itemsArray: [],
 
+    LEAF_ID_OFFSET: 1000000,
+
     constructor: function (config) {
 
         Ext.apply(this, config);
@@ -169,7 +171,7 @@ PersistenceGeo.widgets.FolderTreePanel = Ext.extend(Ext.tree.TreePanel, {
                             var nodeIsLeaf = json.data[i].leaf;
                             var id= json.data[i].id;
                             if(nodeIsLeaf) {
-                                id+=10000000;
+                                id+=this.LEAF_ID_OFFSET;
                             }
                             // Filter by node types
                             var append = !this.nodeTypesAllowed || 
@@ -183,9 +185,10 @@ PersistenceGeo.widgets.FolderTreePanel = Ext.extend(Ext.tree.TreePanel, {
                                     data: json.data[i].data
                                 }));
 
-                                this.onNodeLoaded(treeLoader, node, action.responseText);
+                               
                             }
                         }
+                         this.onNodeLoaded(treeLoader, node, action.responseText);
                     },
                     scope: this
                 }

@@ -43,6 +43,7 @@ PersistenceGeo.widgets.GeoNetworkEditorToolbar = Ext.extend(GeoNetwork.editor.Ed
     doPublicationText : "Allow publication",
     requestPublicationText: "Request publication",
     rejectPublicationText: "Reject publication",
+    validateText: "Validate",
 
     defaultConfig: {
         isTemplate: false,
@@ -69,6 +70,14 @@ PersistenceGeo.widgets.GeoNetworkEditorToolbar = Ext.extend(GeoNetwork.editor.Ed
             cmp.push(this.createTypeMenu());
             cmp.push(['-']);
         }
+
+        this.validateAction = new Ext.Action({
+            text: this.validateText,
+            scope:this.editor,
+            handler : function(){
+                this.validate();
+            }
+        });
         
         this.saveAction = new Ext.Action({
             text: OpenLayers.i18n('save'),
@@ -91,16 +100,23 @@ PersistenceGeo.widgets.GeoNetworkEditorToolbar = Ext.extend(GeoNetwork.editor.Ed
 
         this.requestPublishAction = new Ext.Action({
             text: this.requestPublicationText,
-            // We
             handler: function(){
                 this.publicationRequest();
-            },         
+            },
             scope: this.editor
         });
 
         this.rejectAction = new Ext.Action({
             text: this.rejectPublicationText,
-            // We
+            handler: function(){
+                this.doRejection();
+            },
+            scope: this.editor
+        });
+
+        this.cancelAction = new Ext.Action({
+           text: OpenLayers.i18n('cancel'),
+            iconCls: 'cancel',
             handler: function(){
                 this.cancel();
             },
@@ -112,7 +128,8 @@ PersistenceGeo.widgets.GeoNetworkEditorToolbar = Ext.extend(GeoNetwork.editor.Ed
         this._createLegacyActions();
 
 
-        cmp.push(this.createViewMenu());        
+        cmp.push(this.createViewMenu());
+        cmp.push(this.validateAction);
        
 
         if(this.editor 
@@ -124,7 +141,8 @@ PersistenceGeo.widgets.GeoNetworkEditorToolbar = Ext.extend(GeoNetwork.editor.Ed
              cmp.push( 
                 this.requestPublishAction);
         }
-        // cmp.push(['->'], this.configMenu());
+        
+        cmp.push(this.cancelAction);
 
         GeoNetwork.editor.EditorToolbar.superclass.initComponent.call(this);
         
@@ -176,14 +194,7 @@ PersistenceGeo.widgets.GeoNetworkEditorToolbar = Ext.extend(GeoNetwork.editor.Ed
             },
             scope: this.editor
         });
-        this.cancelAction = new Ext.Action({
-           text: OpenLayers.i18n('cancel'),
-            iconCls: 'cancel',
-            handler: function(){
-                this.cancel();
-            },
-            scope: this.editor
-        });
+        
     }
 
 

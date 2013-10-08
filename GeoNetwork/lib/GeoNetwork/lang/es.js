@@ -195,7 +195,7 @@ GeoNetwork.Lang.es = {
     'abstract':'Resumen',
     'catalogue':'Catálogo',
     'group':'Grupo',
-    'chooseGroup':'Seleccione un grupo de',
+    'chooseGroup':'Seleccione un grupo',
     'md':'Metadatos',
     'tpl':'Plantilla',
     'category':'Categoría',

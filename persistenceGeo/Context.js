@@ -208,10 +208,6 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
             filters = filters.join(",");
         }
         var normalizedIdChannel = idChannel;
-        if (idChannel > 10000000) {
-            normalizedIdChannel = normalizedIdChannel - 10000000;
-        }
-
         this.parser.loadFolderById(normalizedIdChannel, filters,
 
         function(form, action) {
@@ -245,9 +241,6 @@ PersistenceGeo.Context = Ext.extend(Ext.util.Observable, {
      */
     getChannelData: function(idChannel, onLoadLayers, onFailure) {
         var normalizedIdChannel = idChannel;
-        if (idChannel > 10000000) {
-            normalizedIdChannel = normalizedIdChannel - 10000000;
-        }
         this.parser.loadFolderById(normalizedIdChannel, false,
 
         function(form, action) {

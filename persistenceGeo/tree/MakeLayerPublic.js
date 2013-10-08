@@ -47,9 +47,17 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetworkM
 
     /** Save url for the layer publish request **/
     saveUrl: '/persistenceGeo/saveLayerPublishRequest',
+    checkUrl: '/persistenceGeo/checkCanCreateRequest',
 
+    
     savingRequestError: "An error was found while saving the publication request.",
     savingRequestSuccessMsg: "The publication request was registered successfully. It will be attended by an admin as soon as possible.",
+    publicationRequestText: "Publication Request",
+    checkError : "An error was found while checking if the publication is possible.",
+    existingPublicationRequestText: "There is already a publication request peding review for the selected layer, so no new publication requests for the layer can be made.",
+    confirmPublicationRequest: "Do you really want to request the publication of the layer with the current metadata?",
+    doPublicationRequestText:"Request publication",
+
 
     /** private: method[checkIfEnable]
      *  :arg layerRec: ``GeoExt.data.LayerRecord``
@@ -67,63 +75,116 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetworkM
           
           var userInfo = this.target.persistenceGeoContext.userInfo;
           var layerOwned =  !tmpLayer &&  !!userInfo && !userInfo.admin && !!layer.authId && userInfo.authorityId == layer.authId;
-
-          if(layerOwned){
-              this.layerSelected = record;
-              if(layer.metadata && layer.metadata.json
-                    && layer.metadata.json.properties){
-                  this.layerUuid = layer.metadata.metadataUuid;
-                  var metadataId = layer.metadata.json.properties.metadataId;
-                  disable = !!metadataId;
-              }else{
-                disable = false;
-              }
-          }
+          disable = !layerOwned;
         }
 
-        this.launchAction.setDisabled(disable); 
+        this.launchAction.setDisabled(disable);
+    },
+
+    /**
+     * We override the default action handler because we need to check in the server if
+     * there is already a publication request for the selected layer.
+     */
+    actionHandler : function() {
+        var record = this._selectedLayer;
+        if (record) {
+
+            var layer = record.getLayer();
+
+           Ext.Ajax.request({
+              url : this.target.defaultRestUrl + this.checkUrl,
+              params:{
+                  layerId: layer.layerID
+              },
+              method: 'POST',
+              success : this._onCheckSucess,
+              failure : this._onCheckFail,
+              scope : this
+          });
+        }
+    },
+    
+    _onCheckFail : function() {
+        Ext.Msg.alert("", this.checkError);
+    },
+
+    _onCheckSucess : function(response) {
+        if(!response.responseText){
+          this._onCheckFail();
+          return;
+        }
+
+        var jsonData = Ext.decode(response.responseText);
+        if(!jsonData.data){ // Contains a boolean indicating if the user can request the publication.            
+            Ext.Msg.alert(this.publicationRequestText,this.existingPublicationRequestText);
+            return;
+        }
+
+        this.showWindow(this._selectedLayer);
     },
 
     /** api: method[onEditorPanelAction]
      *  :param action: ``String`` action called in editor panel
-     *  :param arg1: ``Object`` optional parameter from the panel (UUID, for example)
+     *  :param metadataInfo: ``Object`` optional parameter from the panel (UUID, for example)
      *
      *  Called when an action is pressed in the editor panel. 
      *  For this widget we need to save the layer changes in a gis_layer_publish_request entry
      *  calling to this.saveUrl
      */
-    onEditorPanelAction: function (action, arg1){
+    onEditorPanelAction: function (action, metadataInfo){
         if(action =="publicationRequest"){
-            // Action 'validate' is perused so we can create the publication request.
-            var targetFolder = this.jsonData.activeAction == this.KNOWN_ACTIONS.NEW_LAYER ?
-                this.jsonData.selectedTargetId : null;
-            var targetLayer = this.jsonData.activeAction == this.KNOWN_ACTIONS.UPDATE_LAYER ?
-                this.jsonData.selectedTargetId : null;
-            this.jsonData.metadataUuid = arg1.metadataUuid;
-            this.jsonData.metadataId = arg1.metadataId;
+            Ext.Msg.show({
+                title: this.publicationRequestText,
+                msg:this.confirmPublicationRequest,
+                buttons: {
+                  "ok": this.doPublicationRequestText,
+                  "cancel": true
+                },
+                fn:function(btn) {
+                  if(btn!="ok") {
+                      return;
+                  }
+                  this._createPublicationRequest(metadataInfo);
+                },
+                scope:this
+            });
+           
+        } else if(action =="cancel"){
+            this.editorWindow.destroy();
+        }
+    },
+
+    _createPublicationRequest : function(metadataInfo) {
+        var targetFolder = this.requestData.activeAction == this.KNOWN_ACTIONS.NEW_LAYER ?
+                 this.requestData.targetId : null;
+            var targetLayer = this.requestData.activeAction == this.KNOWN_ACTIONS.UPDATE_LAYER ?
+                this.requestData.targetId : null;
+            this.jsonData.metadataUuid = metadataInfo.metadataUuid;
+            this.jsonData.metadataId = metadataInfo.metadataId;
+
+            this._createRequestMask = new Ext.LoadMask(Ext.getBody());
+            this._createRequestMask.show();
+
             Ext.Ajax.request({
                 url : this.target.defaultRestUrl + this.saveUrl,
                 params:{
                     layerId: this.jsonData.layerSelected.getLayer().layerID,
-                    layerName: this.jsonData.name,
+                    layerName:  this.requestData.layerTitle,
                     metadataUrl: this.jsonData.metadataUuid,
                     metadataId: this.jsonData.metadataId,
                     targetFolder: targetFolder,
                     targetLayer: targetLayer
                 },
                 method: 'POST',
+
                 success : this.handleSuccess,
                 failure : this.handleFailure,
                 scope : this
             });
-        }else if(action =="cancel"){
-            // Action 'cancel' -->  TODO: We need to remove the layer_request?!
-        }else if(action =="reset"){
-            // something todo if action is 'reset'
-        }
     },
 
     handleSuccess: function(response){
+        this._createRequestMask.hide();
         if(response.responseText){
             var jsonData = Ext.decode(response.responseText);
             if(!jsonData.success){
@@ -133,12 +194,10 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetworkM
                 if(!layer.metadata){
                     layer.metadata = {};
                 }
-                layer.metadata.metadataUuid = this.jsonData.metadataUuid;
-                layer.metadata.metadataId = this.jsonData.metadataId;
-                //TODO: Change condition
+               
 
-                Ext.Msg.alert("", this.savingRequestSuccessMsg);
-                this.launchAction.setDisabled(true); 
+                Ext.Msg.alert(this.publicationRequestText, this.savingRequestSuccessMsg);
+                this.launchAction.setDisabled(true);
 
                 this.editorWindow.destroy();
             }
@@ -146,8 +205,8 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetworkM
     },
 
     handleFailure: function(response){
-
-        Ext.Msg.alert("", this.savingRequestError);
+        this._createRequestMask.hide();
+        Ext.Msg.alert(this.publicationRequestText, this.savingRequestError);
     }
 
 });

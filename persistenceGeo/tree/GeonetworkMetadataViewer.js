@@ -82,11 +82,8 @@ PersistenceGeo.tree.GeonetworkMetadataViewer = Ext.extend(PersistenceGeo.widgets
         if(record && record.getLayer()){
           var layer = record.getLayer();
           this.layerSelected = record;
-          this.layerName = layer.layerLabel;
-          this.layerUuid = layer.metadata.metadataUuid;
-
-          if(!this.layerUuid 
-              &&layer.metadata.json
+          this.layerName = layer.name;
+          if(layer.metadata.json
               &&layer.metadata.json.properties
               &&layer.metadata.json.properties.metadataUuid){
             this.layerUuid = layer.metadata.json.properties.metadataUuid;
@@ -104,7 +101,7 @@ PersistenceGeo.tree.GeonetworkMetadataViewer = Ext.extend(PersistenceGeo.widgets
      */
     showWindow: function(layerRecord) {
 
-      var aResTab = new GeoNetwork.view.ViewPanel({
+      var aResTab = new PersistenceGeo.widgets.GeonetworkViewPanel({
             serviceUrl : catalogue.services.mdView + '?uuid=' + this.layerUuid,
             lang : catalogue.lang,
             autoScroll : true,
@@ -114,7 +111,7 @@ PersistenceGeo.tree.GeonetworkMetadataViewer = Ext.extend(PersistenceGeo.widgets
             padding : '5px 0',
             currTab : GeoNetwork.defaultViewMode || 'simple',
             printDefaultForTabs : GeoNetwork.printDefaultForTabs || false,
-            printUrl : '../../apps/html5ui/print.html',
+            printUrl : '/../geonetwork/apps/html5ui/print.html',
             catalogue : catalogue,
             // maximized: true,
             metadataUuid : this.layerUuid

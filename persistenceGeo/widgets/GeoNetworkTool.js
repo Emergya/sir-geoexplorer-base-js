@@ -88,12 +88,7 @@ PersistenceGeo.widgets.GeoNetworkTool = Ext.extend(gxp.plugins.Tool, {
                 iconCls: this.toolIconCls,
                 disabled: false,
                 tooltip: this.toolTooltipText,
-                handler: function() {
-                    var record = this._selectedLayer;
-                    if (record) {
-                        this.showWindow(record);
-                    }
-                },
+                handler: this.actionHandler,
                 scope: this
             }
         ]); 
@@ -115,6 +110,18 @@ PersistenceGeo.widgets.GeoNetworkTool = Ext.extend(gxp.plugins.Tool, {
         });
 
         return actions;
+    },
+
+    /**
+
+     * api: method[actionHandler]
+     * The handler of the tools action. Can be overriden by concrete tools to change default behaviour.
+     */
+    actionHandler : function() {
+        var record = this._selectedLayer;
+        if (record) {
+            this.showWindow(record);
+        }
     },
 
     /**

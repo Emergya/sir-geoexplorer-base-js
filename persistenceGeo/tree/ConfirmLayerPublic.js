@@ -51,7 +51,8 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
     toolWindowText: "Layer {0} publish request confirmation",
     cancelButtonText: 'Confirm rejection',
     commentFieldLabelText: 'Rejection reasons',
-    cancelWindowText: 'Reject publication of \'{0}\'',
+    rejectWindowTitleText: 'Reject layer publication',
+    publicationTitleText:"Layer publication",
     publicationSuccessText: 'The layer was published successfully.',
     rejectionSuccessText: "Publication of the layer was rejected successfully.",
     rejectionErrorText: "An error happened while rejecting the layer's publication.",
@@ -84,19 +85,29 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
             var userInfo = this.target.persistenceGeoContext.userInfo;
             if ( !! userInfo && userInfo.admin) {
                 this.layerSelected = record;
-                this.layerUuid = layer.metadata.metadataUuid;
                 var pending = false;
                 if(!!layer.metadata.json.properties){
-                    var status = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'ESTADO'];
+                    var status = layer.metadata.json.properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'ESTADO'];
                     if(!!status && status =="PENDIENTE") {
                         pending = true;
                     }
                 }
-                disable = !this.layerUuid && !pending;
+                disable = !!layer.layerID || !pending;
             }
         }
 
         this.launchAction.setDisabled(disable);
+    },
+
+    onTreeNodeLoaded: function(node, selectionModel) {
+       
+        node.expand();
+        node.expandChildNodes();
+
+        // We selected the recevided node if we are editing.
+        if (node.id == +this.selectedTargetId){
+            selectionModel.select(node);
+        }
     },
 
     /**
@@ -107,61 +118,30 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
     showWindow: function(layerRecord) {
         var layer = this.layerSelected.getLayer();
         //TODO: Handle errors!!!
-        var layerPublishRequestId = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'ID'];
-        var nameLayer = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'NOMBREDESEADO'];
-        this.activeAction = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'ACTUALIZACION'] == 'true' ?
+        var layerPublishRequestId = layer.metadata.json.properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'ID'];
+        var nameLayer = layer.metadata.json.properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'NOMBREDESEADO'];
+        this.activeAction = layer.metadata.json.properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'ACTUALIZACION'] == 'true' ?
             this.KNOWN_ACTIONS.UPDATE_LAYER : this.KNOWN_ACTIONS.NEW_LAYER;
-        var updatedLayerId = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'UPDATEDLAYERID'];
+        var updatedLayerId = layer.metadata.json.properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'UPDATEDLAYERID'];
         if (updatedLayerId) {
             this.selectedTargetId = updatedLayerId;
         } else {
             // The folder id comes as a string so we need to conver it.
-            this.selectedTargetId = +layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'PUBLISHEDFOLDER'];
+            this.selectedTargetId = +layer.metadata.json.properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'PUBLISHEDFOLDER'];
         }
         PersistenceGeo.tree.ConfirmLayerPublic.superclass.showWindow.call(this, layerRecord);
         this.nameField.setValue(this.getJsonData().name);
     },
 
-
-    /**
-     * private: method[getTargetWindow]
-     * Obtain folder tree panel window to select a layer
-     */
-    getTargetWindow: function(layerRecord, showLayers) {
-        var targetWindow = PersistenceGeo.tree.ConfirmLayerPublic.superclass.getTargetWindow.call(this, layerRecord, showLayers);
-
-        targetWindow.show();
-
-        var treePanel = targetWindow.items.get(targetWindow.items.keys[0]);
-        treePanel.on({
-            append: function(tree, parent, node, index) {
-                console.log("append");
-                node.on({
-                    render: function() {
-                        this.select();
-                        console.log(node)
-                    },
-                    scope: node
-                });
-            },
-            scope: this
-        });
-        console.log(treePanel);
-
-        treePanel.doLayout();
-
-        return targetWindow;
-    },
-
     /** api: method[onEditorPanelAction]
      *  :param action: ``String`` action called in editor panel
-     *  :param arg1: ``Object`` optional parameter from the panel (UUID, for example)
+     *  :param metadataInfo: ``Object`` optional parameter from the panel (UUID, for example)
      *
      *  Called when an action is pressed in the editor panel.
      *  For this widget we need to save the layer changes in a gis_layer_publish_request entry
      *  calling to this.saveUrl
      */
-    onEditorPanelAction: function(action, arg1) {
+    onEditorPanelAction: function(action, metadataInfo) {
         if (action == "doPublication") {
 
             var self  =this;
@@ -171,30 +151,42 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
                     return;
                 }
 
-                self._doPublicationRequest(arg1);    
+                if(!self.validateForm()) {
+                    return;
+                }
+
+                self._doPublicationRequest(metadataInfo);    
             });
-        } else if (action == "cancel") {
+        } else if (action == "doRejection") {
             this.showCancelWindow();
-        } else if (action == "reset") {
-            // something todo if action is 'reset'
+        } else if (action == "cancel")  {
+            this.closeAll();
         }
     },
 
-    _doPublicationRequest: function(arg1) {
+    _doPublicationRequest: function(metadataInfo) {
          // Action 'finish' | 'validate' --> save
-        var targetFolder = this.jsonData.activeAction == this.KNOWN_ACTIONS.NEW_LAYER ?
-            this.jsonData.selectedTargetId : null;
-        var targetLayer = this.jsonData.activeAction == this.KNOWN_ACTIONS.UPDATE_LAYER ?
-            this.jsonData.selectedTargetId : null;
+        var targetFolder = this.requestData.activeAction == this.KNOWN_ACTIONS.NEW_LAYER ?
+            this.requestData.targetId : null;
+        var targetLayer = this.requestData.activeAction == this.KNOWN_ACTIONS.UPDATE_LAYER ?
+            this.requestData.targetId : null;
         
         // save metadata id and Uuid
-        this.jsonData.metadataUuid = arg1.metadataUuid;
-        this.jsonData.metadataId = arg1.metadataId;
+        this.jsonData.metadataUuid = metadataInfo.metadataUuid;
+        this.jsonData.metadataId = metadataInfo.metadataId;
         
+
+        // Loading indicator.
+        this._proccessMask = new Ext.LoadMask(Ext.getBody());
+        this._proccessMask.show();
+
         Ext.Ajax.request({
             url: this.target.defaultRestUrl + this.saveUrl,
             params: {
-                layerPublishRequestId: this.jsonData.layerPublishRequestId
+                layerPublishRequestId: this.jsonData.layerPublishRequestId,
+                layerTitle: this.requestData.layerTitle,
+                targetFolder: targetFolder,
+                targetLayer: targetLayer
             },
             method: 'POST',
             success: this.handleSuccess,
@@ -205,11 +197,10 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
 
     showCancelWindow: function() {
         var layer = this.layerSelected.getLayer();
-        var nameLayer = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'NOMBREDESEADO'];
-        this.closeAll();
+        var nameLayer = layer.metadata.json.properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'NOMBREDESEADO'];
         // Create a window 
         this.cancelPublishRequestWindow = new Ext.Window({
-            title: String.format(this.cancelWindowText, nameLayer),
+            title:  this.rejectWindowTitleText,
             width: this.windowWidth,
             height: this.windowHeight,
             layout: 'fit',
@@ -237,9 +228,16 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
                 bbar: [
                     ['->'],
                     new Ext.Action({
-                        text: this.cancelButtonText,
+                        text: this.rejectButtonText,
                         handler: function() {
                             this.submitCancel();
+                        },
+                        scope: this
+                    }),
+                    new Ext.Action({
+                        text: this.cancelButtonText,
+                        handler: function() {
+                            this.cancelPublishRequestWindow.hide();
                         },
                         scope: this
                     })
@@ -255,6 +253,9 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
     },
 
     submitCancel: function() {
+
+        this._proccessMask = new Ext.LoadMask(Ext.getBody());
+        this._proccessMask.show();
         // Action 'cancel' -->  We need to remove the layer_request?!
         Ext.Ajax.request({
             url: this.target.defaultRestUrl + this.cancelUrl,
@@ -270,7 +271,9 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
     },
 
     handleSuccessCancel: function(response) {
+        this.closeAll();
         this.cancelPublishRequestWindow.close();
+        this._proccessMask.hide();
         if (response.responseText) {
             var jsonData = Ext.decode(response.responseText);
             if (!jsonData.success) {
@@ -283,21 +286,23 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
                 //TODO REMOVE metadata this.jsonData.metadataUuid in GN
                 layer.metadata.metadataUuid = null;
                 console.log(jsonData.data.estado);
-                layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'ESTADO'] == jsonData.data.estado;                
+                layer.metadata.json.properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'ESTADO'] == jsonData.data.estado;                
 
                 // The rejected layer is removed from the toc.
                 app.mapPanel.map.removeLayer(layer);
 
-                Ext.Msg.alert("", this.rejectionSuccessText);
+                Ext.Msg.alert(this.rejectWindowTitleText, this.rejectionSuccessText);
             }
         }
     },
 
     handleFailureCancel: function(response) {
-        Ext.Msg.alert("", this.rejectionErrorText);
+        this._proccessMask.hide();
+        Ext.Msg.alert(this.rejectWindowTitleText, this.rejectionErrorText);
     },
 
     handleSuccess: function(response) {
+        this._proccessMask.hide();
         if (response.responseText) {
             var jsonData = Ext.decode(response.responseText);
             if (!jsonData.success) {
@@ -313,14 +318,15 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
                 app.mapPanel.map.removeLayer(layer);
 
                 this.closeAll();
-                Ext.Msg.alert("", this.publicationSuccessText);
+                Ext.Msg.alert(this.publicationTitleText, this.publicationSuccessText);
 
             }
         }
     },
 
     handleFailure: function(response) {
-        Ext.Msg.alert("", this.publicationErrorText);
+        this._proccessMask.hide();
+        Ext.Msg.alert(this.publicationTitleText, this.publicationErrorText);
     },
     /** This function make the metadata public!! **/
     makeMetadataPublic: function(){

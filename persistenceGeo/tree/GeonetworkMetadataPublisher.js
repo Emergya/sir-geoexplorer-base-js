@@ -1,16 +1,16 @@
 /*
  * GeoNetworkMetadataPublisher.js Copyright (C) 2013 This file is part of PersistenceGeo project
- * 
+ *
  * This software is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This software is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this library; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301  USA
@@ -20,7 +20,7 @@
  * resulting executable to be covered by the GNU General Public License.
  * This exception does not however invalidate any other reasons why the
  * executable file might be covered by the GNU General Public License.
- * 
+ *
  * Authors: Alejandro Diaz Torres (mailto:adiaz@emergya.com)
  */
 
@@ -36,9 +36,9 @@ Ext.namespace("PersistenceGeo.tree");
 
 /**
  * Class: PersistenceGeo.tree.GeonetworkMetadataViewer
- * 
+ *
  * GN metadata publisher. See #87023
- * 
+ *
  */
 PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widgets.GeoNetworkTool, {
 
@@ -69,7 +69,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
 
     /**
      * api: config[formActionFieldPosibleValues]
-     *  ``Array`` Posible values for action field. 
+     *  ``Array`` Posible values for action field.
      *  @see ``KNOWN_ACTIONS``.
      */
     formActionFieldPosibleValues: ["Publish as new layer", "Update layer"],
@@ -77,12 +77,12 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
     /** api: config[KNOWN_ACTIONS]
      *  ``Object`` Actions for this component: ``NEW_LAYER`` | ``UPDATE_LAYER``.
      */
-    KNOWN_ACTIONS:{
+    KNOWN_ACTIONS: {
         NEW_LAYER: 1,
         UPDATE_LAYER: 2
     },
-	
-	/** api: config[isUpdate]
+
+    /** api: config[isUpdate]
      *  ``Boolean`` Indicate if this instance is an update or not.
      */
     isUpdate: false,
@@ -94,7 +94,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
     metadataWindowHeight: 600,
 
     /** The window used to edit metadata will be stored here **/
-    editorWindow : null,
+    editorWindow: null,
 
     /** Selected target data **/
     selectedTargetId: null,
@@ -134,14 +134,14 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
 
         var disable = true;
 
-        if(record && record.getLayer()){
-          var layer = record.getLayer();
-          disable = !!layer.metadata && !!layer.metadata.metadataUuid;
-         
+        if (record && record.getLayer()) {
+            var layer = record.getLayer();
+            disable = !! layer.metadata && !! layer.metadata.metadataUuid;
+
             if (!disable && this.checkUserInfo) {
                 // Obtain user info from persistenceGeoContext
                 var userInfo = this.target.persistenceGeoContext.userInfo;
-                if(!userInfo || !userInfo.id){
+                if (!userInfo || !userInfo.id) {
                     disable = true;
                 } else {
                     // Only for the owned layers of not admin users
@@ -150,13 +150,13 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
             }
         }
 
-        this.launchAction.setDisabled(disable); 
+        this.launchAction.setDisabled(disable);
     },
 
     /** private: method[constructor]
      *  Contructor method.
      */
-    constructor: function (config) {
+    constructor: function(config) {
 
         // Call superclass constructor
         PersistenceGeo.tree.GeoNetworkMetadataPublisher.superclass.constructor.call(this, config);
@@ -169,10 +169,10 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
             scope: this
         });
 
-         // add any custom application events
+        // add any custom application events
         this.addEvents(
             /** api: event[obtaindata]
-             *  Obtain multi window form data 
+             *  Obtain multi window form data
              *
              *  Returns:
              *
@@ -197,7 +197,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
     },
 
     /**
-
+     
      * api: method[showWindow]
      * Show all windows of this component.
      */
@@ -215,8 +215,8 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
         var offsetY = (this.metadataWindowHeight - this.windowHeight) / 2;
         this.publishRequestWindowPos = [position[0] - this.windowWidth, position[1] - offsetY];
         this.metadataWindowPos = [position[0] - this.windowWidth + offset, position[1] - offsetY];
-        this.targetWindowPos = [position[0] - this.windowWidth,  position[1] - offsetY + this.windowHeight + 20];
-        publishRequestWindow.setPosition(this.publishRequestWindowPos[0],this.publishRequestWindowPos[1]);
+        this.targetWindowPos = [position[0] - this.windowWidth, position[1] - offsetY + this.windowHeight + 20];
+        publishRequestWindow.setPosition(this.publishRequestWindowPos[0], this.publishRequestWindowPos[1]);
 
         // Create and show auxiliary windows
         var metadataWindow = this.getMetadataWindow(layerRecord);
@@ -237,18 +237,18 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
      * private: method[closeAll]
      * Close all windows of this component
      */
-    closeAll: function(){
-        if(!this.closing){
+    closeAll: function() {
+        if (!this.closing) {
             this.closing = true;
-            if(this.publishRequestWindow){
+            if (this.publishRequestWindow) {
                 this.publishRequestWindow.close();
                 delete this.publishRequestWindow;
             }
-            if(this.newMetadataWindow){
+            if (this.newMetadataWindow) {
                 this.newMetadataWindow.close();
                 delete this.newMetadataWindow;
             }
-            if(this.targetWindow){
+            if (this.targetWindow) {
                 this.targetWindow.close();
                 delete this.targetWindow;
             }
@@ -263,11 +263,11 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
      * Obtain publish request window
      */
     getPublishRequestWindow: function(layerRecord) {
-    	var layer = layerRecord.getLayer();
+        var layer = layerRecord.getLayer();
 
         // Create a window 
         this.publishRequestWindow = new Ext.Window({
-            title:  String.format(this.toolWindowText, layer.name),
+            title: String.format(this.toolWindowText, layer.name),
             width: this.windowWidth,
             height: this.windowHeight,
             layout: 'fit',
@@ -281,7 +281,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
             scope: this
         });
 
-	    return this.publishRequestWindow;
+        return this.publishRequestWindow;
     },
 
     /**
@@ -291,30 +291,30 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
     getMetadataWindow: function(layerRecord) {
         var layer = layerRecord.getLayer();
 
-    	if(this.isUpdate){
-    		// Simple editor
-         	var layerUuid = layer.metadata.json.properties.metadataId;
-			var metadataId = layer.metadata.json.properties.metadataId;
-	        this.newMetadataWindow = this.metadataEdit(metadataId, false, null, null, null, null, this.metadataWindowWidth, this.metadataWindowHeight); // TODO: W/H
-    	}else{
-	        // Create a window to choose the template and the group
-	        var newMetadataPanel = new GeoNetwork.editor.NewMetadataPanel({
-	                    getGroupUrl: catalogue.services.getGroups,
-	                    catalogue: catalogue
-	                });
-	        
-	        this.newMetadataWindow = new Ext.Window({
-	            title: this.metadataWindowText,
-	            width: this.metadataWindowWidth,
-	            height: this.metadataWindowHeight,
-	            layout: 'fit',
-	            modal: false,
-	            items: newMetadataPanel,
-	            closeAction: 'hide',
-	            controller: this,
-	            constrain: true
-	        });
-	    }
+        if (this.isUpdate) {
+            // Simple editor
+            var layerUuid = layer.metadata.json.properties.metadataId;
+            var metadataId = layer.metadata.json.properties.metadataId;
+            this.newMetadataWindow = this.metadataEdit(metadataId, false, null, null, null, null, this.metadataWindowWidth, this.metadataWindowHeight); // TODO: W/H
+        } else {
+            // Create a window to choose the template and the group
+            var newMetadataPanel = new PersistenceGeo.widgets.GeoNetworkNewMetadataPanel({
+                getGroupUrl: catalogue.services.getGroups,
+                catalogue: catalogue
+            });
+
+            this.newMetadataWindow = new Ext.Window({
+                title: this.metadataWindowText,
+                width: this.metadataWindowWidth,
+                height: this.metadataWindowHeight,
+                layout: 'fit',
+                modal: false,
+                items: newMetadataPanel,
+                closeAction: 'hide',
+                controller: this,
+                constrain: true
+            });
+        }
 
         this.newMetadataWindow.on({
             "beforehide": this.closeAll,
@@ -350,7 +350,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
         });
         this.targetWindow.on({
             "treenodeclick": this.onTargetSelected,
-            "beforehide": this.closeAll,
+            "beforehide": this.closeAll,  
             "treenodeloaded" : this.onTreeNodeLoaded,
             scope: this
         });
@@ -361,25 +361,27 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
         return this.targetWindow;
     },
 
-    onTreeNodeLoaded: function(node, selectionModel) {
-        // We selected the recevided node if we are editing.
-        if(node.id == this.selectedTargetId) {
-            selectionModel.select(node);
-        }
+    onTreeNodeLoaded : function(node, selectionModel) {
 
-        node.expand();
-        node.expandChildNodes();
     },
 
     /**
      * private: method[onTargetSelected]
      * Method called when one target has been selected on tree folder window
      */
-    onTargetSelected: function(node, clicked){
-        if(this.activeAction == this.KNOWN_ACTIONS.NEW_LAYER
-            || node.leaf){
-            this.selectedTargetId = node.id;
-            this.selectedTargetName = node.text;   
+    onTargetSelected: function(node, clicked) {
+        if (this.activeAction == this.KNOWN_ACTIONS.NEW_LAYER || node.leaf) {
+            this.selectedTargetId = +node.id;
+            if(this.selectedTargetId > PersistenceGeo.widgets.FolderTreePanel.prototype.LEAF_ID_OFFSET) {
+                // We normalize layer's ids.
+                this.selectedTargetId -= PersistenceGeo.widgets.FolderTreePanel.prototype.LEAF_ID_OFFSET;
+              
+            }
+            this.selectedTargetId+=""; // Back to string.
+        } else {
+            // E.g.: the user select's a folder when should have selected a layer. 
+            // We clear the selected target id so we get a validation error.
+            this.selectedTargetId = null;
         }
     },
 
@@ -388,7 +390,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
      * Obtain default form panel initialized.
      * TODO: Make all fields as select fields localized
      */
-    getPanel: function(layer){
+    getPanel: function(layer) {
 
         this.actionField = {
             xtype: 'radiogroup',
@@ -396,10 +398,16 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
             allowBlank: false,
             width: 250,
             msgTarget: "under",
-            items: [
-                {boxLabel: this.formActionFieldPosibleValues[0], name: 'rb-auto', inputValue: this.KNOWN_ACTIONS.NEW_LAYER, checked: true},
-                {boxLabel: this.formActionFieldPosibleValues[1], name: 'rb-auto', inputValue: this.KNOWN_ACTIONS.UPDATE_LAYER}
-            ],
+            items: [{
+                boxLabel: this.formActionFieldPosibleValues[0],
+                name: 'rb-auto',
+                inputValue: this.KNOWN_ACTIONS.NEW_LAYER,
+                checked: true
+            }, {
+                boxLabel: this.formActionFieldPosibleValues[1],
+                name: 'rb-auto',
+                inputValue: this.KNOWN_ACTIONS.UPDATE_LAYER
+            }],
             listeners: {
                 change: this.updateActionValue,
                 scope: this
@@ -408,7 +416,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
 
         var nameValue = this.formNameFieldValueText;
 
-        if(layer && layer.name){
+        if (layer && layer.name) {
             nameValue = layer.name;
         }
 
@@ -439,18 +447,18 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
      * private: method[updateActionValue]
      * Change action target
      */
-    updateActionValue: function(radio, checked){
+    updateActionValue: function(radio, checked) {
         this.activeAction = radio.getValue().inputValue;
         this.selectedTargetId = null;
-        this.selectedTargetName = null;   
-        if(this.targetWindow){
-            this.closing= true;
+        this.selectedTargetName = null;
+        if (this.targetWindow) {
+            this.closing = true;
             this.targetWindow.close();
-            this.closing= false;
+            this.closing = false;
         }
-        if(this.activeAction == this.KNOWN_ACTIONS.NEW_LAYER){
+        if (this.activeAction == this.KNOWN_ACTIONS.NEW_LAYER) {
             this.getTargetWindow(this.layerSelected, false).show();
-        }else{
+        } else {
             // this.activeAction == this.KNOWN_ACTIONS.UPDATE_LAYER
             this.getTargetWindow(this.layerSelected, true).show();
         }
@@ -463,81 +471,87 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
      *
      *  True if the form data is valid or false otherwise
      */
-    validateForm: function(){
+    validateForm: function() {
 
         var errors = [];
-        
-        if(!this.layerSelected) {
+
+        if (!this.layerSelected) {
             errors.push(this.noLayerSelectedError);
         }
 
 
-        if(!this.activeAction || (this.KNOWN_ACTIONS.NEW_LAYER != this.activeAction 
-                && this.KNOWN_ACTIONS.UPDATE_LAYER != this.activeAction)) {
+        if (!this.activeAction || (this.KNOWN_ACTIONS.NEW_LAYER != this.activeAction && this.KNOWN_ACTIONS.UPDATE_LAYER != this.activeAction)) {
             errors.push(this.noValidActionSelectedError);
         }
 
-        if(!this.nameField || !this.nameField.getValue()) {
+        if (!this.nameField || !this.nameField.getValue()) {
             this.nameField.isValid();
             errors.push(this.noDesiredNameSetError);
         }
 
-        if(!this.selectedTargetId || !this.selectedTargetName) {
-            if(this.KNOWN_ACTIONS.NEW_LAYER == this.activeAction){
+        if (!this.selectedTargetId) {
+            if (this.KNOWN_ACTIONS.NEW_LAYER == this.activeAction) {
                 errors.push(this.noValidTargetFolderError);
             } else {
                 errors.push(this.noValidTargetLayerError);
             }
         }
 
-        
 
-        if (errors.length>0) {
+
+        if (errors.length > 0) {
             Ext.Msg.alert(this.validationErrorsTitle, errors.join('<br>'));
             return false;
         }
+
+        this.requestData = {
+            layerTitle: this.nameField.getValue(),
+            targetId: this.selectedTargetId,
+            activeAction: this.activeAction 
+        };
 
         return true;
     },
 
     defaultCountry: 'España',
 
-    /** private: attribute[PUBLISH_REQUET_DATA_PREFIX]
+    /** private: attribute[PUBLISH_REQUEST_DATA_PREFIX]
      *  @see com.emergya.ohiggins.dto.LayerPublishRequestDto#toPropMap()
      */
-    PUBLISH_REQUET_DATA_PREFIX: "PUBLISH_REQUET_DATA_",
-    
+    PUBLISH_REQUEST_DATA_PREFIX: "PUBLISH_REQUEST_DATA_",
+
     /** private: method[obtainCommonData]
-     *  Obtain multi window form data 
+     *  Obtain multi window form data
      */
-    obtainCommonData: function(){
+    obtainCommonData: function() {
         // Init
         var layerUrl = this.layerSelected.getLayer().url;
         var nameLayer;
         var layerPublishRequestId = null;
         var metadataId = null;
-        if(this.isUpdate){
-        	var layer = this.layerSelected.getLayer();	
-        	//TODO: Handle errors!!!
-        	layerPublishRequestId = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'ID'];
-        	nameLayer = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'NOMBREDESEADO'];
-        	this.activeAction = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'ACTUALIZACION'] == 'true' ?
-        		this.KNOWN_ACTIONS.UPDATE_LAYER : this.KNOWN_ACTIONS.NEW_LAYER;
-        	var updatedLayerId = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'UPDATEDLAYERID'];
-        	if(updatedLayerId){
-        		this.selectedTargetId = updatedLayerId;
-        	}else{
-        		//TODO folderID in this.selectedTargetId
-        		this.selectedTargetName = layer.metadata.json.properties[this.PUBLISH_REQUET_DATA_PREFIX + 'PUBLISHEDFOLDER'];
-        	}
-        	/*TODO: More data needed?
+        if (this.isUpdate) {
+            var layer = this.layerSelected.getLayer();
+            var properties = layer.metadata.json.properties
+            //TODO: Handle errors!!!
+            layerPublishRequestId =properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'ID'];
+            nameLayer = properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'NOMBREDESEADO'];
+            this.activeAction = properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'ACTUALIZACION'] == 'true' ?
+                this.KNOWN_ACTIONS.UPDATE_LAYER : this.KNOWN_ACTIONS.NEW_LAYER;
+            var updatedLayerId = properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'UPDATEDLAYERID'];
+            if (updatedLayerId) {
+                this.selectedTargetId = updatedLayerId;
+            } else {
+                this.selectedTargetId = properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'PUBLISHEDFOLDER'];
+            }
+
+            /*TODO: More data needed?
         	PUBLISH_REQUET_DATA_ACTUALIZACION: "false"
 			PUBLISH_REQUET_DATA_ESTADO: "PENDIENTE"
 			PUBLISH_REQUET_DATA_ID: "64658"
 			PUBLISH_REQUET_DATA_NAME_PROPERTY: "nombredeseado"
 			PUBLISH_REQUET_DATA_NOMBREDESEADO: "gn_test"
 			PUBLISH_REQUET_DATA_PUBLISHEDFOLDER: "Otros"
-			PUBLISH_REQUET_DATA_PUBLISH_REQUET_DATA_PREFIX: "PUBLISH_REQUET_DATA_"
+			PUBLISH_REQUET_DATA_PUBLISH_REQUEST_DATA_PREFIX: "PUBLISH_REQUET_DATA_"
 			PUBLISH_REQUET_DATA_RECURSOSERVIDOR: "http://sig-minen-apps.emergya.es/geoserver/wms"
 			PUBLISH_REQUET_DATA_SERIALVERSIONUID: "-4222276053302896611"
 			PUBLISH_REQUET_DATA_SOURCELAYERID: "82"
@@ -545,10 +559,10 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
 			PUBLISH_REQUET_DATA_TABLENAME: "gn_test_e1511745_3ddc_41dd_96e1_9deae50b46d5"
 			PUBLISH_REQUET_DATA_UPDATEDLAYERPATH: ""
 			*/
-			metadataId = layer.metadata.json.properties.metadataId;
-        }else{
-	        nameLayer = this.nameField.getValue();
-	    }
+            metadataId = layer.metadata.json.properties.metadataId;
+        } else {
+            nameLayer = this.nameField.getValue();
+        }
         this.jsonData = {
             // common data
             layerPublishRequestId: layerPublishRequestId,
@@ -559,7 +573,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
             metadataId: metadataId,
             activeAction: this.activeAction,
             // Data to ovewrite metedata form @see PersistenceGeo.widgets.GeoNetworkEditorPanel
-            formData:{
+            formData: {
                 // title for th layer
                 title: nameLayer,
                 // Contact info
@@ -584,13 +598,13 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
     },
 
     /** api: method[getJsonData]
-     *  Obtain multi window form data 
+     *  Obtain multi window form data
      *
      *  Returns:
      *
      *  Json data
      */
-    getJsonData: function(){
+    getJsonData: function() {
         return this.jsonData;
     },
 
@@ -599,39 +613,42 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
      *
      *  Open a metadata editor.
      */
-    metadataEdit: function(metadataId, create, group, child, n, templateName, width, height){
+    metadataEdit: function(metadataId, create, group, child, n, templateName, width, height) {
         var jsonData = this.obtainCommonData();
 
-        if(!this.isUpdate)
-        	this.closeAll();
+        if (!this.isUpdate)
+            this.closeAll();
 
         Ext.getCmp('metadata-panel') && Ext.getCmp('metadata-panel').destroy();
 
         var editorPanel = new PersistenceGeo.widgets.GeoNetworkEditorPanel({
-            defaultViewMode : GeoNetwork.Settings.editor.defaultViewMode,
-            catalogue : catalogue,
+            defaultViewMode: GeoNetwork.Settings.editor.defaultViewMode,
+            catalogue: catalogue,
             selectionPanelImgPath: GN_URL + '/apps/js/ext-ux/images',
             controller: this,
-            layout : 'border',
-            xlinkOptions : {
-                CONTACT : true
+            layout: 'border',
+            utilityPanelCollapsed: this.isUpdate,
+            panelVertical: !this.isUpdate,
+            xlinkOptions: {
+                CONTACT: true
             }
         });
-        
+
         // W/H
         var mapPanelSize = this.target.mapPanel.getSize();
-        if(!width){
-        	width = mapPanelSize.width;
+        if (!width) {
+            width = mapPanelSize.width;
         }
-        if(!height){
-        	height = mapPanelSize.height
+        if (!height) {
+            height = mapPanelSize.height
         }
 
         var editorWindow = new Ext.Window({
             title: this.metadataEditorTitle,
-            items:[editorPanel],
+            items: [editorPanel],
             closeAction: 'close',
             cls: "gnMetadataEditorWindow",
+            layout: "fit",
             width: width,
             height: height
         });
@@ -652,8 +669,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
      *
      *  Called when an action is pressed in the editor panel.
      */
-    onEditorPanelAction: function (action, arg1){
-    }
+    onEditorPanelAction: function(action, arg1) {}
 });
 
 Ext.preg(PersistenceGeo.tree.GeoNetworkMetadataPublisher.prototype.ptype, PersistenceGeo.tree.GeoNetworkMetadataPublisher);

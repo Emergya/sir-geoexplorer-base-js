@@ -129,7 +129,7 @@ Viewer.dialog.ChannelTools = Ext.extend(Ext.Window, {
     onTreeNodeClick: function (node, checked) {
         if (!this.showLayers) {
             if (node.isLeaf()) {
-                this.selectedChannel = node.id;
+                this.selectedChannel = node.id - PersistenceGeo.widgets.FolderTreePanel.prototype.LEAF_ID_OFFSET;
                 this.selectedChannelName = node.text;
                 this.loadButton.enable();
             } else {
