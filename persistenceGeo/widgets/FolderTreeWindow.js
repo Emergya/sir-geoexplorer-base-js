@@ -74,7 +74,12 @@ PersistenceGeo.widgets.FolderTreeWindow = Ext.extend(Ext.Window, {
      */
     showLayers: false,
 
-     
+    /** api: config[allFolders]
+     *  ``Boolean``
+     *  Retrieve all folders if true, just default type folders if not.
+     */
+    allFolders: false,
+
     /** api: config[recursive]
      *  ``Boolean``
      *  Show folders recursively.
@@ -92,7 +97,6 @@ PersistenceGeo.widgets.FolderTreeWindow = Ext.extend(Ext.Window, {
      *  Actual context loaded.
      */
     persistenceGeoContext: null,
-
      
     /** private: config[LOAD_FOLDER_URL]
      *  ``String``
@@ -180,19 +184,17 @@ PersistenceGeo.widgets.FolderTreeWindow = Ext.extend(Ext.Window, {
             restBaseUrl: this.restBaseUrl,
             recursive: this.recursive,
             rootNodeText:this.titleText,
-            rootVisible: !this.showLayers,
-            folderType: this.showLayers 
-                ? PersistenceGeo.widgets.FolderTreePanel.prototype.KNOWN_FOLDER_TYPES.DEFAULT_TYPE: // show folders in root when show layers!!
-                null,
+            rootVisible: false,
+            folderType: this.allFolders?PersistenceGeo.widgets.FolderTreePanel.prototype.KNOWN_FOLDER_TYPES.ANY_FOLDER_TYPE:null,
             nodeTypesAllowed: nodeTypesFilter,
-            showVirtualFolder: this.showLayers,
+            showVirtualFolder: true,
             leafAsCheckbox: this.leafAsCheckbox,
             listeners: {
                 click: this.onTreeNodeClick,
                 nodeloaded: this.onTreeNodeLoaded,
                 scope: this
             }
-        });
+        });       
         this.add(this.layersTree);
     },
 
@@ -223,13 +225,8 @@ PersistenceGeo.widgets.FolderTreeWindow = Ext.extend(Ext.Window, {
      */
     setShowLayers: function (showLayers) {
         this.showLayers = showLayers;
-        this.layersTree.rootVisible = !this.showLayers;
-        this.layersTree.folderType = this.showLayers 
-                ? PersistenceGeo.widgets.FolderTreePanel.prototype.KNOWN_FOLDER_TYPES.DEFAULT_TYPE: // show folders in root when show layers!!
-                null;
         this.layersTree.reload();
     }
-
 });
 
 Ext.preg(PersistenceGeo.widgets.FolderTreeWindow.prototype.ptype, PersistenceGeo.widgets.FolderTreeWindow);

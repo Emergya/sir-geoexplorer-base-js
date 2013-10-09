@@ -78,6 +78,7 @@ PersistenceGeo.widgets.FolderTreePanel = Ext.extend(Ext.tree.TreePanel, {
           9 | DEFAULT     |  
     */
     KNOWN_FOLDER_TYPES:{
+        ANY_FOLDER_TYPE: -1, // To return all folders.
         CHANNEL_TYPE: 1,
         FOLDER_TYPE: 7,
         IPT_TYPE: 8,

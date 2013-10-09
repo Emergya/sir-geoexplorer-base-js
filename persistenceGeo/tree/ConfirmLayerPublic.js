@@ -103,10 +103,17 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
        
         node.expand();
         node.expandChildNodes();
-
+       
         // We selected the recevided node if we are editing.
-        if (node.id == +this.selectedTargetId){
+        var checkId = node.id;
+        if(node.attributes.type!="FolderDto" 
+            && checkId > PersistenceGeo.widgets.FolderTreePanel.prototype.LEAF_ID_OFFSET) {
+            checkId -= PersistenceGeo.widgets.FolderTreePanel.prototype.LEAF_ID_OFFSET;
+        }
+        
+        if (checkId == +this.selectedTargetId){
             selectionModel.select(node);
+            node.ui.focus();
         }
     },
 

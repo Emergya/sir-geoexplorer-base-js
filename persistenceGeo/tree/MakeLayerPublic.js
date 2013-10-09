@@ -207,6 +207,15 @@ PersistenceGeo.tree.MakeLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetworkM
     handleFailure: function(response){
         this._createRequestMask.hide();
         Ext.Msg.alert(this.publicationRequestText, this.savingRequestError);
+    },
+
+    onTargetSelected: function(node, clicked) {
+        PersistenceGeo.tree.MakeLayerPublic.superclass.onTargetSelected.call(this,node, clicked);
+
+        if(this.selectedTargetId && this.activeAction == this.KNOWN_ACTIONS.UPDATE_LAYER) {
+            // We use the selected target layer's name as 'proposed' title for the updated layer.
+            this.form.nameField.setValue(node.attributes.text);
+        }
     }
 
 });

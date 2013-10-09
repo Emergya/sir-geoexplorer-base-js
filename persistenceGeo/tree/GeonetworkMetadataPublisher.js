@@ -212,10 +212,10 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
         // Position of the windows
         var position = publishRequestWindow.getPosition();
         var offset = publishRequestWindow.getWidth() + 20;
-        var offsetY = (this.metadataWindowHeight - this.windowHeight) / 2;
-        this.publishRequestWindowPos = [position[0] - this.windowWidth, position[1] - offsetY];
-        this.metadataWindowPos = [position[0] - this.windowWidth + offset, position[1] - offsetY];
-        this.targetWindowPos = [position[0] - this.windowWidth, position[1] - offsetY + this.windowHeight + 20];
+        var topPos = (document.height - this.metadataWindowHeight) / 2;
+        this.publishRequestWindowPos = [position[0] - this.windowWidth, topPos];
+        this.metadataWindowPos = [position[0] - this.windowWidth + offset, topPos];
+        this.targetWindowPos = [position[0] - this.windowWidth, topPos + this.windowHeight + 20];
         publishRequestWindow.setPosition(this.publishRequestWindowPos[0], this.publishRequestWindowPos[1]);
 
         // Create and show auxiliary windows
@@ -339,6 +339,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
             title: showLayers ? this.targetLayerWindowTitleText : this.targetFolderWindowTitleText,
             map: mapPanel.map,
             recursive: true,
+            allFolders: true,
             showLayers: showLayers,
             width: this.windowWidth,
             height: this.metadataWindowHeight - this.windowHeight - 20,
@@ -391,6 +392,8 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
      * TODO: Make all fields as select fields localized
      */
     getPanel: function(layer) {
+		// We are creating a new window, so we reset the lock on tree initialization.
+		this._treeInitialized = false;
 
         this.actionField = {
             xtype: 'radiogroup',
@@ -398,6 +401,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
             allowBlank: false,
             width: 250,
             msgTarget: "under",
+			ref: "actionField",
             items: [{
                 boxLabel: this.formActionFieldPosibleValues[0],
                 name: 'rb-auto',
@@ -425,6 +429,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
             allowBlank: false,
             width: 250,
             msgTarget: "under",
+			ref:"nameField",
             //validator: this.urlValidator.createDelegate(this),
             value: nameValue
         });
@@ -448,9 +453,19 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
      * Change action target
      */
     updateActionValue: function(radio, checked) {
-        this.activeAction = radio.getValue().inputValue;
-        this.selectedTargetId = null;
-        this.selectedTargetName = null;
+		if(radio.getValue()) {
+			this.activeAction = radio.getValue().inputValue;
+        }
+        // We don't clear the selected target id the first time
+        // we enter the method, as if we are dealing with a layer update
+        // we need to change the panel, and retain this value when this method is called.
+        if(this._treeInitialized) {
+            this.selectedTargetId = null;
+            this.selectedTargetName = null;
+        }
+
+        this._treeInitialized = true;
+        
         if (this.targetWindow) {
             this.closing = true;
             this.targetWindow.close();
@@ -459,7 +474,6 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
         if (this.activeAction == this.KNOWN_ACTIONS.NEW_LAYER) {
             this.getTargetWindow(this.layerSelected, false).show();
         } else {
-            // this.activeAction == this.KNOWN_ACTIONS.UPDATE_LAYER
             this.getTargetWindow(this.layerSelected, true).show();
         }
     },
@@ -535,14 +549,18 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
             //TODO: Handle errors!!!
             layerPublishRequestId =properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'ID'];
             nameLayer = properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'NOMBREDESEADO'];
-            this.activeAction = properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'ACTUALIZACION'] == 'true' ?
-                this.KNOWN_ACTIONS.UPDATE_LAYER : this.KNOWN_ACTIONS.NEW_LAYER;
+            this.nameField.setValue(nameLayer);
             var updatedLayerId = properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'UPDATEDLAYERID'];
             if (updatedLayerId) {
+				this.activeAction = this.KNOWN_ACTIONS.UPDATE_LAYER;
                 this.selectedTargetId = updatedLayerId;
             } else {
+				this.activeAction = this.KNOWN_ACTIONS.NEW_LAYER;
                 this.selectedTargetId = properties[this.PUBLISH_REQUEST_DATA_PREFIX + 'PUBLISHEDFOLDER'];
             }
+
+			// We select the appropiate radio button.
+            this.form.actionField.setValue(this.activeAction);
 
             /*TODO: More data needed?
         	PUBLISH_REQUET_DATA_ACTUALIZACION: "false"
