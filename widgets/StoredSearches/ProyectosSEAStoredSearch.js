@@ -30,7 +30,7 @@ Viewer.controller.ProyectosSEAStoredSearch = Ext.extend(Viewer.controller.Stored
 
     featureType: 'Proyectos_SEA',
     
-    title: 'Proyectos aprobados en SEIA por ámbito',
+    title: 'Proyectos de generación aprobados en SEIA por ámbito',
 
     constructor: function(config) {
 

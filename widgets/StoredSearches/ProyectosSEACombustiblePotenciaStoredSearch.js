@@ -30,7 +30,7 @@ Viewer.controller.ProyectosSEACombustiblePotenciaStoredSearch = Ext.extend(Viewe
 
     featureType: 'Proyectos_SEA',
     
-    title: 'Proyectos aprobados por tipo de combustible y potencia',
+    title: 'Proyectos de generación aprobados por tipo de combustible y potencia',
 
     constructor: function(config) {
 

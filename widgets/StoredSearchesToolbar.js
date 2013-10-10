@@ -57,7 +57,7 @@ Viewer.widgets.StoredSearchesToolbar = Ext.extend(Ext.Toolbar, {
 
         this.plugins = [{
             ptype: 'viewer_storedSearchAction',
-            tooltip: 'Proyectos aprobados en SEIA por ámbito',
+            tooltip: 'Proyectos de generación aprobados en SEIA por ámbito',
             controller: 'ProyectosSEAStoredSearch',
             actionTarget: 'storedsearchestbar',
             iconCls: 'vw-icon-ProyectosSEAStoredSearch',
@@ -68,7 +68,7 @@ Viewer.widgets.StoredSearchesToolbar = Ext.extend(Ext.Toolbar, {
             wfsServiceUrl: this.url 
         }, {
             ptype: 'viewer_storedSearchAction',
-            tooltip: 'Proyectos aprobados por tipo de combustible y potencia',
+            tooltip: 'Proyectos de generación aprobados por tipo de combustible y potencia',
             controller: 'ProyectosSEACombustiblePotenciaStoredSearch',
             actionTarget: 'storedsearchestbar',
             iconCls: 'vw-icon-ProyectosSEACombustiblePotenciaStoredSearch',

@@ -170,15 +170,14 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
     },
 
     showLoadMask: function(show){
-        // if(show){
-        //     this.loadMask || (this.loadMask = new Ext.LoadMask(
-        //         this.getId(),
-        //         { msg: 'Buscando...' }
-        //     ));
-        //     this.loadMask.show();
-        // }else if(!!this.loadMask && !!this.loadMask.hide){
-        //     this.loadMask.hide();
-        // }
+        if(show){
+            if(!this.loadMask) {
+                this.loadMask = new Ext.LoadMask(this.getEl());
+            }
+            this.loadMask.show();
+        }else if(!!this.loadMask && !!this.loadMask.hide){
+            this.loadMask.hide();
+        }
     },
 
     onSearchButtonClicked: function(widget, evt) {
@@ -189,7 +188,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
             item.value = field.getValue();
         }
 
-        //this.showLoadMask(true);
+        this.showLoadMask(true);
 
         //TODO: HANDLE here this.controller.doRequest();
 
@@ -206,7 +205,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
         this._manager.loadFeatures(ogcFilter, function (){
             this.grid.setStore(this._manager.featureStore);
             this.showGrid(true);
-            
+            this.showLoadMask(false);
         }, this);
     },
 
@@ -403,7 +402,7 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
 
 
 
-        Ext.MessageBox.wait("Por favor espere...");
+        this.showLoadMask(true);
 
         var url = app.proxy + "http://localhost/phpPDF/phpPDF.php";
 
@@ -414,16 +413,13 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
             },
             isUpload: true,
             success: function(response) {
-                Ext.MessageBox.updateProgress(1);
-                Ext.MessageBox.hide();
+                this.showLoadMask(false);
                 // We should have get a json text here
 
                 var result = Ext.decode(response.responseText);
                 if(result.error) {
                     console.log(result.error);
-                    Ext.MessageBox.updateProgress(1);
-                    Ext.MessageBox.hide();
-                    Ext.MessageBox.alert("", this.errorText)
+                    Ext.MessageBox.alert(this.controller.title, this.errorText)
                 }
 
                 // We can use localhost this way because of the proxy
@@ -435,9 +431,8 @@ Viewer.dialog.StoredSearchWindow = Ext.extend(Ext.Window, {
                 });
             },
             failure: function(response) {
-                Ext.MessageBox.updateProgress(1);
-                Ext.MessageBox.hide();
-                Ext.MessageBox.alert("", this.errorText)
+                this.showLoadMask(false);
+                Ext.MessageBox.alert(this.controller.title, this.errorText)
             },
             scope: this
         })
