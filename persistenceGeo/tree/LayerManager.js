@@ -252,7 +252,14 @@ PersistenceGeo.tree.LayerManager = Ext.extend(gxp.plugins.LayerManager, {
                     }
                 }
                 c.contextNode = node;
-                c.items.getCount() > 0 && c.showAt(e.getXY());
+
+                c.items.getCount() > 0 && c.showAt(e.getXY());   
+                // Fixes #89625 by forcing a redraw after a while.
+                setTimeout(function(){
+                    c.items.getCount() > 0 && c.showAt(e.getXY());                         
+                }, 120);
+                
+
             }
         }
     },
