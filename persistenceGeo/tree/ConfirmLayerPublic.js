@@ -48,7 +48,7 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
     /** i18n **/
     toolText: 'Confirm or reject publish request',
     toolTooltipText: 'Confirms or rejects a layer request publish',
-    toolWindowText: "Layer {0} publish request confirmation",
+    toolWindowText: "Layer Publish Request Confirmation",
     cancelButtonText: 'Confirm rejection',
     commentFieldLabelText: 'Rejection reasons',
     rejectWindowTitleText: 'Reject layer publication',

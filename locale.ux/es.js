@@ -774,7 +774,7 @@ GeoExt.Lang.add(
     'PersistenceGeo.tree.MakeLayerPublic.prototype':  {
         toolText: "Solicitar publicación",
         toolTooltipText: "Solicita la publicación de la capa",
-        toolWindowText: "Publicación de la capa '{0}'",
+        toolWindowText: "Solicitar publicación de capa",
         formActionFieldText: "Acción a realizar",
         formActionFieldValueText: "Publicar nueva capa",
         formTemplateFieldText: "Norma a aplicar",
@@ -791,7 +791,7 @@ GeoExt.Lang.add(
     "PersistenceGeo.tree.ConfirmLayerPublic.prototype": {
         toolText: 'Confirmar o rechazar publicación',
         toolTooltipText: 'Confirma o rechaza la solicitud de publicación de un usuario',
-        toolWindowText: "Confirmación de la publicación de la capa {0}",
+        toolWindowText: "Solicitud de publicación capa",
         rejectButtonText: 'Confirmar rechazo',
         cancelButtonText: 'Cancelar',
         commentFieldLabelText: 'Motivos del rechazo',
@@ -816,7 +816,7 @@ GeoExt.Lang.add(
     'PersistenceGeo.tree.GeoNetworkMetadataPublisher.prototype' : {
         toolText: "Publicar",
         toolTooltipText: "Crear una solicitud de publicación",
-        toolWindowText: "Solicitud de publicación de la capa '{0}'",
+        toolWindowText: "Solicitar publicación de capa",
         formActionFieldText: "Acción deseada",
         formNameFieldText: "Nombre deseado",
         formNameFieldValueText: "Nombre de la capa",
@@ -824,7 +824,7 @@ GeoExt.Lang.add(
         targetLayerWindowTitleText: "Capa a actualizar",
         targetFolderWindowTitleText: "Carpeta de destino",
         formActionFieldPosibleValues: ["Publicar nueva capa", "Actualizar capa"],
-        metadataEditorTitle: "Metadatos para la publicación de la Capa",
+        metadataEditorTitle: "Metadatos para la publicación de la capa",
         validationErrorsTitle: "Errores de validación",
         noLayerSelectedError: "No hay capa seleccionada.",
         noValidActionSelectedError: "Debe seleccionar la acción a realizar",

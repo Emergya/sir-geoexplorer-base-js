@@ -51,7 +51,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
     /** i18n **/
     toolText: "Publish",
     toolTooltipText: "Make a publish request",
-    toolWindowText: "Layer {0} publish request",
+    toolWindowText: "Create Layer Rublish Request",
     formActionFieldText: "Target action",
     formNameFieldText: "Target name",
     formNameFieldValueText: "Name of the layer",
@@ -267,12 +267,12 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
 
         // Create a window 
         this.publishRequestWindow = new Ext.Window({
-            title: String.format(this.toolWindowText, layer.name),
+            title: this.toolWindowText, layer.name,
             width: this.windowWidth,
             height: this.windowHeight,
             layout: 'fit',
             modal: false,
-            items: this.getPanel(layer),
+            items: this.createActionAndNameForm(layer),
             closeAction: 'hide',
             constrain: true,
         });
@@ -387,11 +387,11 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
     },
 
     /**
-     * private: method[getPanel]
+     * private: method[createActionAndNameForm]
      * Obtain default form panel initialized.
      * TODO: Make all fields as select fields localized
      */
-    getPanel: function(layer) {
+    createActionAndNameForm: function(layer) {
 		// We are creating a new window, so we reset the lock on tree initialization.
 		this._treeInitialized = false;
 
