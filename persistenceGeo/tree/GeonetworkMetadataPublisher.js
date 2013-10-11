@@ -589,9 +589,14 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
             selectedTargetName: this.selectedTargetName,
             name: nameLayer,
             metadataId: metadataId,
-            activeAction: this.activeAction,
+            activeAction: this.activeAction          
+        };
+
+
+        if(!this.isUpdate) {
             // Data to ovewrite metedata form @see PersistenceGeo.widgets.GeoNetworkEditorPanel
-            formData: {
+            // We only do this for new layers as we want to conserve original data when checking.
+            this.jsonData.formData = {
                 // title for th layer
                 title: nameLayer,
                 // Contact info
@@ -611,7 +616,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
                 // Online (get map) url
                 get_map_url: layerUrl
             }
-        };
+        }
         return this.getJsonData();
     },
 
