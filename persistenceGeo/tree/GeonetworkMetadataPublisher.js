@@ -267,7 +267,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
 
         // Create a window 
         this.publishRequestWindow = new Ext.Window({
-            title: this.toolWindowText, layer.name,
+            title: this.toolWindowText,
             width: this.windowWidth,
             height: this.windowHeight,
             layout: 'fit',
