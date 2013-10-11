@@ -321,7 +321,7 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
                 }
                 layer.metadata.metadataUuid = this.jsonData.metadataUuid;
 
-                // The rejected layer is removed from the toc.
+                
                 app.mapPanel.map.removeLayer(layer);
 
 
@@ -356,17 +356,18 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
                             success : function(){
                                 this._proccessMask.hide();
                                 this.closeAll();
+                                
                                 Ext.Msg.alert(this.publicationTitleText, this.publicationSuccessText);
                             },
-                            failure: this._onMakeMetadataPublicFailed
+                            failure: this._onMakeMetadataPublicFailed,
                             scope : this
-                        }); 
+                        });
                     },
-                    failure: this._onMakeMetadataPublicFailed
+                    failure: this._onMakeMetadataPublicFailed,
                     scope : this
                 });
             },
-            failure: this._onMakeMetadataPublicFailed
+            failure: this._onMakeMetadataPublicFailed,
             scope : this
         });
     },
