@@ -59,6 +59,7 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
     publicationErrorText: "An error happened while publishing the layer.",
     confirmationTitleText: "Confirmation",
     confirmationQuestionText: "Do you really wish to pulish the layer with the current metadata?",
+    layerPublishedButMetadataPrivateText: "The layer was published successfully, but there was an error making the metadata public.",
 
     /** Save url for the layer publish request **/
     saveUrl: '/persistenceGeo/confirmPublishRequest',
@@ -309,7 +310,6 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
     },
 
     handleSuccess: function(response) {
-        this._proccessMask.hide();
         if (response.responseText) {
             var jsonData = Ext.decode(response.responseText);
             if (!jsonData.success) {
@@ -324,9 +324,8 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
                 // The rejected layer is removed from the toc.
                 app.mapPanel.map.removeLayer(layer);
 
-                this.closeAll();
-                Ext.Msg.alert(this.publicationTitleText, this.publicationSuccessText);
 
+                this.makeMetadataPublic();
             }
         }
     },
@@ -355,16 +354,28 @@ PersistenceGeo.tree.ConfirmLayerPublic = Ext.extend(PersistenceGeo.tree.GeoNetwo
                             method: 'GET',
                             disableCaching: false, //we need this parameter because gn try to parse _dc as _${idGropup}
                             success : function(){
-                                //console.log("OK!!");
+                                this._proccessMask.hide();
+                                this.closeAll();
+                                Ext.Msg.alert(this.publicationTitleText, this.publicationSuccessText);
                             },
+                            failure: this._onMakeMetadataPublicFailed
                             scope : this
                         }); 
                     },
+                    failure: this._onMakeMetadataPublicFailed
                     scope : this
                 });
             },
+            failure: this._onMakeMetadataPublicFailed
             scope : this
         });
+    },
+
+    _onMakeMetadataPublicFailed : function() {
+        this._proccessMask.hide();
+        this.closeAll();
+        Ext.Msg.alert(this.publicationTitleText, this.layerPublishedButMetadataPrivateText);
+
     }
 });
 
