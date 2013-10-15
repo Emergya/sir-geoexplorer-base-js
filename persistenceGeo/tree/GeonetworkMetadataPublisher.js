@@ -652,6 +652,7 @@ PersistenceGeo.tree.GeoNetworkMetadataPublisher = Ext.extend(PersistenceGeo.widg
             layout: 'border',
             utilityPanelCollapsed: this.isUpdate,
             panelVertical: !this.isUpdate,
+            overrideExtent: !this.isUpdate,
             xlinkOptions: {
                 CONTACT: true
             }

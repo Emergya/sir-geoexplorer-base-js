@@ -65,6 +65,8 @@ PersistenceGeo.widgets.GeoNetworkEditorPanel = Ext.extend(GeoNetwork.editor.Edit
     /** api: config[panelVertical] */
     panelVertical: true,
 
+    /** api: config[overrideExtent] */
+    overrideExtent: true,
 
     /**
      * private: property[controller]
@@ -262,7 +264,7 @@ PersistenceGeo.widgets.GeoNetworkEditorPanel = Ext.extend(GeoNetwork.editor.Edit
         }
         // Handle extent
         this.catalogue.extentMap.mapPanel.map.zoomToExtent(GeoNetwork.map.EXTENT);
-        if (jsonData.layerSelected) {
+        if (this.overrideExtent && jsonData.layerSelected) {
             var layer = jsonData.layerSelected.getLayer();
             if (layer.boundCalculated) {
                 this.catalogue.extentMap.setBbox(layer.boundCalculated);
