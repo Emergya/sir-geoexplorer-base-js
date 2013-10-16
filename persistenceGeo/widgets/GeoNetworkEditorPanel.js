@@ -164,7 +164,7 @@ PersistenceGeo.widgets.GeoNetworkEditorPanel = Ext.extend(GeoNetwork.editor.Edit
             metadataId: this.metadataId,
             editor: this,
             serviceUrl: this.catalogue.services.mdValidate,
-            columnWidth: 0.5,
+            columnWidth: 0.33,
             collapsible: this.panelVertical,
             collapsed: this.panelVertical
         }, this.utilityPanelConfig.validationPanel));
@@ -173,12 +173,14 @@ PersistenceGeo.widgets.GeoNetworkEditorPanel = Ext.extend(GeoNetwork.editor.Edit
         this.helpPanel = new GeoNetwork.editor.HelpPanel(Ext.applyIf({
             editor: this,
             html: '',
-            columnWidth: 0.5,
+            cls: "helpPanel",
+            columnWidth: 0.33,
             collapsible: this.panelVertical
         }, this.utilityPanelConfig.helpPanel));
 
         this.relationPanel = new GeoNetwork.editor.LinkedMetadataPanel(Ext.applyIf({
             editor: this,
+            columnWidth: 0.33,
             metadataId: this.metadataId,
             metadataSchema: this.metadataSchema,
             catalogue: this.catalogue,
@@ -188,7 +190,7 @@ PersistenceGeo.widgets.GeoNetworkEditorPanel = Ext.extend(GeoNetwork.editor.Edit
 
         this.suggestionPanel = new GeoNetwork.editor.SuggestionsPanel(Ext.applyIf({
             metadataId: this.metadataId,
-            editor: this,
+            editor: this, 
             catalogue: this.catalogue
         }, this.utilityPanelConfig.suggestionPanel));
 
@@ -207,7 +209,7 @@ PersistenceGeo.widgets.GeoNetworkEditorPanel = Ext.extend(GeoNetwork.editor.Edit
             minHeight: 280,
             items: [
                 // TODO: Fix integration and uncomment panels!!
-                // this.relationPanel, 
+                this.relationPanel, 
                 // this.suggestionPanel,
                 this.validationPanel,
                 this.helpPanel
