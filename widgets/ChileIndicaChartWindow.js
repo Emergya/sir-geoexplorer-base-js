@@ -181,7 +181,8 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                     flex: 1,
                     buttons: [{
                         id: 'iniciatiavasGeoId',
-                        text: this.geoButtonText,
+                        //text: this.geoButtonText,
+                        text: 'Ver Iniciativas',
                         handler: this.georeferenceInitiatives,
                         scope: this
                     }],
@@ -373,9 +374,47 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         listClass: "vw_chart_window_combo_list"
                     },
                     flex: 1,
-                    items: [{
+                    items: [
+                            /* Para tener un ID por cada tipo
+                            {
+                    		  id: 'tipoIniciativa',
+                    		  fieldLabel: 'Tipo Iniciativa',
+                    		  hiddenName: 'tipo-inciativa',
+                    		  typeAhead: true,
+                   		      triggerAction: 'all',
+                    		  lazyRender:true,
+                    		  mode: 'local',
+                    		  editable: false,     
+                    		  forceSelection: true,
+                    		  value: 0,
+                              store: new Ext.data.ArrayStore({
+                                  id: 0,
+                                  fields: [
+                                      'IdTipoIniciativa',
+                                      'TextTipoIniciativa'
+                                  ],
+                                  data: [[0,'Todos'],[1, 'ARI'],[2, 'PROPIR'],[3, 'PREINVERSIÓN'],[4, 'EJECUCIÓN']]
+                              }),
+                              valueField: 'IdTipoIniciativa',
+                              displayField: 'TextTipoIniciativa'
+                    		},
+                    		*/
+                            {
+                    		  id: 'tiniciativa',
+                    		  fieldLabel: 'Tipo Iniciativa',
+                    		  hiddenName: 'tipoIniciativa',
+                    		  typeAhead: true,
+                   		      triggerAction: 'all',
+                    		  lazyRender:true,
+                    		  mode: 'local',
+                    		  editable: false,     
+                    		  forceSelection: true,
+                    		  value: "Todos",
+                              store: ['Todos', 'Ari', 'Propir', 'Preinversión', 'Ejecución']                                                           
+                    		},                    		
+                            {
                             id: 'tipoProyectoId',
-                            fieldLabel: this.stageText,
+                            fieldLabel: this.stageText,                            
                             hiddenName: 'financiamiento',
 
                             //mode : 'local',
