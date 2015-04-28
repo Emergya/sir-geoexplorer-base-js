@@ -305,12 +305,9 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 		/**
 		 *  Here common last config tools (loginbutton and header)!!!
 		 **/
-//		this.defaultLastTools = [{
-//			actions: ["loginbutton", "toggleheader"]
-//		}];
 		
-		this.defaultLastTools = [{
-			actions: []
+		this.defaultLastTools = [{			
+			actions: ["loginbutton"]
 		}];
 
 		config.tools = this.finalTools(config);
@@ -1003,7 +1000,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 			activeItem: 0
 		});
 
-		var northPanel = this.getNorthPanel();
+		//var northPanel = this.getNorthPanel();
 		var footerPanel = this.getFooterPanel();
 
 		this.portalItems = [{
@@ -1013,7 +1010,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 			items: [
 				this.mapPanelContainer,
 				westPanel,
-				southPanel, northPanel
+				southPanel
 			]
 		}, footerPanel];
 
@@ -1046,39 +1043,20 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 	getNorthPanel: function() {
 		return {
 			region: 'north',
-//			id: 'viewer-header',
-//			cls: 'viewer-header',
+			id: 'viewer-header',
+			cls: 'viewer-header',
 			//collapsible: true,
-//			height: 100,
+			height: 100,
 			layout: 'fit',
-//			html: '<div id="responsive-wrap">' + '<div id="logo" class="span-4">' + '<a href="' + this.adminUrl +
-//				'" title="Inicio" class="logo-chile">' +
-//				'<img src="../theme/app/img/logo.png" alt="sir-admin logo" height="100" />' + '</a>' +
-//				'</div>' +
-//				'<img src="../theme/app/img/back-header.jpg" alt="Header image" class="banner" />' +
-//				'</div><!-- /#responsive-wrap -->'
+			html: '<div id="responsive-wrap">' + '<div id="logo" class="span-4">' + '<a href="' + this.adminUrl +
+				'" title="Inicio" class="logo-chile">' +
+				'<img src="../theme/app/img/logo.png" alt="sir-admin logo" height="100" />' + '</a>' +
+				'</div>' +
+				'<img src="../theme/app/img/back-header.jpg" alt="Header image" class="banner" />' +
+				'</div><!-- /#responsive-wrap -->'
 		};
 	},
 
-//	/**
-//	 * api: method[getFooterPanel]
-//	 * Obtain footer panel of the app. Must be overwritten.
-//	 */
-//	getFooterPanel: function() {
-//		return {
-//			region: 'south',
-//			id: 'viewer-footer',
-//			cls: 'viewer-footer',
-//			height: 60,
-//			layout: 'fit',
-//			html: '<div id="footer">' + '<div class="span-24">' +
-//				'<a href="../../contacto/nuevoContacto" target="_blank" style="text-decoration: none;cursor:pointer;">Contacto</a>' +
-//				' | <a href="../../faq/faqs/cartogr%C3%A1fico" target="_blank" style="text-decoration: none;cursor:pointer;">FAQ</a>' +
-//				'</div>' + '<div class="span-24" style="padding-bottom: 30px">' +
-//				'<p><strong>sir-admin demo viewer</strong></p>' + '</div>' + '</div>'
-//		};
-//	},
-	
 	/**
 	 * api: method[getFooterPanel]
 	 * Obtain footer panel of the app. Must be overwritten.
@@ -1122,31 +1100,31 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 			}
 		}
 
-//		new Ext.Button({
-//			id: 'toggleheader',
-//			iconCls: 'x-tool x-tool-maximize',
-//			tooltip: 'Click para ocultar la cabecera',
-//			listeners: {
-//				click: this._toggleHeader,
-//				scope: this
-//			}
-//		});
+		new Ext.Button({
+			id: 'toggleheader',
+			iconCls: 'x-tool x-tool-maximize',
+			tooltip: 'Click para ocultar la cabecera',
+			listeners: {
+				click: this._toggleHeader,
+				scope: this
+			}
+		});
 
 
 	},
 
-//	_toggleHeader: function(param) {
-//		var header = Ext.getCmp('viewer-header');
-//		var button = Ext.getCmp('toggleheader');
-//
-//		header.toggleCollapse(true);
-//
-//		var iconCls = !header.collapsed ? 'x-tool-restore' : 'x-tool-maximize';
-//		var tooltip = !header.collapsed ? 'Click para mostrar la cabecera' :
-//			'Click para ocultar la cabecera';
-//		button.setTooltip(tooltip);
-//		button.setIconClass('x-tool ' + iconCls);
-//	},
+	_toggleHeader: function(param) {
+		var header = Ext.getCmp('viewer-header');
+		var button = Ext.getCmp('toggleheader');
+
+		header.toggleCollapse(true);
+
+		var iconCls = !header.collapsed ? 'x-tool-restore' : 'x-tool-maximize';
+		var tooltip = !header.collapsed ? 'Click para mostrar la cabecera' :
+			'Click para ocultar la cabecera';
+		button.setTooltip(tooltip);
+		button.setIconClass('x-tool ' + iconCls);
+	},
 
 	downloadFile: function(url, params, sourceForm) {
 		var body = Ext.getBody();
