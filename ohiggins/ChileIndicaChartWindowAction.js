@@ -109,7 +109,7 @@ Viewer.plugins.ChileIndicaChartWindowAction = Ext.extend(gxp.plugins.Tool, {
                     if (ds.isVisible()) {
                         ds.hide();
                     } else {
-                        Viewer.trackUrl('modules/Iniciativas_de_inversion');
+                        //Viewer.trackUrl('modules/Iniciativas_de_inversion');
                         ds.show();
                         //ds.alignTo(app.mapPanelContainer.ownerCt.el,"bl-bl");
                     }

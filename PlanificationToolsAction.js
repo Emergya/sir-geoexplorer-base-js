@@ -76,7 +76,7 @@ gxp.plugins.PlanificationToolsAction = Ext.extend(gxp.plugins.Tool, {
      *  ``Boolean``
      *  Send a call to stats module to track this component.
      */
-    track: true,
+    track: false,
     
     /** private: method[constructor]
      */

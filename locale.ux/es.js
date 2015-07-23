@@ -388,6 +388,7 @@ GeoExt.Lang.add(
         loginErrorText: 'Contrase\u00f1a o nombre de usuario incorrecto.',
         userFieldText: 'Usuario',
         passwordFieldText: 'Contrase\u00f1a',
+        idRegionFieldText: 'ID de regi\u00f3n',
         saveErrorText: 'Error al salvar: ',
         tableText: 'Datos',
         queryText: 'Consultar',
@@ -752,6 +753,7 @@ GeoExt.Lang.add(
         loginErrorText: "Usuario o contrase\u00f1.a inv\u00e1lida",
         userFieldText: "Usuario",
         passwordFieldText: "Contras\u00f1a", 
+        idRegionFieldText: 'ID de regi\u00f3n',
         saveErrorText: "Error al salvar: ",
         loginUserErrorTitleText: 'Error de login',
         loginUserErrorText: '<b>¡Usuario o contraseña incorrectas!</b><br><br>Por favor, inténtelo de nuevo con otros datos de acceso o consulte con el adminsitrador.'

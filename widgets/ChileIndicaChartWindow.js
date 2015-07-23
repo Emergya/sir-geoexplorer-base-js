@@ -85,41 +85,49 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                     .getSelectedFeatures();
 
                 var context = this;
-                this._barStore = new Ext.data.JsonStore({
-                    url: context.baseUrl + '/getMontosGroupBy',
-                	//url: '../../getMontosGroupBy_territorial.json',                	
-                    storeId: 'barStoreId',
-                    root: 'data',
-                    idProperty: 'groupBy',
-                    fields: [{
-                        name: 'groupBy',
-                        type: 'string'
-                    }, {
-                        name: 'monto',
-                        type: 'float'
-                    }, {
-                        name: 'numProyectos',
-                        type: 'int'
-                    }],
-                    autoload: false
+                this._barStore = new Ext.data.Store({
+                    reader : new Ext.data.JsonReader({
+								                        fields: [{
+												        name: 'groupBy',
+												        type: 'string'
+												    }, {
+												        name: 'monto',
+												        type: 'float'
+												    }, {
+												        name: 'numProyectos',
+												        type: 'int'
+												    }],
+												    idProperty: 'groupBy',
+								                    root : 'data'
+								                    }),
+                    proxy : new Ext.data.HttpProxy({
+                        url : this.baseUrl + '/getMontosGroupBy'
+                    }),
+                    remoteSort : true,
+                    autoload : false,
+                    storeId: 'barStoreId'
                 });
-                this._pieStore = new Ext.data.JsonStore({
-                    url : context.baseUrl + '/inversion/getMontosGroupBy',
-                	//url: '../../getMontosGroupBy_sectores.json',                	
-                    storeId : 'pieStoreId',
-                    root : 'data',
-                    idProperty : 'groupBy',
-                    fields : [ {
-                        name : 'groupBy',
-                        type : 'string'
-                    }, {
-                        name : 'monto',
-                        type : 'float'
-                    }, {
-                        name : 'numProyectos',
-                        type : 'int'
-                    } ],
-                    autoload : false
+                this._pieStore = new Ext.data.Store({
+                    reader : new Ext.data.JsonReader({
+								                        fields: [{
+												        name: 'groupBy',
+												        type: 'string'
+												    }, {
+												        name: 'monto',
+												        type: 'float'
+												    }, {
+												        name: 'numProyectos',
+												        type: 'int'
+												    }],
+												    idProperty: 'groupBy',
+								                    root : 'data'
+								                    }),
+                    proxy : new Ext.data.HttpProxy({
+                        url : this.baseUrl + '/getMontosGroupBy'
+                    }),
+                    remoteSort : true,
+                    autoload : false,
+                    storeId: 'pieStoreId'
                 });
 
                 this.map.events.register('preremovelayer', this,
@@ -425,7 +433,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         root : 'data'
                     }),
                     proxy : new Ext.data.HttpProxy({
-                        url : this.baseUrl + '/inversion/getFuentes'
+                        url : this.baseUrl + '/getFuentes'
                     	//url: '../../getFuentes.json' 
                     }),
                     remoteSort : true,
@@ -483,7 +491,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         root : 'data'
                     }),
                     proxy : new Ext.data.HttpProxy({
-                        url : this.baseUrl + '/inversion/getProvisiones'
+                        url : this.baseUrl + '/getProvisiones'
                         //url: "../../getProvisiones.json"
                     }),
                     remoteSort : true,
@@ -509,7 +517,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         root : 'data'
                     }),
                     proxy : new Ext.data.HttpProxy({
-                        url : this.baseUrl + '/inversion/getSectores'
+                        url : this.baseUrl + '/getSectores'
                         //url: "../../getSectores.json"
                     }),
                     remoteSort : true,
