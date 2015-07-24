@@ -57,6 +57,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
             geoButtonText: 'Search geo referenced initiatives',
             // This is used to know which chart is the big one.
             _bigChart : null,
+            _winResultsGrid:null,
 
             constructor: function(config) {
 
@@ -85,41 +86,49 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                     .getSelectedFeatures();
 
                 var context = this;
-                this._barStore = new Ext.data.JsonStore({
-                    url: context.baseUrl + '/getMontosGroupBy',
-                	//url: '../../getMontosGroupBy_territorial.json',                	
-                    storeId: 'barStoreId',
-                    root: 'data',
-                    idProperty: 'groupBy',
-                    fields: [{
-                        name: 'groupBy',
-                        type: 'string'
-                    }, {
-                        name: 'monto',
-                        type: 'float'
-                    }, {
-                        name: 'numProyectos',
-                        type: 'int'
-                    }],
-                    autoload: false
+                this._barStore = new Ext.data.Store({
+                    reader : new Ext.data.JsonReader({
+								                        fields: [{
+												        name: 'groupBy',
+												        type: 'string'
+												    }, {
+												        name: 'monto',
+												        type: 'float'
+												    }, {
+												        name: 'numProyectos',
+												        type: 'int'
+												    }],
+												    idProperty: 'groupBy',
+								                    root : 'data'
+								                    }),
+                    proxy : new Ext.data.HttpProxy({
+                        url : this.baseUrl + '/getMontosGroupBy'
+                    }),
+                    remoteSort : true,
+                    autoload : false,
+                    storeId: 'barStoreId'
                 });
-                this._pieStore = new Ext.data.JsonStore({
-                    url : context.baseUrl + '/inversion/getMontosGroupBy',
-                	//url: '../../getMontosGroupBy_sectores.json',                	
-                    storeId : 'pieStoreId',
-                    root : 'data',
-                    idProperty : 'groupBy',
-                    fields : [ {
-                        name : 'groupBy',
-                        type : 'string'
-                    }, {
-                        name : 'monto',
-                        type : 'float'
-                    }, {
-                        name : 'numProyectos',
-                        type : 'int'
-                    } ],
-                    autoload : false
+                this._pieStore = new Ext.data.Store({
+                    reader : new Ext.data.JsonReader({
+								                        fields: [{
+												        name: 'groupBy',
+												        type: 'string'
+												    }, {
+												        name: 'monto',
+												        type: 'float'
+												    }, {
+												        name: 'numProyectos',
+												        type: 'int'
+												    }],
+												    idProperty: 'groupBy',
+								                    root : 'data'
+								                    }),
+                    proxy : new Ext.data.HttpProxy({
+                        url : this.baseUrl + '/getMontosGroupBy'
+                    }),
+                    remoteSort : true,
+                    autoload : false,
+                    storeId: 'pieStoreId'
                 });
 
                 this.map.events.register('preremovelayer', this,
@@ -199,7 +208,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                     columnWidth : 1,
                     xtype : 'gvisualization',
                     region : "south",
-                    height : 250,
+                    height : 230,
                     id : 'smallChartId',
                     visualizationPkgs : {
                         'corechart' : 'PieChart'
@@ -425,7 +434,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         root : 'data'
                     }),
                     proxy : new Ext.data.HttpProxy({
-                        url : this.baseUrl + '/inversion/getFuentes'
+                        url : this.baseUrl + '/getFuentes'
                     	//url: '../../getFuentes.json' 
                     }),
                     remoteSort : true,
@@ -483,7 +492,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         root : 'data'
                     }),
                     proxy : new Ext.data.HttpProxy({
-                        url : this.baseUrl + '/inversion/getProvisiones'
+                        url : this.baseUrl + '/getProvisiones'
                         //url: "../../getProvisiones.json"
                     }),
                     remoteSort : true,
@@ -509,7 +518,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                         root : 'data'
                     }),
                     proxy : new Ext.data.HttpProxy({
-                        url : this.baseUrl + '/inversion/getSectores'
+                        url : this.baseUrl + '/getSectores'
                         //url: "../../getSectores.json"
                     }),
                     remoteSort : true,
@@ -880,22 +889,35 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                 var num=0;
                 // create store con resultados, si hay error en la peticion ajax lanza el mensaje.
                 var context=this;
+                // close windows if button of view iniciatives is clicked
+                if(context._winResultsGrid!=null){
+                	context._winResultsGrid.close();
+                	context._winResultsGrid=null;
+                	// AL igual hay que borrar capas en mapa
+                } 
                 var storeInv = context._createGridInvStore(num); 
                 storeInv.load({
                 	params : values,
 	               	callback : function(r, options, success) {
 	               			if(!success) context.georeferenceInitiativesFailure();
 	               			else {
+	               				    
+	               				    
 	               					num=r.length;
-		               				var data={'results':r.length,'data':[],'success':true};			               			
+		               				var data={'results':r.length,'data':[],'success':true};
+		               				var dataJson={'results':r.length,'data':[],'success':true};
 			               			//data['data']=new Array();
 				               		for (var i = 0; i < r.length; i++) {
 				                        data.data.push(r[i].data);
-				                    }
+				                        dataJson.data.push(r[i].json);
+				                    }				               						               		
 				               		// show data into grid
 				               		context._showResultsGrid(this);
+				               		Ext.MessageBox.alert("Resultado de la búsqueda",
+				                            "Se han encontrado " + data.results +
+				                            " proyectos georreferenciados");
 				               		// show georeferenciacion
-				               		//context.georeferenceInitiativesSuccess(data);
+				               		context.georeferenceInitiativesSuccess(dataJson);
 				                    
 	               			}	               					               				               			
 	                    }
@@ -903,8 +925,8 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                 );
             },
             georeferenceInitiativesSuccess: function(responseJson) {
-                var button = Ext.getCmp('iniciatiavasGeoId');
-                button.enable();                
+                //var button = Ext.getCmp('iniciatiavasGeoId');
+                //button.enable();                
                 //var jsonData = Ext.encode(Ext.pluck(storeInv.data.items, 'data'));
                 
                 
@@ -915,7 +937,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                // var jsonExample='{"results":8,"data":[{"properties":{"codBip":"30081714","titulo":"Aceramiento de carreteras","etapa":"Ejecución","anyo":"2008"},"type":"Feature","geometry":{"crs":{"type":"name","properties":{"name":"EPSG:4326"}},"type":"Point","coordinates":[-69.60778,-17.852125]}},{"properties":{"codBip":"30110768","titulo":"Aceramiento en Arica","etapa":"Ejecución","anyo":"2011"},"type":"Feature","geometry":{"crs":{"type":"name","properties":{"name":"EPSG:4326"}},"type":"Point","coordinates":[-70.30152,-18.437927]}},{"properties":{"codBip":"30080182","titulo":"Plan de evacuación de lodos","etapa":"Ejecución","anyo":"2011"},"type":"Feature","geometry":{"crs":{"type":"name","properties":{"name":"EPSG:4326"}},"type":"Point","coordinates":[-70.2495,-18.589384]}},{"properties":{"codBip":"20156521","titulo":"Plan contra uracanes","etapa":"Ejecución","anyo":"2010"},"type":"Feature","geometry":{"crs":{"type":"name","properties":{"name":"EPSG:4326"}},"type":"Point","coordinates":[-70.2918,-18.438282]}},{"properties":{"codBip":"30110767","titulo":"Escuela en Paranicota","etapa":"Ejecución","anyo":"2012"},"type":"Feature","geometry":{"crs":{"type":"name","properties":{"name":"EPSG:4326"}},"type":"Point","coordinates":[-70.27955,-18.44835]}},{"properties":{"codBip":"30110765","titulo":"Regadio en rio mares","etapa":"Ejecución","anyo":"2011"},"type":"Feature","geometry":{"crs":{"type":"name","properties":{"name":"EPSG:4326"}},"type":"Point","coordinates":[-70.3125,-18.42229]}},{"properties":{"codBip":"30101968","titulo":"Incentivos contra incendios","etapa":"Ejecución","anyo":"2011"},"type":"Feature","geometry":{"crs":{"type":"name","properties":{"name":"EPSG:4326"}},"type":"Point","coordinates":[-70.28482,-18.500265]}},{"properties":{"codBip":"30098735","titulo":"Plan económico contra PYMES","etapa":"Ejecución","anyo":"2010"},"type":"Feature","geometry":{"crs":{"type":"name","properties":{"name":"EPSG:4326"}},"bbox":[-69.64752216134906,-18.950296602408866,5e-324,5e-324],"type":"LineString","coordinates":[[-69.64752216134906,-18.950296602408866],[-69.64714158856125,-18.950126222826835]]}}],"success":true}';                
                // var responseJson = Ext.util.JSON.decode(jsonExample);
                 
-                
+                console.log(responseJson.data);
                 var investmentLayer = this._getInvestmentLayer();
                 var baseUrl = this.baseUrl;
 
@@ -926,9 +948,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                     features: responseJson.data
                 };
                 
-                Ext.MessageBox.alert("Resultado de la búsqueda",
-                    "Se han encontrado " + responseJson.results +
-                    " proyectos georreferenciados");
+                
                 
                 //this._showResultsGrid(responseJson);
                 var geojsonFormat = new OpenLayers.Format.GeoJSON();
@@ -946,15 +966,18 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
             /* INICIO DE LO NUEVO */
             // Nueva funcionalidad para visualizar las iniciativas en grid
             _showResultsGrid : function(store) {            	
-            	new Ext.Window({
+            	var win=new Ext.Window({
             		title: 'Iniciativas encontradas',
-            		height: 400,
-            		width: 700,
             		layout: 'fit',
+            		 frame: true,   
+ 	                width:900, 
+ 	                height:460,	                	                 	                
             		items: this._createGridInv(store)
-            	}).show();
+            	});
+            	win.show();
+            	this._winResultsGrid=win;
             	// escribe descripción para aplicar filtro
-            	Ext.DomHelper.insertBefore('resultsGeo_panel',{tag:'p',html:'<p>&nbsp; APLICACIÓN DE FILTROS: Se debe situar sobre la columna deseada y activar el menú de la parte derecha de dicha columna </p>'});
+            	Ext.DomHelper.insertBefore('resultsGeo_panel',{tag:'p',html:'<p>&nbsp; APLICACIÓN DE FILTROS: Se debe situar sobre la columna deseada y activar el menú de la parte derecha de dicha columna </p>'});            	
             },
             
             _createFilterGridInv: function() {
@@ -1094,20 +1117,12 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
 	                store: store,    
 	                id:'resultsGeo_panel',
 	                colModel: context._createModelColumns(11), // PONER NUMERO DE COLUMNAS
-	                loadMask: true,	          
+	                loadMask: true,	 
+	                layout: 'fit',
+	                autoScroll: true,
 	                plugins: [context._createFilterGridInv()],
 	                //autoExpandColumn: 'nombreIniciativa',
-	                listeners: {
-	                    render: {
-	                        fn: function(){                    
-	                            store.load({
-	                                params: {
-	                                    start: 0,
-	                                    limit: 50
-	                                }
-	                            });                                        
-	                        }
-	                    },
+	                listeners: {	                    
 	                    viewready:{
 	                        fn: function(){
 	                            // remove options rows sort column
@@ -1128,46 +1143,32 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
 	                    afterrender: {
 	                        fn: function(component){  
 	                                        // remove refresh button
-	                                        component.getBottomToolbar().refresh.hideParent = true;
-	                                        component.getBottomToolbar().refresh.hide(); 
+	                                        //component.getBottomToolbar().refresh.hideParent = true;
+	                                        //component.getBottomToolbar().refresh.hide(); 
 	                        }
 	                    }
 	                },        
-	                tbar: [	                
-	                {
-	                    text: 'Eliminar Filtros',
-	                    handler : function(){
-	                        grid.filters.clearFilters();
-	                    }
-	                }
+	                tbar: [		                       	                       
+			                {
+			                    text: 'Eliminar Filtros',
+			                    handler : function(){
+			                        grid.filters.clearFilters();
+			                    }
+			                }
+	                 
 	                ],
-	                bbar: new Ext.PagingToolbar({
-	                    store: store,
-	                    pageSize: 50,
-	                    displayInfo: true,
-	                    firstText: 'Ir a primera',
-	                    lastText: 'Ir a última',
-	                    nextText: 'Ir a la siguiente',
-	                    prevText: 'Ir a la anterior',
-	                    beforePageText:'Página',
-	                    afterPageText: ' de {0}',
-	                    displayMsg: 'Total: {2} iniciativas',
-	                    emptyMsg: "Sin iniciativas",
-	                    plugins: [context._createFilterGridInv()],
-	                    items: [
-	                            // begin using the right-justified button container
-	                            '->',
-	                            {
-	        	                    text: 'Exportar Excel ',
-	        	                    tooltip: 'Exportar Excel',
-	        	                    handler: function (button, state) {
-	        	                        var res = [];
-	        	                        grid.getStore().each(function(item){ res.push(item.data); });                	                        
-	        	                        context.JSONToCSVConvertor(JSON.stringify(res),"Iniciativas",true);
-	        	                    } 
-	        	                } 
-	                          ]
-	                })
+	                bbar:[	                      
+	                      '->',
+	                      {
+	  	                    text: 'Exportar Excel ',
+	  	                    tooltip: 'Exportar Excel',	  	                    
+	  	                    handler: function (button, state) {
+	  	                        var res = [];
+	  	                        grid.getStore().each(function(item){ res.push(item.data); });                	                        
+	  	                        context.JSONToCSVConvertor(JSON.stringify(res),"Iniciativas",true);
+	  	                    } 
+	  	                   }
+	                      ]
 	                
 	            });
                 return grid;
