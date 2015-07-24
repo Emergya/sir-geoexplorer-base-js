@@ -39,7 +39,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 	 *  ``String`` The name of the public workspace in Geoserver.
 	 *  logged in user.
 	 */
-	publicWorkspace: "gore",
+	publicWorkspace: "subdere",
 
 	/**
 	 * api: config[printingNorthArrowPosition]
