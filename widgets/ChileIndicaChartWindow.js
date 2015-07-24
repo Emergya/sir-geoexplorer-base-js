@@ -57,7 +57,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
             geoButtonText: 'Search geo referenced initiatives',
             // This is used to know which chart is the big one.
             _bigChart : null,
-            _winResultsGrid:null,
+            _winResultsGrid:null,            
 
             constructor: function(config) {
 
@@ -871,7 +871,14 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                     chart.datachanged, chart);
             },
 
-            georeferenceInitiatives: function() {
+            georeferenceInitiatives: function() {            	
+            	Ext.MessageBox.show({
+                    title: 'Consultando datos',
+                    msg: 'Consultando datos. Espere, por favor...',
+                    width:300,
+                    wait:true,                    
+                    animEl: 'mb7'
+                });
                 var values = Ext.getCmp('inversion-form-region')
                     .getForm().getValues();
                 var button = Ext.getCmp('iniciatiavasGeoId');
@@ -899,6 +906,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
                 storeInv.load({
                 	params : values,
 	               	callback : function(r, options, success) {
+	               		    Ext.MessageBox.hide();
 	               			if(!success) context.georeferenceInitiativesFailure();
 	               			else {
 	               				    
@@ -965,6 +973,7 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
             },
             /* INICIO DE LO NUEVO */
             // Nueva funcionalidad para visualizar las iniciativas en grid
+            
             _showResultsGrid : function(store) {            	
             	var win=new Ext.Window({
             		title: 'Iniciativas encontradas',
