@@ -915,10 +915,19 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
 		               				var data={'results':r.length,'data':[],'success':true};
 		               				var dataJson={'results':r.length,'data':[],'success':true};
 			               			//data['data']=new Array();
+		               				//console.log("Total store");
+		               				//console.log(r);
 				               		for (var i = 0; i < r.length; i++) {
-				                        data.data.push(r[i].data);
+				               			r[i].data.x=r[i].json.geometry.coordinates[0];
+				               			r[i].data.y=r[i].json.geometry.coordinates[1];	
+				                        data.data.push(r[i].data); // lleva datos de iniciativas y datos gis en x e y				                        
 				                        dataJson.data.push(r[i].json);
-				                    }				               						               		
+				                        //console.log("json coordenadas del store");
+				                        //console.log(r[i].json.geometry.coordinates);				                        
+				                        //data.data.push(r[i].json)
+				                    }				           
+				               		//console.log("Total data grid");
+				               		//console.log(data);
 				               		// show data into grid
 				               		context._showResultsGrid(this);
 				               		Ext.MessageBox.alert("Resultado de la búsqueda",
@@ -1155,6 +1164,27 @@ Viewer.dialog.ChileIndicaChartWindow = Ext
 	                                        //component.getBottomToolbar().refresh.hideParent = true;
 	                                        //component.getBottomToolbar().refresh.hide(); 
 	                        }
+	                    },
+	                    cellclick: { 
+	                    	fn:function(grid, rowIndex, columnIndex, e) {
+	                    	
+	                    	var record = grid.getStore().getAt(rowIndex);
+	                    	var x=record.data.x;
+	                    	var y=record.data.y;
+	                    	console.log(x);
+	                    	console.log(y);
+	                    	var point = new OpenLayers.LonLat(x, y);	                    	
+	                    	point.transform(new OpenLayers.Projection("EPSG:4326"), context.map.getProjectionObject());
+	                    	context.map.setCenter(point,18);
+	                    	//context.map.zoom=60;
+	                    	
+	        		        //var zRec = iView.getRecord(iRowEl);
+                    		//console.log(record.get("x"));
+                    		//console.log(record.get("y"));
+                    		
+	        		        //console.log(zRec.data.name);
+	        		        
+	        		       }
 	                    }
 	                },        
 	                tbar: [		                       	                       
