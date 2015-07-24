@@ -16,10 +16,8 @@ Viewer.plugins.ChileIndicaFichaInversion = Ext.extend(GeoExt.Popup, {
 	location: null,
 	baseUrl: null,
 	closeAction: 'close',
-	feature: null,
-	iniItem: null,
-	item1: null,
-	item2: null,
+	feature: null,	
+	item1: null,	
 	item3: null,
 	window: null,
 
@@ -29,14 +27,14 @@ Viewer.plugins.ChileIndicaFichaInversion = Ext.extend(GeoExt.Popup, {
 	imprimirFicha: function() {
 		var url = this.baseUrl + "/fichaImprimir";
 		var params = Ext.urlEncode({
-			codBip: this.feature.attributes.codBip,
-			etapa: this.feature.attributes.etapa,			
-			anyo: this.feature.attributes.anyo
+			idInv: this.feature.attributes.id
 		});
 		url = Ext.urlAppend(url, params);
-		window.open(url, "Ficha_" + this.feature.attributes.codBip);
+		window.open(url, "Ficha_" + this.feature.attributes.id);
 	},
 
+	
+	
 	/** private: method[constructor]
 	 */
 	constructor: function(config) {
@@ -50,21 +48,15 @@ Viewer.plugins.ChileIndicaFichaInversion = Ext.extend(GeoExt.Popup, {
 	 */
 	initComponent: function() {
 
-		this.iniItem = new Ext.Panel({
-			cls: 'item postini'
-		});
+		
 
 		this.item1 = new Ext.Panel({
-			title: 'Detalles',
+			title: 'Postulación iniciativa',
 			autoScroll: true,
 			cls: 'item details'
 		});
 
-		this.item2 = new Ext.Panel({
-			title: 'Aprobación de Recursos Financieros',
-			autoScroll: true,
-			cls: 'item labelsInFinancingSources'
-		});
+		
 
 		this.item3 = new Ext.Panel({
 			title: 'Proceso Ejecución Inversión',
@@ -78,10 +70,10 @@ Viewer.plugins.ChileIndicaFichaInversion = Ext.extend(GeoExt.Popup, {
 			split: true,
 			height: 250,
 			layout: 'accordion',
-			items: [this.item1, this.item2, this.item3]
+			items: [this.item1, this.item3]
 		});
 
-		this.items = [this.iniItem, accordion];
+		this.items = [accordion];
 
 
 		Viewer.plugins.ChileIndicaFichaInversion.superclass.initComponent.call(this);
@@ -95,18 +87,14 @@ Viewer.plugins.ChileIndicaFichaInversion = Ext.extend(GeoExt.Popup, {
 	createPopup: function() {
 
 		// Parametros del punto
-		var codBip = this.feature.attributes.codBip;
-		var etapa = this.feature.attributes.etapa;		
-		var anyo = this.feature.attributes.anyo;
-
+		var idInv = this.feature.attributes.id;
+		
 		Ext.Msg.wait(this.waitText, this.title);
 
 		Ext.Ajax.request({
 			url: this.baseUrl + "/fichaPopup",
 			params: {
-				codBip: codBip,
-				etapa: etapa,				
-				anyo: anyo
+				idInv: idInv
 			},
 			scope: this,
 			success: function(response) {
@@ -118,20 +106,16 @@ Viewer.plugins.ChileIndicaFichaInversion = Ext.extend(GeoExt.Popup, {
 				var html = Ext.DomHelper.createDom({
 					html: info
 				});
-				var bloqueIni = Ext.DomQuery.selectNode("div[id=headerPopup]", html);
-				if (bloqueIni) {
-					this.iniItem.html = bloqueIni.innerHTML;
-				}
+				
 
 				var bloque1 = Ext.DomQuery.selectNode("div[id=details]", html);
 				if (bloque1) {
 					this.item1.html = bloque1.innerHTML;
 				}
 
-				var bloque2 = Ext.DomQuery.selectNode("div[id=financingSources]", html);
-				if (bloque2) {
-					this.item2.html = bloque2.innerHTML;
-				}
+				
+					
+				
 
 				var bloque3 = Ext.DomQuery.selectNode("div[id=executionProcess]", html);
 				if (bloque3) {
