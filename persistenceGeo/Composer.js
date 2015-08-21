@@ -306,9 +306,11 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 		 *  Here common last config tools (loginbutton and header)!!!
 		 **/
 		
-		this.defaultLastTools = [{			
-			actions: ["loginbutton"]
-		}];
+		this.defaultLastTools = [
+		  /*{			
+		  actions: ["loginbutton"]
+		  }*/
+		];
 
 		config.tools = this.finalTools(config);
 
@@ -330,7 +332,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 			saveErrorText: this.saveErrorText,
 			id: "loginDialog"
 		});
-
+		
 		PersistenceGeo.Composer.superclass.constructor.apply(this, arguments);
 	},
 
@@ -1083,6 +1085,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 	createTools: function() {
 		PersistenceGeo.Composer.superclass.createTools.apply(this, arguments);
 
+		/*
 		new Ext.Button({
 			id: 'loginbutton'
 		});
@@ -1099,7 +1102,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 				this.showLogout(user);
 			}
 		}
-
+		 */
 		new Ext.Button({
 			id: 'toggleheader',
 			iconCls: 'x-tool x-tool-maximize',
