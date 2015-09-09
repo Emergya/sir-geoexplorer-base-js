@@ -119,7 +119,9 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 		// Here we reset the form.
 		this._setFormValue("pageSize", "letter");
 		this._setFormValue("resolution", 75);
+		/*
 		this._setFormValue("grid", false);
+		*/
 		this._setFormValue("legend", true);
 
 		//this._setFormValue("logo", null);
@@ -279,7 +281,9 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 						width: 100
 					}
 				]
-			}, {
+			}, 
+			/*
+			{
 				flex: 0,
 				items: [{
 						xtype: "checkbox",
@@ -298,7 +302,9 @@ Viewer.dialog.PDFPrintWindow = Ext.extend(Ext.Window, {
 						}
 					}
 				]
-			}, {
+			},
+			*/
+			{
 				flex: 0,
 				items: [{
 						xtype: "checkbox",
