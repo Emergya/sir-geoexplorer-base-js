@@ -1231,7 +1231,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 
 	getAditionalControls: function() {
 		return [
-			new OpenLayers.Control.CustomOverviewMap({
+			/*new OpenLayers.Control.CustomOverviewMap({
 				viewFixed: true,
 				fixedZoomLevel: 2,
 				layers: [new OpenLayers.Layer.WMS(
@@ -1241,7 +1241,7 @@ PersistenceGeo.Composer = Ext.extend(GeoExplorer, {
 						//layers: "basic"
 						layers: "osm_auto:all"
 					})]
-			}),
+			}),*/
 			new OpenLayers.Control.CustomMousePosition({
 				emptyString: '',
 				displayProjection: Viewer.GEO_PROJECTION,

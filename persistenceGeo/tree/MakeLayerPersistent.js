@@ -77,11 +77,26 @@ PersistenceGeo.tree.MakeLayerPersistent = Ext.extend(gxp.plugins.Tool, {
     },
 
     _enableOrDisable: function(record) {
-        this.selectedLayer = record;
+    	
+    	this.selectedLayer = record;
         var persistibleLayer = false;
-        if (record && record.getLayer) {
-            var layer = record.getLayer();
-            persistibleLayer = typeof(layer.layerID) == "undefined" && layer.metadata.removable && !layer.metadata.labelLayer;
+        
+        var externalLayer = false; 	
+    	
+        ///////////////////////////////////////////////////////////////////////////////////
+        
+        if(this.selectedLayer && this.selectedLayer.data 
+   			 && this.selectedLayer.data.layer && (this.selectedLayer.data.layer.source || 
+        		(this.selectedLayer.data.layer.protocol && this.selectedLayer.data.layer.protocol.CLASS_NAME 
+        				&& this.selectedLayer.data.layer.protocol.CLASS_NAME.match("OpenLayers.Protocol.WFS") 
+        					&& this.selectedLayer.data.layer.protocol.CLASS_NAME.match("OpenLayers.Protocol.WFS").length == 1))){
+        	externalLayer = true;
+        }
+        ///////////////////////////////////////////////////////////////////////////////////
+        
+        if (record && record.getLayer) { 
+            var layer = record.getLayer();           
+            persistibleLayer = typeof(layer.layerID) == "undefined" && layer.metadata.removable && !layer.metadata.labelLayer && !externalLayer;            
         }
 
         var userInfo = app.persistenceGeoContext.userInfo;
