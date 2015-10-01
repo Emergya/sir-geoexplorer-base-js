@@ -172,9 +172,11 @@ Viewer.dialog.CreateBuffer = Ext.extend(Ext.Window, {
             map.addLayer(layer);
 
             var self = this;
+            /*
             setTimeout(function() {
                 self._addFeaturesToLayer(layer);
             }, 1000);
+            */
 
         } else if (resp && resp.success && resp.data && resp.data.status === "error") {
             Ext.Msg.alert(this.titleText, resp.data.message);
