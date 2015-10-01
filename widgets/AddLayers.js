@@ -326,15 +326,15 @@ Ext.namespace("Viewer.plugins");
             if (!this.uploadShpWindow) {
                 this.uploadShpWindow = new Viewer.plugins.ShpWizard();
                 this.uploadShpWindow.on({
-                    'close': {
+                    'close': {                    	
                         fn: function() {
                             this.uploadShpWindow = null;
                         },
                         scope: this
-                    },
+                    }/*,
                     "hide": function() {
                         menuButton.toggle(false);
-                    }
+                    }*/
                 });
 
             }
@@ -353,10 +353,10 @@ Ext.namespace("Viewer.plugins");
                             this.uploadXlsWindow = null;
                         },
                         scope: this
-                    },
+                    }/*,
                     "hide": function() {
                         menuButton.toggle(false);
-                    },
+                    }*/
                 });
 
             }
@@ -376,10 +376,10 @@ Ext.namespace("Viewer.plugins");
                             this.uploadKmlImporterWindow = null;
                         },
                         scope: this
-                    },
+                    }/*,
                     "hide": function() {
                         menuButton.toggle(false);
-                    }
+                    }*/
                 });
 
             }
@@ -425,10 +425,10 @@ Ext.namespace("Viewer.plugins");
                             this.uploadRasterWindow = null;
                         },
                         scope: this
-                    },
+                    }/*,
                     "hide": function() {
                         menuButton.toggle(false);
-                    }
+                    }*/
                 });
 
             }
